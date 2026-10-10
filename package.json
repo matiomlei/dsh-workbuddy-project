@@ -1,0 +1,71 @@
+{
+  "name": "dsh-workbuddy-project",
+  "version": "0.3.0",
+  "description": "Configure DSH projects with experts, skills, rules, connectors, and optional shared capability libraries.",
+  "type": "module",
+  "main": "lib/index.js",
+  "exports": {
+    ".": "./lib/index.js",
+    "./client": "./lib/client.js",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "lib",
+    "docs",
+    "examples",
+    "README.md",
+    "LICENSE",
+    "CHANGELOG.md"
+  ],
+  "engines": {
+    "node": ">=22"
+  },
+  "license": "MIT",
+  "dsh": {
+    "client": {
+      "platform": "web"
+    }
+  },
+  "peerDependencies": {
+    "@deepseek-ai/cordis": "~4.0.4",
+    "@deepseek-ai/dsh-tools": "~0.2.0-rc.2",
+    "@deepseek-ai/dsh-mcp-client": "~0.2.0-rc.2",
+    "@deepseek-ai/dsh-subprocess": "~0.2.0-rc.2",
+    "@deepseek-ai/schemastery": "~3.18.4",
+    "@modelcontextprotocol/client": "^2.0.0",
+    "@deepseek-ai/dsh-app-boot": "~0.2.0-rc.2"
+  },
+  "scripts": {
+    "test": "node test/packages.mjs && node test/library-sync.mjs",
+    "test:host": "node test/packages-host.mjs",
+    "test:ui": "node test/packages-ui.cjs",
+    "check:package": "node scripts/check-package.mjs"
+  },
+  "dependencies": {
+    "yaml": "2.9.1"
+  },
+  "keywords": [
+    "dsh-plugin",
+    "deepseek-harness",
+    "projects",
+    "workbuddy",
+    "skills",
+    "mcp"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/matiomlei/dsh-workbuddy-project.git"
+  },
+  "homepage": "https://github.com/matiomlei/dsh-workbuddy-project#readme",
+  "bugs": {
+    "url": "https://github.com/matiomlei/dsh-workbuddy-project/issues"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "devDependencies": {
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
+    "jsdom": "^26.1.0"
+  }
+}

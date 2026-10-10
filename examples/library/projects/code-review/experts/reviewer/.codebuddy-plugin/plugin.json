@@ -1,0 +1,9 @@
+{
+  "name": "reviewer",
+  "version": "1.0.0",
+  "displayName": "代码评审专家",
+  "description": "检查代码正确性、兼容性与重要边界条件",
+  "agentName": "reviewer",
+  "agents": ["./agents/reviewer.md"],
+  "icon": "🔎"
+}

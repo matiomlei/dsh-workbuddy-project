@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "id": "research",
+  "name": "资料研究",
+  "description": "整理提供的资料，建立证据与结论的对应关系",
+  "instructions": "围绕研究问题整理用户提供的资料。每个关键结论标明来源，分清事实、推断和信息缺口。需要联网时，先确认当前会话有可用检索工具。",
+  "experts": ["project:experts/researcher"],
+  "skills": [],
+  "rules": [],
+  "connectors": []
+}

@@ -1,0 +1,9 @@
+{
+  "name": "researcher",
+  "version": "1.0.0",
+  "displayName": "资料研究专家",
+  "description": "将资料、证据、结论和不确定性组织成清晰报告",
+  "agentName": "researcher",
+  "agents": ["./agents/researcher.md"],
+  "icon": "📚"
+}

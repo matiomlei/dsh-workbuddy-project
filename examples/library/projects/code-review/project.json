@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "id": "code-review",
+  "name": "代码评审",
+  "description": "基于实际代码与验证结果给出可执行的评审意见",
+  "instructions": "先阅读项目约定与相关代码，再检查行为变化。结论引用文件和行号，区分已验证问题与待确认假设。",
+  "experts": ["project:experts/reviewer"],
+  "skills": [],
+  "rules": [],
+  "connectors": []
+}
