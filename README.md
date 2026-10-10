@@ -4,7 +4,7 @@
 
 Configure DeepSeek Harness projects with experts, skills, rules, connectors, reusable templates, and optional shared capability libraries.
 
-包名与仓库名：`dsh-workbuddy-project`。当前版本为发布准备版，尚未发布到 npm 或提交市场收录。
+包名与仓库名：`dsh-workbuddy-project`。正式版本：`0.3.0`。市场目录收录与 npm 发布状态分别说明，目录审核不会影响从 GitHub 制品安装。
 
 ## 功能
 
@@ -25,11 +25,17 @@ Configure DeepSeek Harness projects with experts, skills, rules, connectors, reu
 
 ## 安装
 
-目前可先打包并从本地制品安装：
+从正式 GitHub Release 的制品安装：
+
+```sh
+dsh plugin --profile web add -w https://github.com/matiomlei/dsh-workbuddy-project/releases/download/v0.3.0/dsh-workbuddy-project-0.3.0.tgz
+```
+
+也可打包并从本地制品安装：
 
 ```sh
 npm pack
-dsh plugin --profile web add /absolute/path/dsh-workbuddy-project-0.3.0.tgz
+dsh plugin --profile web add -w /absolute/path/dsh-workbuddy-project-0.3.0.tgz
 ```
 
 如果以 npx 运行 DSH，命令前缀可换为 `npx --no-install @deepseek-ai/dsh`。安装后重启目标 DSH profile 并刷新界面。
@@ -37,10 +43,14 @@ dsh plugin --profile web add /absolute/path/dsh-workbuddy-project-0.3.0.tgz
 也可从[项目仓库](https://github.com/matiomlei/dsh-workbuddy-project)安装：
 
 ```sh
-dsh plugin --profile web add github:matiomlei/dsh-workbuddy-project
+dsh plugin --profile web add -w github:matiomlei/dsh-workbuddy-project#v0.3.0
 ```
 
-当前代码已上传 GitHub，尚未发布 npm 包。npm 发布成功后才可使用 `dsh plugin --profile web add dsh-workbuddy-project`。
+从 npm 安装指定正式版本：
+
+```sh
+dsh plugin --profile web add -w dsh-workbuddy-project@0.3.0
+```
 
 ## 第一次使用
 
@@ -88,4 +98,4 @@ npm run check:package
 
 宿主测试通过 `WB_DSH_NODE_MODULES` 指定已安装 DSH 的 `node_modules`；默认查找 `~/.dsh/profiles/node_modules`。UI 测试使用开发依赖，也可通过 `WB_UI_PACKAGE_JSON` 指向已有 React/jsdom 环境。
 
-发布准备项和待补材料见[发布清单](docs/releasing.md)。
+发布流程与市场收录要求见[发布清单](docs/releasing.md)。
