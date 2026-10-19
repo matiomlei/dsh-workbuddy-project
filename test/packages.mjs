@@ -34,6 +34,17 @@ try {
  assert.equal(catalog.length,5)
  const expert=catalog.find(x=>x.kind==='expert');assert.equal(expert.displayName,'软件公司');assert.equal(expert.expertType,'team');assert.match(expert.iconUrl,/data:image\/svg\+xml/)
  assert.equal(scanPackages(join(library,'skills'),'skill','team').length,1)
+ // Existing expert avatars above the upload limit must still render.
+ const png=Buffer.concat([Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+j6XkAAAAASUVORK5CYII=','base64'),Buffer.alloc(320*1024)])
+ put(join(library,'experts/company/avatars/large.png'),png)
+ const avatarManifest=join(library,'experts/company/.codebuddy-plugin/plugin.json'),avatarMetadata=JSON.parse(readFileSync(avatarManifest))
+ json(avatarManifest,{...avatarMetadata,avatar:'avatars/large.png'})
+ const largeAvatar=describeOption({path:join(library,'experts/company'),name:'company'},'expert')
+ assert.match(largeAvatar.iconUrl,/^data:image\/png;base64,/);assert.deepEqual(Buffer.from(largeAvatar.iconUrl.split(',')[1],'base64'),png)
+ put(join(library,'experts/company/avatars/too-large.png'),Buffer.alloc(2*1024*1024+1))
+ json(avatarManifest,{...avatarMetadata,avatar:'avatars/too-large.png'})
+ assert.equal(describeOption({path:join(library,'experts/company'),name:'company'},'expert').iconUrl,undefined)
+ json(avatarManifest,avatarMetadata)
  const options={expertsRoot:join(home,'experts'),libraries:[{name:'team',path:library}],cacheRoot,lockPath}
  const input={id:'demo',name:'示例',instructions:'./instructions.md\n  literal text',experts:['team:experts/company'],skills:['team:skills/@owner/review'],rules:['team:rules/style'],connectors:['team:connectors/search','team:connectors/cli']}
  const project=normalizeProject(input,cwd,'test',options)
