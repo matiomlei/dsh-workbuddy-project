@@ -1838,6 +1838,12 @@
           true,
         );
       }
+      function runQualityBadge(run) {
+        return run.qualityStatus === "passed" &&
+          run.qualityUnconfiguredNodes.length
+          ? el("span", { class: "badge good" }, "已配置项通过")
+          : badge(run.qualityStatus);
+      }
       function runTable(runs) {
         return el(
           "table",
@@ -1873,7 +1879,7 @@
                   el("div", { class: "muted mono" }, r.requestId.slice(0, 8)),
                 ),
                 el("td", {}, badge(r.status)),
-                el("td", {}, badge(r.qualityStatus)),
+                el("td", {}, runQualityBadge(r)),
                 el("td", { class: "muted" }, time(r.startedAt)),
               ),
             ),
