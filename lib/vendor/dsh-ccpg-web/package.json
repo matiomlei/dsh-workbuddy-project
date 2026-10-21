@@ -1,0 +1,38 @@
+{
+  "name": "dsh-ccpg-web",
+  "version": "0.12.0",
+  "private": false,
+  "type": "module",
+  "main": "lib/index.js",
+  "description": "Workflow One 编排画布：静态托管 /wf1/",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/chumingjun/dsh-harness-one.git",
+    "directory": "dsh-plugins/dsh-ccpg-web"
+  },
+  "engines": {
+    "node": ">=22.15.0"
+  },
+  "scripts": {
+    "prepack": "sh ../build-web.sh"
+  },
+  "peerDependencies": {
+    "@deepseek-ai/schemastery": "*"
+  },
+  "peerDependenciesMeta": {
+    "@deepseek-ai/schemastery": {
+      "optional": true
+    }
+  },
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    }
+  },
+  "files": [
+    "lib",
+    "web-dist",
+    "cordis.patch.yml"
+  ]
+}

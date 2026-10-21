@@ -1,0 +1,17 @@
+{
+  "scope": "immutable workflow projections, business execution and completion adapter",
+  "hashes": {
+    "lib/index.js": {
+      "original": "6f7aae750285a7fb02463ddaf9d4ba6153557f8d297d9541bfaba9aa96f57c03",
+      "adapted": "662c0fa9993268335cb8b76f4060f07a97dae098bd96eb5840d8a9aabd45e6de"
+    },
+    "lib/sqlite-store.js": {
+      "original": "3471d185662e4c9d84e9b3ecd9788d79601908a51efd993e7219cf4586db9e3a",
+      "adapted": "89a79ae30659176ad0378e5aef05c03e6c1ef6056249ccda96f4a09306ba49c4"
+    },
+    "lib/engine.js": {
+      "original": "a428c533cdeaa9a6cb2a38d2f82dacf58ea36288aaa6d910091d56df485a307e",
+      "adapted": "b63d0fe78fadda092b08719e7149ddcc9a474f5dcec10b2083940f7e8ed9aecf"
+    }
+  }
+}
