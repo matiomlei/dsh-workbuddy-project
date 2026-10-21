@@ -4,7 +4,7 @@
 
 Configure DeepSeek Harness projects with experts, skills, rules, connectors, reusable templates, and optional shared capability libraries.
 
-包名与仓库名：`dsh-workbuddy-project`。正式版本：`0.3.0`。市场目录收录与 npm 发布状态分别说明，目录审核不会影响从 GitHub 制品安装。
+包名与仓库名：`dsh-workbuddy-project`。正式版本：`0.3.1`。市场目录收录与 npm 发布状态分别说明，目录审核不会影响从 GitHub 制品安装。
 
 ## 功能
 
@@ -20,22 +20,26 @@ Configure DeepSeek Harness projects with experts, skills, rules, connectors, reu
 ## 运行要求
 
 - Node.js >= 22。
-- 兼容当前 `package.json` peer 范围的 DSH；本轮验证使用 DSH `0.2.0-rc.2`。
+- 兼容当前 `package.json` peer 范围的 DSH；本轮验证使用 DSH `0.2.1-rc.2`。
 - Web 界面提供「项目」「能力库」两个设置入口；命令和模型管理工具也支持无界面宿主。
+
+内网部署与自定义插件市场见 [内网发布指南](docs/intranet-market.md)。
 
 ## 安装
 
-从正式 GitHub Release 的制品安装：
+以下远程命令需对应版本已发布；本次本地适配不会自动发布 npm 或 GitHub Release。可优先使用本地制品或内网仓库。
+
+从 GitHub Release 的制品安装：
 
 ```sh
-dsh plugin --profile web add -w https://github.com/matiomlei/dsh-workbuddy-project/releases/download/v0.3.0/dsh-workbuddy-project-0.3.0.tgz
+dsh plugin --profile web add -w https://github.com/matiomlei/dsh-workbuddy-project/releases/download/v0.3.1/dsh-workbuddy-project-0.3.1.tgz
 ```
 
 也可打包并从本地制品安装：
 
 ```sh
 npm pack
-dsh plugin --profile web add -w /absolute/path/dsh-workbuddy-project-0.3.0.tgz
+dsh plugin --profile web add -w /absolute/path/dsh-workbuddy-project-0.3.1.tgz
 ```
 
 如果以 npx 运行 DSH，命令前缀可换为 `npx --no-install @deepseek-ai/dsh`。安装后重启目标 DSH profile 并刷新界面。
@@ -43,13 +47,13 @@ dsh plugin --profile web add -w /absolute/path/dsh-workbuddy-project-0.3.0.tgz
 也可从[项目仓库](https://github.com/matiomlei/dsh-workbuddy-project)安装：
 
 ```sh
-dsh plugin --profile web add -w github:matiomlei/dsh-workbuddy-project#v0.3.0
+dsh plugin --profile web add -w github:matiomlei/dsh-workbuddy-project#v0.3.1
 ```
 
 从 npm 安装指定正式版本：
 
 ```sh
-dsh plugin --profile web add -w dsh-workbuddy-project@0.3.0
+dsh plugin --profile web add -w dsh-workbuddy-project@0.3.1
 ```
 
 ## 第一次使用
@@ -92,6 +96,7 @@ dsh plugin --profile web add -w dsh-workbuddy-project@0.3.0
 npm install
 npm test
 npm run test:host
+npm run test:preset
 npm run test:ui
 npm run check:package
 ```

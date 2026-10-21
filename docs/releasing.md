@@ -2,13 +2,13 @@
 
 本仓库是独立发布包 `dsh-workbuddy-project`，运行时版本由 `package.json` 决定。npm 发布、GitHub Release 和插件市场收录是独立步骤；市场收录需要维护者审核。
 
-## 0.3.0 验证
+## 0.3.1 验证（DSH 0.2.1-rc.2）
 
-- 单元、库同步、宿主和 UI 测试通过。
+- 单元、库同步、宿主和 UI 测试通过；真实基础服务下的项目 preset 创建、激活、更新和移除验证通过。
+- 格式 1 索引生成结果通过同版本 DSH 的官方 parseMarketIndex 校验器。
 - npm 包检查通过，制品包含运行入口、DSH bundle patch、文档和示例，不包含用户数据、凭据、依赖目录或开发测试。
-- 在独立临时 `DSH_HOME` 中从 tgz 安装成功，配置组合器发现插件，Web 宿主启动成功。
-- 通过真实宿主的已认证 API 创建仅含指令的项目，确认默认数据根目录与 preset 校验。
-- 代码评审、资料研究模板均完成专家复制、依赖解析、保存编译及完整宿主 preset 校验。
+- 在独立临时 `DSH_HOME` 中从 0.3.1 tgz 安装成功，Web profile 配置组合器发现插件。
+- 宿主测试完成 HTTP/stdio tools/call、连接错误分类、模板复制与编译、能力编辑和 Git 同步。
 
 自动化验收不包含真实模型对话、OAuth 连接器登录或所有设备的视觉检查。当前连接器与协作边界见 README。
 
@@ -17,6 +17,7 @@
 ```sh
 npm test
 npm run test:host
+npm run test:preset
 npm run test:ui
 npm run check:package
 npm pack
@@ -25,18 +26,14 @@ npm pack
 宿主测试使用 `WB_DSH_NODE_MODULES` 指向已安装 DSH 的 `node_modules`，UI 测试可使用 `WB_UI_PACKAGE_JSON` 指向已有 React/jsdom 环境。正式包应在干净 profile 中实际安装：
 
 ```sh
-DSH_HOME=/absolute/path/to/test-home dsh plugin --profile web add -w /absolute/path/dsh-workbuddy-project-0.3.0.tgz
+DSH_HOME=/absolute/path/to/test-home dsh plugin --profile web add -w /absolute/path/dsh-workbuddy-project-0.3.1.tgz
 ```
 
-确认版本、发布说明与检查结果后，提交代码并推送 `v0.3.0` 标签，发布同一 tgz 到 npm 和 GitHub Release。发布后核验 npm 的版本、完整性摘要、GitHub 标签和 Release 附件。后续修复使用新版本，勿替换已发布制品。
+确认版本、发布说明与检查结果后，提交代码并推送 `v0.3.1` 标签，发布同一 tgz 到 npm 和 GitHub Release。发布后核验 npm 的版本、完整性摘要、GitHub 标签和 Release 附件。后续修复使用新版本，勿替换已发布制品。
 
-## 市场收录
+## 自定义插件市场
 
-收录目标为 [awesome-dsh-plugin](https://github.com/awesome-dsh-plugin/awesome-dsh-plugin)，市场客户端从该目录读取条目。按其 [贡献指南](https://github.com/awesome-dsh-plugin/awesome-dsh-plugin/blob/main/CONTRIBUTING.md) 添加单个文件 `data/plugins/matiomlei__dsh-workbuddy-project.yml`，分类使用 `tools`。
-
-仓库声明 `dsh.bundle` 并包含真实代码，已添加 `dsh-plugin` topic。仓库于 2026-10-10 01:35:34 UTC 创建，需到 2026-10-11 01:35:34 UTC（北京时间 09:35:34）才满足创建满 1 天的 CI 门槛。提前提交的草稿 PR 需在到期后重新运行检查，再申请维护者审核；npm 与 GitHub 发布不受该门槛影响。
-
-截图是市场可选材料。后续可在本仓库 `screenshots.json` 中声明 1–8 张真实截图，市场会随构建更新，无需修改目录 README。
+DSH 0.2.1-rc.2 的发现页读取用户配置的格式 1 JSON 索引。内网 Git 部署、索引生成、Raw URL、依赖和升级步骤见 [内网发布指南](intranet-market.md)。新版自定义市场没有默认官方索引；第三方目录收录和 npm/Git 发布互相独立。
 
 ## 独立开发
 

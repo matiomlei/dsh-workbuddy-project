@@ -125,3 +125,7 @@ WB_UI_PACKAGE_JSON=/path/to/react-jsdom/package.json npm run test:ui
 ```
 
 单元测试覆盖包扫描、专家入口、资源完整性、JSON 声明、版本固定、升级、Git 同步和路径边界；宿主测试通过真实 DSH 启动、HTTP/stdio MCP 调用、模板完整复制、能力编辑验证和 Git 分支提交推送验证；页面测试覆盖选择、模板填充、版本升级和包内文件编辑。
+
+## DSH 0.2.1-rc.2 兼容性
+
+插件 0.3.1 使用新版 preset 检查接口，移除对 livePresetMounts 的依赖。Host 连接器继续读取已解析配置；声明式 preset 中可发现已激活模块的普通静态配置。包含 `!!js` 的 preset 子配置不在宿主外执行，因此不自动列为可复用本地连接器或技能目录；可改为本插件的连接器／技能能力包后引用。内网安装和市场索引配置参见发布目录的 `docs/intranet-market.md`。

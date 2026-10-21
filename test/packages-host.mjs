@@ -99,6 +99,19 @@ try {
  const {localRuntimeEntries}=await load('lib/local-runtime.js')
  const wrappedRuntime={root:{get:()=>({entries:()=>[{options:{name:'/tmp/fixture/.dsh/profiles/web/plugins/dsh-workbuddy-project-packages-abc/lib/connector-client.js'},id:'search',fiber:{config:{serverName:'search',transport:'streamable-http',url:'https://example.test/mcp',headers:{Authorization:'fixture-secret'}}}}]})}}
  assert.equal(localRuntimeEntries(wrappedRuntime)[0].module,'@deepseek-ai/dsh-mcp-client','wrapper configurations remain discoverable as DSH local connectors')
+ // DSH 0.2.1 exposes detached module inspections, not livePresetMounts/Loader trees.
+ const nativeModule='@deepseek-ai/dsh-mcp-client', nativeConfig={serverName:'native',transport:'streamable-http',url:'https://example.test/mcp'}
+ const expression={ [Symbol('expression')]:'process.env.SECRET' }
+ const presetRows=[{options:{name:'@deepseek-ai/dsh-agent-preset'},id:'preset-fixture',fiber:{config:{id:'fixture',plugins:[
+   {id:'native',name:nativeModule,config:nativeConfig},
+   {id:'disabled',name:nativeModule,disabled:true,config:nativeConfig},
+   {id:'dynamic',name:nativeModule,config:{...nativeConfig,url:expression}},
+   {id:'serialized-expression',name:nativeModule,config:{...nativeConfig,url:{__jsExpr:'process.env.SECRET'}}},
+   {id:'group',name:'cordis:group',group:true,config:[{id:'nested',name:nativeModule,config:nativeConfig}]},
+ ]}}}]
+ const presetRuntime={root:{get:name=>name==='loader'?{entries:()=>presetRows}:name==='agentPresets'?{inspectCompositions:()=>[{id:'fixture',modules:[{moduleName:nativeModule}]}]}:undefined}}
+ assert.deepEqual(localRuntimeEntries(presetRuntime).map(row=>row.id),['preset:fixture:native','preset:fixture:group:nested'])
+ assert.deepEqual(localRuntimeEntries(presetRuntime)[0].config,nativeConfig)
  // Template-owned packages resolve from the template and copy as complete bundles.
  const own=join(team,'projects/own'),ownCwd=join(root,'own-workspace')
  json(join(own,'project.json'),{id:'own',name:'Own',experts:['project:experts/author'],skills:['project:skills/review'],connectors:[]})

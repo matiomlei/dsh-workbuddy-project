@@ -1,6 +1,6 @@
 {
   "name": "dsh-workbuddy-project",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "Configure DSH projects with experts, skills, rules, connectors, and optional shared capability libraries.",
   "type": "module",
   "main": "lib/index.js",
@@ -19,7 +19,8 @@
     "CHANGELOG.md"
   ],
   "engines": {
-    "node": ">=22"
+    "node": ">=22",
+    "dsh": "~0.2.1-rc.2"
   },
   "license": "MIT",
   "dsh": {
@@ -31,18 +32,19 @@
     }
   },
   "peerDependencies": {
-    "@deepseek-ai/cordis": "~4.0.4",
-    "@deepseek-ai/dsh-tools": "~0.2.0-rc.2",
-    "@deepseek-ai/dsh-mcp-client": "~0.2.0-rc.2",
-    "@deepseek-ai/dsh-subprocess": "~0.2.0-rc.2",
-    "@deepseek-ai/schemastery": "~3.18.4",
+    "@deepseek-ai/cordis": "~4.0.5",
+    "@deepseek-ai/dsh-tools": "~0.2.1-rc.2",
+    "@deepseek-ai/dsh-mcp-client": "~0.2.1-rc.2",
+    "@deepseek-ai/dsh-subprocess": "~0.2.1-rc.2",
+    "@deepseek-ai/schemastery": "~3.18.5",
     "@modelcontextprotocol/client": "^2.0.0",
-    "@deepseek-ai/dsh-app-boot": "~0.2.0-rc.2"
+    "@deepseek-ai/dsh-app-boot": "~0.2.1-rc.2"
   },
   "scripts": {
     "test": "node test/packages.mjs && node test/library-sync.mjs",
     "test:host": "node test/packages-host.mjs",
     "test:ui": "node test/packages-ui.cjs",
+    "test:preset": "node test/preset-host.mjs",
     "check:package": "node scripts/check-package.mjs"
   },
   "dependencies": {
