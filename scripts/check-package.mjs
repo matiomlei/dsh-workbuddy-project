@@ -13,7 +13,7 @@ for (const filename of [manifest.main, manifest.exports['./client'], manifest.ds
 }
 const npm = process.platform === 'win32' ? 'npm.cmd' : 'npm'
 const [pack] = JSON.parse(execFileSync(npm, ['pack', '--dry-run', '--json', '--ignore-scripts'], { cwd: root, encoding: 'utf8', shell: process.platform === 'win32', stdio: ['ignore', 'pipe', 'pipe'] }))
-const allowed = /^(?:package\.json|cordis\.patch\.yml|README\.md|LICENSE|CHANGELOG\.md|(?:lib|docs|examples)\/.*)$/
+const allowed = /^(?:package\.json|cordis\.patch\.yml|README\.md|LICENSE|CHANGELOG\.md|(?:lib|docs|examples|scripts|client)\/.*)$/
 for (const { path } of pack.files) {
   assert.ok(allowed.test(path), `Unexpected package file: ${path}`)
   assert.ok(!/(?:^|\/)(?:node_modules|\.git|\.dsh|\.env(?:\..*)?|\.DS_Store)(?:\/|$)/.test(path), `Private or generated file: ${path}`)

@@ -1,106 +1,87 @@
-# DSH WorkBuddy Project
+# DSH WorkBuddy Project · 项目交付
 
-为 DeepSeek Harness 按项目配置专家、技能、规则与连接器，复用项目模板，并可接入共享能力库。
+在 DSH 中创建业务项目，绑定一个或多个 Git 仓库，选用可复用 DAG 模板，并跟踪每次运行的进度、节点产物和质量验收。
 
-Configure DeepSeek Harness projects with experts, skills, rules, connectors, reusable templates, and optional shared capability libraries.
+当前分支为 **0.4.0-preview.1 产品预览版**，目标宿主是 **DSH 0.2.1-rc2（npm 0.2.1-rc.2）**。本分支未发布到 npm 或 GitHub Release；不要使用旧 0.3.1 的下载命令获取这个预览版。
 
-包名与仓库名：`dsh-workbuddy-project`。正式版本：`0.3.1`。市场目录收录与 npm 发布状态分别说明，目录审核不会影响从 GitHub 制品安装。
+## 产品入口
 
-## 功能
+DSH 侧栏 → **项目交付**，包含四个页面：
 
-- **项目**：绑定工作目录、项目指令和所选能力，保存并编译为 DSH preset。
-- **专家**：首位专家作为主专家加载，其他专家提供按需方法论卡；专家团按单个入口加载。
-- **完整能力包**：专家、技能、规范、连接器保留完整目录及附带文件；项目能力选择器展示本地与共享来源。
-- **能力库**：统一展示本地、项目和共享来源，按来源与类型筛选；新建能力默认保存到本地，无需 Git 仓库。顶部共享资源库横栏仅显示已连接库数量与添加按钮，具体配置在弹窗中完成，能力清单保持全宽。填写 Git 地址后显示同步设置。
-- **连接器**：HTTP/stdio MCP 桥接、本机 DSH 连接器引用和 CLI 包；检查连接、授权要求与工具发现结果。
-- **固定版本**：项目锁定能力内容，资源库同步不会自动升级已保存项目；显式升级后使用新版内容。
+- **项目**：管理仓库别名、本机 Git 根目录和分支；选用已发布的工作流版本，映射仓库角色，输入业务需求并发起运行。
+- **工作流模板**：创建和编辑任意 DAG 结构；配置节点任务、模型、仓库角色、入口专家/专家团包、Skills、MCP、规范及人工验收；保存草稿、发布版本、复制、导入导出、重命名和归档。
+- **能力库**：管理本地能力和共享 Git 资源库；复用现有 WorkBuddy 包，显式选择并固定节点所用内容。共享库可指向内网 Git。
+- **运行记录**：查看 DAG 进度、模型与仓库快照、节点输出、文件产物、验收轮次、恢复入口和累计代码补丁。
 
-个人使用不需要团队账号、管理平台或 Git 仓库。Git 同步与贡献操作需要本机 Git 及仓库访问资格。
+![隔离测试环境中的项目交付运行面板](docs/screenshots/product-run.png)
 
-## 运行要求
+已有的设置页“会话项目”和 `/project` 命令保留，继续用于普通 DSH 会话 preset。业务交付项目从新侧栏入口管理。
 
-- Node.js >= 22。
-- 兼容当前 `package.json` peer 范围的 DSH；本轮验证使用 DSH `0.2.1-rc.2`。
-- Web 界面提供「项目」「能力库」两个设置入口；命令和模型管理工具也支持无界面宿主。
+## Windows 封闭环境验证
 
-内网部署与自定义插件市场见 [内网发布指南](docs/intranet-market.md)。
+完整步骤见 **[Windows 安装与验证](docs/windows-preview.md)**。准备机可以是 Windows、macOS 或 Linux，不需要在 Mac 上安装 Windows 原生依赖。
 
-## 安装
-
-以下远程命令需对应版本已发布；本次本地适配不会自动发布 npm 或 GitHub Release。可优先使用本地制品或内网仓库。
-
-从 GitHub Release 的制品安装：
+在可联网的准备机，从当前分支制作离线包：
 
 ```sh
-dsh plugin --profile web add -w https://github.com/matiomlei/dsh-workbuddy-project/releases/download/v0.3.1/dsh-workbuddy-project-0.3.1.tgz
+npm ci --ignore-scripts --legacy-peer-deps
+npm run build:client
+npm run prepare:offline
 ```
 
-也可打包并从本地制品安装：
+将 `dist/` 下的 `.tgz`、`.sha256`、`install-windows.ps1` 和 `WINDOWS-README.md` 复制到目标机。目标机已有 Node.js >=22.15、Git for Windows 和 DSH 0.2.1-rc.2 后，关闭 DSH，在 PowerShell 安装：
 
-```sh
-npm pack
-dsh plugin --profile web add -w /absolute/path/dsh-workbuddy-project-0.3.1.tgz
+```powershell
+powershell -ExecutionPolicy Bypass -File .\install-windows.ps1 `
+  -Archive .\dsh-workbuddy-project-0.4.0-preview.1-offline.tgz `
+  -Profile web -DshHome 'D:\dsh-validation' -DshRoot 'D:\tools\dsh'
+$env:DSH_HOME = 'D:\dsh-validation'
+dsh --profile web --no-open
 ```
 
-如果以 npx 运行 DSH，命令前缀可换为 `npx --no-install @deepseek-ai/dsh`。安装后重启目标 DSH profile 并刷新界面。
+插件安装本身不下载依赖；实际运行需要目标环境中可访问的模型服务，以及所选 MCP、Skill 和业务项目自己的工具链。建议先在单独的 `DSH_HOME` 中配置模型并确认普通会话可用，再验证项目交付。
 
-也可从[项目仓库](https://github.com/matiomlei/dsh-workbuddy-project)安装：
+## 第一次交付
 
-```sh
-dsh plugin --profile web add -w github:matiomlei/dsh-workbuddy-project#v0.3.1
-```
+1. 在能力库中准备所需的专家、Skill、MCP 和规范。也可以先不绑定能力包。
+2. 新建工作流模板，在画布增删节点、建立依赖；右侧配置每个 Agent 节点的能力和仓库角色。需要人工检查的节点启用验收，再保存并发布 v1。
+3. 手工 clone 业务仓库并提交初始内容，新建项目，填写本机仓库路径和 ref。
+4. 为项目选择模板 v1，将仓库角色映射到项目仓库。
+5. 输入本次需求并运行。需要验收的节点执行完成后等待，填写验收说明、通过后继续下游。
+6. 查看产物，下载所选节点的累计补丁，在干净分支上 `git apply --check` 后应用。
 
-从 npm 安装指定正式版本：
-
-```sh
-dsh plugin --profile web add -w dsh-workbuddy-project@0.3.1
-```
-
-## 第一次使用
-
-1. 打开设置 → 项目 → 新建项目，选择已有工作目录并填写项目指令。
-2. 按需选择专家、技能、规范和连接器。没有能力包时，也可先创建仅含指令的项目。
-3. 保存并编译；配置连接器的项目可点击「检查连接器」。
-4. 新建会话，在 preset 选择器中选中该项目。已有会话保留创建时配置。
-
-默认项目注册与编译目录是 `<DSH_HOME>/projects`；未设置 `DSH_HOME` 时使用 `~/.dsh/projects`，也可在插件配置中显式指定 `projectsRoot`。工作目录里的项目声明保存在 `.dsh/project.json`。
-
-## 体验示例模板
-
-在 DSH 插件配置中，将 `libraries` 设为 `[{"name":"examples","path":"/absolute/path/to/dsh-workbuddy-project/examples/library"}]`（替换为本机实际路径）。随后在「项目」新建页面选择「代码评审」或「资料研究」模板。模板自带专家，无外部连接器或凭据依赖。界面添加新 Git 资源库时需要仓库地址；预配置本地示例库无需 Git 同步。
-
-项目模板位于「项目」页。能力库同时发现本地能力、已注册项目自有能力和共享资源库；本地及项目能力可直接保存，外部已安装来源为只读查看。详见[能力包格式与运行约定](docs/capability-packages.md)。
-
-## 命令
-
-```text
-/project list
-/project preview <id>
-/project apply <id>
-/project upgrade <id>
-```
-
-库同步与项目升级是两个动作；保存现有项目保持已锁定版本。
+“需求分析 → 设计 → 编码 → 测试”只是一个例子，模板不固定这几个阶段。发布版本、节点能力、运行模型和仓库提交均在运行开始时固定，后续修改不改变旧运行。
 
 ## 当前边界
 
-- 专家卡不代表独立多智能体并行执行；共享资源库不提供成员角色、共享对话或任务协作服务。
-- 当前 MCP 桥接支持 HTTP 与 stdio，SSE 不支持。OAuth 交互登录尚未实现，可引用已授权的本地 DSH 连接器或使用本机环境变量凭据。
-- CLI 包不自动安装本机命令。发现 WorkBuddy 包不代表导入其账号授权。
-- 包编辑器「提交为 PR」目前创建并推送 Git 评审分支；不会自动在托管平台建立 PR。
-- 发布版与旧开发插件应分别在不同 profile 验证；二者都提供 `/project` 命令和项目 preset，请避免在同一 profile 同时启用。
+这是第一版产品预览，仍需要 Windows 和实际模型环境的功能验收，详见 [验证记录](docs/product-preview-validation.md)。
 
-## 开发与发布验证
+- 当前业务执行支持 Agent、JavaScript、输入、输出节点；画布中的其他高级节点暂未接入交付运行。
+- 专家团按一个包的入口加载，附带 Skill 一起提供；不在节点内再启动 Teams 多成员调度器。
+- 完成条件先提供人工验收，hook、自动测试与产物校验提供方保留扩展空间。未配置验收只表示执行完成。
+- 仓库先在本机准备。每个 Agent 有一个主仓库 cwd；多仓库项目通过节点角色分工。
+- 运行使用私有 Git worktree，不自动改动源仓库、不自动 push；源仓库未提交内容不进入运行。
+- MCP 按能力包绑定；宿主原生 MCP 需先保存为能力包。共享能力库不负责分发账号凭据。
+- 本地独立运行、内网共享能力库；集中调度、多人审批、自动克隆仓库尚未提供。
+
+## 能力库与内网分发
+
+能力包格式见 [能力包约定](docs/capability-packages.md)，内网 Git 插件市场见 [内网发布指南](docs/intranet-market.md)。
+
+原有会话项目使用 `<DSH_HOME>/projects`；业务交付数据默认在 `<DSH_HOME>/delivery`。可通过 `projectsRoot`、`deliveryRoot` 显式配置。配置 `libraries` 可添加预置能力库；界面中也可以添加 Git 资源库并同步。
+
+共享库同步与工作流发布是两个动作。选用的能力包保存内容快照，旧模板版本和已有运行不随资源库同步而变化。
+
+## 开发与打包
 
 ```sh
-npm install
+npm run build:client
 npm test
-npm run test:host
-npm run test:preset
-npm run test:ui
+npm run test:delivery
 npm run check:package
+npm run prepare:offline
 ```
 
-宿主测试通过 `WB_DSH_NODE_MODULES` 指定已安装 DSH 的 `node_modules`；默认查找 `~/.dsh/profiles/node_modules`。UI 测试使用开发依赖，也可通过 `WB_UI_PACKAGE_JSON` 指向已有 React/jsdom 环境。
+真实宿主的旧能力管理测试使用 `WB_DSH_NODE_MODULES` 指向 DSH 的 `node_modules` 后运行 `npm run test:host`。产品离线安装与正常路径自动化见 [发布验证](docs/releasing.md)。测试用模型适配器只在 `test/`，不进入安装包，也不改变产品模型选择。
 
-发布流程与市场收录要求见[发布清单](docs/releasing.md)。
+内嵌 Workflow One 0.12.0 调度器与画布，MIT 许可证和适配重现方法见 [第三方来源](lib/vendor/README.md)。不依赖另行安装 Workflow One 或 Teams 插件。
