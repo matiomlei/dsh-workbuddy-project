@@ -1,59 +1,2330 @@
-<!doctype html><html lang="zh-CN"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>项目交付</title><style>
-:root{font:14px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei",sans-serif;color:#223448;background:#f5f7fa;font-synthesis:none}*{box-sizing:border-box}body{margin:0}button,input,select,textarea{font:inherit}button{cursor:pointer;background:white;border:1px solid #d9e1e9;border-radius:7px;padding:7px 14px;color:#304659;transition:.15s}button:hover{border-color:#10848e;background:#f0faf9}button:disabled{opacity:.45;cursor:default}.primary{background:#087e8b;border-color:#087e8b;color:white}.primary:hover{background:#096c77;color:white}.danger{color:#ad3434}input,select,textarea{width:100%;border:1px solid #d7e0e9;border-radius:7px;background:#fff;color:#223448;padding:9px 11px;outline:none}input:focus,select:focus,textarea:focus{border-color:#087e8b;box-shadow:0 0 0 3px #087e8b12}textarea{resize:vertical;min-height:95px}input[type=checkbox]{width:auto;accent-color:#087e8b}h1,h2,h3,p{margin:0}h1{font-size:23px;letter-spacing:-.4px}h2{font-size:17px}h3{font-size:14px}.muted{color:#7b8897;font-size:12px}.eyebrow{font-size:11px;letter-spacing:1.6px;color:#087e8b;font-weight:650}.row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}.spread{justify-content:space-between}.stack{display:flex;flex-direction:column;gap:18px}.grow{flex:1;min-width:0}.page{max-width:1400px;margin:auto;padding:28px 30px 40px}.heading{margin-bottom:24px}.heading p{color:#748396;margin-top:6px}.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:18px}.card{background:#fff;border:1px solid #e1e7ee;border-radius:11px;padding:21px;box-shadow:0 2px 5px #23344703}.clickable{cursor:pointer}.clickable:hover{border-color:#6fabb1;box-shadow:0 6px 20px #23344708}.card.selected{border-color:#087e8b;background:#f9fdfd}.badge{display:inline-flex;align-items:center;gap:5px;border-radius:5px;background:#eef3f8;color:#576d82;font-size:11px;padding:2px 7px;white-space:nowrap}.badge.good{color:#197253;background:#eaf7ee}.badge.wait{color:#9c6818;background:#fff4da}.badge.bad{color:#b54242;background:#fff0ed}.dot{display:inline-block;border-radius:50%;width:6px;height:6px;background:currentColor}.empty{padding:65px 30px;text-align:center;border:1px dashed #d3dfe7;border-radius:12px;background:#ffffff80;color:#728397}.empty h2{color:#30465a;margin:13px 0 7px}.empty button{margin-top:20px}.stats{display:flex;gap:30px;margin:18px 0 0;padding-top:15px;border-top:1px solid #eef1f4}.stats strong{font-size:22px;display:block;font-weight:600}.stats span{font-size:11px;color:#8793a1}.project-layout{display:grid;grid-template-columns:260px 1fr;gap:22px}.list{display:flex;flex-direction:column;gap:10px}.repo{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid #eef2f6}.repo:last-child{border:0}.repo code{font-size:12px;word-break:break-all;color:#66788b}.section-title{margin-bottom:15px}.banner{padding:15px 19px;border:1px solid #cfe4e6;background:#eff8f8;border-radius:9px;color:#326671;font-size:13px}.sep{height:1px;background:#e7edf3;margin:16px 0}.mono,pre,code{font-family:ui-monospace,SFMono-Regular,Consolas,monospace}pre{white-space:pre-wrap;overflow-wrap:anywhere;font-size:12px;background:#f5f7fa;border:1px solid #e5ebf1;border-radius:7px;padding:14px;max-height:420px;overflow:auto}.table{width:100%;border-collapse:collapse;text-align:left;font-size:13px}.table th{color:#8a97a5;font-size:11px;font-weight:550;padding:12px 14px;border-bottom:1px solid #e7edf3}.table td{padding:14px;border-bottom:1px solid #eef2f6}.table tbody tr:hover{background:#f6fafa;cursor:pointer}.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);padding:11px 20px;border-radius:8px;box-shadow:0 5px 25px #18344322;background:#223e4a;color:#fff;z-index:100;max-width:90%;white-space:pre-wrap}.toast.error{background:#9a3d3d}.modal-wrap{position:fixed;inset:0;background:#172c4050;display:grid;place-items:center;z-index:50;padding:24px;backdrop-filter:blur(2px)}.modal{background:#fff;border-radius:13px;width:min(680px,100%);max-height:90vh;overflow:auto;box-shadow:0 18px 80px #10243433}.modal.wide{width:min(860px,100%)}.modal-head{padding:21px 24px;border-bottom:1px solid #e5ebf0}.modal-body{padding:24px;display:flex;flex-direction:column;gap:17px}.modal-foot{display:flex;justify-content:flex-end;gap:10px;padding:17px 24px;border-top:1px solid #e5ebf0;background:#fafbfd}.field{display:flex;flex-direction:column;gap:6px}.field>span{font-size:12px;font-weight:600;color:#597085}.fields{display:grid;grid-template-columns:1fr 1fr;gap:15px}.repo-fields{display:grid;grid-template-columns:110px 1fr 100px 34px;gap:8px}.subtle{border:0;background:none;color:#768a9a;padding:4px 7px}.editor-page{height:100vh;display:flex;flex-direction:column;background:white}.editor-head{padding:15px 22px;border-bottom:1px solid #e2e9ef}.editor-body{display:flex;min-height:0;flex:1}.canvas{flex:1;border:0;min-width:0;height:100%}.inspector{width:265px;flex-shrink:0;background:#f9fbfc;border-left:1px solid #e2e9ef;padding:18px;overflow:auto}.node-item{width:100%;text-align:left;margin-top:10px;padding:12px;background:#fff}.node-item small{display:block;color:#8291a0}.choices{display:grid;grid-template-columns:1fr 1fr;gap:8px;max-height:220px;overflow:auto}.choice{display:flex;align-items:center;gap:8px;border:1px solid #e3eaf0;border-radius:7px;padding:8px;font-size:12px}.choice small{display:block;color:#8b97a5;font-size:10px}.run-layout{display:grid;grid-template-columns:minmax(300px,1.4fr) minmax(270px,1fr);gap:20px}.dag{overflow:auto;padding:10px 0}.dag svg{display:block;width:100%;min-width:380px;height:auto}.node-detail{max-height:680px;overflow:auto}.quality{background:#fffaf0;border:1px solid #f0dcaf;padding:15px;border-radius:8px}.pill{font-size:12px;padding:6px 10px;border-radius:20px;background:#edf4f5;color:#42747c}.metric{font-variant-numeric:tabular-nums}.trail{font-size:12px;color:#8b97a5;margin-bottom:10px}.artifact{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 0;border-bottom:1px solid #ecf0f4}.artifact button{text-align:left;word-break:break-all}.inline-error{color:#ad3434;font-size:12px;white-space:pre-wrap}.file-input{display:none}@media(max-width:850px){.project-layout,.run-layout{grid-template-columns:1fr}.page{padding:22px 18px}.inspector{width:220px}.fields{grid-template-columns:1fr}.repo-fields{grid-template-columns:80px 1fr}.choices{grid-template-columns:1fr}}
-</style></head><body><main id="app"></main><div id="overlays"></div><script>
-'use strict';
-const page="__INITIAL_PAGE__", $=id=>document.getElementById(id), root=$('app'), overlays=$('overlays');
-let runViewHash='',templates=[],projects=[],bootstrap={},activeProject=null,activeRun=null,activeNode=null,editor=null,editorFrame=null,capabilities=[],polling=false;
-const uuid=()=>crypto.randomUUID();
-function el(tag,attrs={},...children){const n=document.createElement(tag);for(const [key,value] of Object.entries(attrs)){if(key==='class')n.className=value;else if(key.startsWith('on'))n.addEventListener(key.slice(2),value);else if(key==='checked')n.checked=value;else if(key==='disabled')n.disabled=value;else if(value!==undefined&&value!==null)n.setAttribute(key,value)}for(const child of children.flat(Infinity)){if(child!==null&&child!==undefined&&child!==false)n.append(child instanceof Node?child:document.createTextNode(String(child)))}return n}
-const row=(...children)=>el('div',{class:'row'},...children),stack=(...children)=>el('div',{class:'stack'},...children),muted=text=>el('span',{class:'muted'},text),label=(text,input,hint)=>el('label',{class:'field'},el('span',{},text),input,hint?muted(hint):null);
-function input(value='',placeholder='',type='text'){const n=el('input',{type,placeholder});n.value=value;return n}
-function area(value='',placeholder=''){const n=el('textarea',{placeholder});n.value=value;return n}
-function select(options,value){const n=el('select',{},options.map(o=>el('option',{value:typeof o==='string'?o:o.value},typeof o==='string'?o:o.label)));if(value!==undefined)n.value=value;return n}
-function button(text,fn,style=''){return el('button',{class:style,onclick:async event=>{const b=event.currentTarget;b.disabled=true;try{await fn()}catch(error){notice(error.message,true)}finally{b.disabled=false}}},text)}
-function notice(text,error=false){document.querySelector('.toast')?.remove();const n=el('div',{class:'toast'+(error?' error':'')},text);document.body.append(n);setTimeout(()=>n.remove(),6000)}
-async function api(action,payload={}){const response=await fetch('/api/workbuddy-delivery',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({action,...payload})});const value=await response.json();if(!response.ok||value.error)throw new Error(value.error||'请求失败');return value}
-async function catalog(){const data=await api('catalog');templates=data.templates;projects=data.projects}
-const names=id=>projects.find(p=>p.id===id)?.name||'项目';const time=s=>s?new Date(s).toLocaleString('zh-CN',{hour12:false}):'—';
-const states={preparing:'准备中',ready:'已就绪',starting:'启动中',running:'运行中',recovering:'恢复中',execution_succeeded:'执行完成',execution_failed:'执行失败',preparation_failed:'启动失败',interrupted:'已中断',canceled:'已取消',success:'已完成',error:'失败',skipped:'未执行',pending:'待验收',waiting_quality:'待验收',passed:'验收通过',failed:'未通过',not_evaluated:'未配置验收'};
-function badge(status){return el('span',{class:'badge '+(['success','passed','execution_succeeded'].includes(status)?'good':['failed','error','execution_failed','preparation_failed'].includes(status)?'bad':['pending','waiting_quality','running','preparing','recovering'].includes(status)?'wait':'')},el('i',{class:'dot'}),states[status]||status)}
-function head(title,description,actions=[]){return el('div',{class:'row spread heading'},el('div',{},el('div',{class:'eyebrow'},'WORKBUDDY / DELIVERY'),el('h1',{},title),el('p',{},description)),row(actions))}
-function empty(title,description,action){return el('div',{class:'empty'},el('div',{style:'font-size:32px;color:#7da1ac'},'◇'),el('h2',{},title),el('p',{},description),action)}
-function mount(...children){root.replaceChildren(el('div',{class:'page'},...children))}
-function modal(title,content,onSave,saveText='保存',wide=false){const wrap=el('div',{class:'modal-wrap'}),error=el('div',{class:'inline-error'});function close(){wrap.remove()}const cancel=button('取消',close),save=button(saveText,async()=>{try{await onSave();close()}catch(e){error.textContent=e.message;throw e}},'primary');wrap.append(el('section',{class:'modal'+(wide?' wide':'')},el('div',{class:'modal-head'},el('h2',{},title)),el('div',{class:'modal-body'},content,error),el('div',{class:'modal-foot'},cancel,save)));overlays.append(wrap);return{close,wrap}}
-function download(name,content,type='application/json'){const url=URL.createObjectURL(new Blob([content],{type})),a=el('a',{href:url,download:name});a.click();setTimeout(()=>URL.revokeObjectURL(url),1000)}
-function repoForm(project){const name=input(project?.name||'','例如：客户服务平台'),container=el('div',{class:'stack',style:'gap:9px'}),rows=[];function add(repo={}){const alias=input(repo.alias||'','别名'),path=input(repo.url||'','本机 Git 仓库根目录'),ref=input(repo.ref||'HEAD','分支 / 标签');const r=el('div',{class:'repo-fields'},alias,path,ref,button('×',()=>{r.remove();rows.splice(rows.indexOf(entry),1)},'subtle'));const entry={alias,path,ref};rows.push(entry);container.append(r)}for(const repo of project?.repositories||[{}])add(repo);modal(project?'编辑项目':'新建项目',stack(label('项目名称',name),label('Git 仓库',container,'先在本机克隆仓库；每次运行固定所选分支的提交，未提交内容不包含在内。'),button('＋ 添加仓库',()=>add())),async()=>{const repositories=rows.map(r=>({alias:r.alias.value.trim(),url:r.path.value.trim(),ref:r.ref.value.trim()}));const saved=await api(project?'project/update':'project/create',{id:project?.id,expectedRevision:project?.revision,name:name.value.trim(),repositories});await catalog();activeProject=saved.id;await showProjects();notice('项目已保存')},'保存项目',true)}
-async function showProjects(){if(activeProject){const p=projects.find(p=>p.id===activeProject);if(p)return projectDetail(p);activeProject=null}mount(head('把业务需求带到交付','为项目绑定仓库，选择工作流，开始一次可追踪的交付。',[button('新建项目',()=>repoForm(),'primary')]),projects.length?el('div',{class:'grid'},projects.map(p=>el('article',{class:'card clickable',onclick:()=>{activeProject=p.id;showProjects()}},el('div',{class:'row spread'},el('h2',{},p.name),el('span',{class:'badge'},p.binding?'已选工作流':'待配置')),el('p',{class:'muted',style:'margin-top:10px'},p.repositories.map(r=>r.alias).join(' · ')),el('div',{class:'stats'},el('div',{},el('strong',{},p.repositories.length),el('span',{},'Git 仓库')),el('div',{},el('strong',{},p.binding?'v'+p.binding.version:'—'),el('span',{},p.binding?templates.find(t=>t.id===p.binding.templateId)?.name||'工作流版本':'选择工作流')))))):empty('创建第一个项目','项目把仓库、工作流和每次运行的交付记录联系在一起。',button('新建项目',()=>repoForm(),'primary')))}
-async function projectDetail(p){
-  const runs=(await api('runs/list',{projectId:p.id})).runs;
-  const template=p.binding&&templates.find(t=>t.id===p.binding.templateId);
-  const repos=el('section',{class:'card'},el('h3',{class:'section-title'},'仓库 · '+p.repositories.length),p.repositories.map(r=>el('div',{class:'repo'},el('div',{},el('strong',{},r.alias),el('div',{},el('code',{},r.url)),muted(r.ref)))));
-  const binding=p.binding?stack(row(el('h3',{},template?.name||'工作流'),el('span',{class:'badge good'},'v'+p.binding.version)),row(Object.entries(p.binding.repositoryMap).map(([role,alias])=>el('span',{class:'pill'},role+' → '+alias))),muted('项目固定使用发布版本；编辑模板草稿不会改变这个绑定。')):el('div',{class:'banner'},'选择一个已发布的工作流版本，并把模板的仓库角色映射到项目仓库。');
-  const workflow=el('section',{class:'card'},el('div',{class:'row spread section-title'},el('h2',{},'项目工作流'),button(p.binding?'更换版本':'选择工作流',()=>bindDialog(p))),binding);
-  const history=el('section',{class:'card'},el('div',{class:'row spread section-title'},el('h2',{},'最近运行'),muted(runs.length+' 次')),runs.length?runTable(runs):muted('还没有运行记录，配置工作流后即可发起。'));
-  mount(el('div',{class:'trail'},button('← 全部项目',()=>{activeProject=null;showProjects()},'subtle')),head(p.name,'管理仓库与工作流，查看这个项目的交付记录。',[button('编辑项目',()=>repoForm(p)),button('发起运行',()=>startDialog(p),'primary')]),el('div',{class:'project-layout'},stack(repos),stack(workflow,history)));
-}
-async function bindDialog(p){const available=templates.filter(t=>!t.archived),template=select([{value:'',label:'选择模板'},...available.map(t=>({value:t.id,label:t.name}))]),version=select([{value:'',label:'先选择模板'}]),mapping=el('div',{class:'stack',style:'gap:10px'});let versions=[];async function updateVersion(){mapping.replaceChildren();const v=versions.find(v=>String(v.version)===version.value);for(const role of v?.definition.repositoryRoles||[])mapping.append(label(role.id,select(p.repositories.map(r=>r.alias),p.binding?.repositoryMap[role.id])));for(const [i,node] of [...mapping.children].entries())node.dataset.role=v.definition.repositoryRoles[i].id}template.onchange=async()=>{try{versions=template.value?(await api('detail',{id:template.value})).versions.filter(v=>v.ready):[];version.replaceChildren(...versions.map(v=>el('option',{value:v.version},'v'+v.version)));if(!versions.length)version.append(el('option',{value:''},'尚无已发布版本'));updateVersion()}catch(e){notice(e.message,true)}};version.onchange=updateVersion;modal('选择项目工作流',stack(label('工作流模板',template),label('发布版本',version),label('仓库角色映射',mapping)),async()=>{if(!template.value||!version.value)throw new Error('请选择已发布版本');await api('project/bind',{id:p.id,expectedRevision:p.revision,binding:{templateId:template.value,version:Number(version.value),repositoryMap:Object.fromEntries([...mapping.children].map(n=>[n.dataset.role,n.querySelector('select').value]))}});await catalog();showProjects();notice('项目工作流已更新')},'使用此版本');if(p.binding){template.value=p.binding.templateId;await template.onchange();version.value=String(p.binding.version);updateVersion()}}
-async function startDialog(p){if(!p.binding){await bindDialog(p);return}const {version}=await api('project/workflow',{projectId:p.id}),task=area('','描述这次业务需求、验收标准和需要关注的内容…'),fields=new Map();const inputs=el('div',{class:'stack'});for(const f of version.definition.inputSchema?.fields||[]){const node=f.type==='boolean'?select(['true','false'],String(f.defaultValue??false)):input(typeof f.defaultValue==='object'?JSON.stringify(f.defaultValue):f.defaultValue??'',f.description||f.key);fields.set(f.key,{field:f,node});inputs.append(label(f.key+(f.required?' *':''),node))}modal('发起项目运行',stack(el('div',{class:'banner'},p.name+' · '+(templates.find(t=>t.id===p.binding.templateId)?.name||'工作流')+' v'+p.binding.version),label('本次需求',task),inputs,muted('Agent 使用节点指定模型或 DSH 当前模型。运行开始时固定版本、能力包、模型和仓库提交。')),async()=>{const values={};for(const [key,{field:f,node}]of fields){const v=node.value;if(v!==''||f.required)values[key]=f.type==='number'?Number(v):f.type==='boolean'?v==='true':['object','array','json','string[]'].includes(f.type)?JSON.parse(v):v}const run=await api('runs/start',{requestId:uuid(),projectId:p.id,expectedProjectRevision:p.revision,triggerInput:task.value,inputs:values});activeRun=run.requestId;await showRun(run);notice(run.status==='preparation_failed'?run.error:'运行已启动',run.status==='preparation_failed')},'开始运行')}
-function newTemplate(){const name=input('','例如：版本发布评审');modal('新建工作流模板',stack(label('模板名称',name),muted('从一个 Agent 节点开始；在画布中添加、连接和删除节点，形成适合业务的 DAG。')),async()=>{const id='agent_'+uuid().slice(0,8);const created=await api('template/import',{name:name.value,definition:{graph:{nodes:[{id,type:'agent',position:{x:100,y:120},data:{label:'执行任务',prompt:'根据本次业务需求完成任务，使用需要的工具检查结果。',inputTemplate:'{{$trigger}}\n\n{{$upstream}}'}}],edges:[]},repositoryRoles:[{id:'main'}]}});await catalog();await openEditor(created.templateId)},'创建并编辑')}
-async function showTemplates(){editor=null;editorFrame=null;mount(head('让交付方式可以复用','自由创建 DAG，配置节点能力，发布稳定版本供项目选用。',[button('导入模板',()=>importTemplate()),button('新建模板',newTemplate,'primary')]),templates.length?el('div',{class:'grid'},templates.map(t=>el('article',{class:'card'},el('div',{class:'row spread'},el('h2',{},t.name),el('span',{class:'badge'},t.archived?'已归档':'草稿 r'+t.revision)),el('p',{class:'muted',style:'margin:12px 0 20px'},t.source?'从已有模板复制，可独立编辑':'可复用的业务工作流模板'),row(button('编辑模板',()=>openEditor(t.id)),button('版本与管理',()=>manageTemplate(t)))))):empty('沉淀你的工作流','节点、依赖与能力组合都由你定义。',button('新建模板',newTemplate,'primary')))}
-async function importTemplate(){const picker=el('input',{type:'file',accept:'.json,application/json',class:'file-input',onchange:async()=>{try{const data=JSON.parse(await picker.files[0].text());const created=await api('template/import',{name:data.name||picker.files[0].name.replace(/\.json$/,''),definition:data.definition||data});await catalog();openEditor(created.templateId);notice('模板已导入，请核对能力并重新保存节点配置')}catch(e){notice(e.message,true)}finally{picker.remove()}}});document.body.append(picker);picker.click()}
-async function manageTemplate(t){const d=await api('detail',{id:t.id}),content=stack(el('div',{},el('strong',{},t.name),el('p',{class:'muted'},'草稿 r'+d.draft.revision+' · '+d.versions.length+' 个发布版本')),d.versions.map(v=>el('div',{class:'row spread'},row(el('strong',{},'v'+v.version),el('span',{class:'badge '+(v.ready?'good':'wait')},v.ready?'可选用':'待发布完成')),button('从此版本复制',async()=>{const c=await api('template/restore',{id:t.id,version:v.version,name:t.name+' · v'+v.version+' 副本'});dialog.close();await catalog();openEditor(c.templateId)}))),row(!t.archived?button('重命名',()=>{const name=input(t.name);modal('重命名模板',label('模板名称',name),async()=>{await api('template/rename',{id:t.id,expectedRevision:d.draft.revision,name:name.value});dialog.close();await catalog();showTemplates()},'保存名称')}):null,button('导出草稿',()=>download(t.name+'.json',JSON.stringify({schemaVersion:1,name:t.name,definition:{...d.draft.definition,nodeBindings:(d.draft.definition.nodeBindings||[]).map(b=>({...b,packages:{}}))}},null,2))),button('复制草稿',async()=>{const c=await api('copy',{id:t.id,expectedRevision:d.draft.revision,name:t.name+' 副本'});dialog.close();await catalog();openEditor(c.templateId)}),!t.archived?button('归档',async()=>{await api('archive',{id:t.id});dialog.close();await catalog();showTemplates()},'danger'):null));const dialog=modal('模板版本与管理',content,async()=>{},'关闭')}
-const flushWaiters=new Map();
-window.addEventListener('message',async event=>{if(event.origin===location.origin&&event.source===window.parent&&event.data?.type==='delivery-prepare-navigation'){try{if(overlays.children.length)throw new Error('请先保存或取消当前配置。');if(editor)await flush();window.parent.postMessage({type:'delivery-navigation-ready'},location.origin)}catch(error){window.parent.postMessage({type:'delivery-navigation-ready',error:error.message},location.origin)}return}if(event.origin!==location.origin||event.source!==editorFrame?.contentWindow)return;if(event.data?.type==='wf1-ready'){editorFrame.contentWindow.postMessage({type:'wf1-session',sessionId:'delivery-editor'},location.origin);return}if(event.data?.type==='delivery-save-result'){const waiter=flushWaiters.get(event.data.requestId);if(waiter){flushWaiters.delete(event.data.requestId);clearTimeout(waiter.timer);event.data.ok?waiter.resolve(event.data):waiter.reject(new Error(event.data.error||'保存失败'))}if(event.data.ok)refreshInspector().catch(e=>notice(e.message,true))}});
-function flush(){if(!editorFrame)throw new Error('请先打开模板');const requestId=uuid();return new Promise((resolve,reject)=>{const timer=setTimeout(()=>{flushWaiters.delete(requestId);reject(new Error('画布尚未就绪，请稍后重试'))},12000);flushWaiters.set(requestId,{resolve,reject,timer});editorFrame.contentWindow.postMessage({type:'delivery-flush',requestId},location.origin)})}
-async function syncRevision(){const state=await api('editor/state',{editorId:editor.editorId});editor.revision=state.revision;editor.definition=state.definition;editorFrame.contentWindow.postMessage({type:'delivery-revision',revision:state.revision},location.origin);return state}
-async function openEditor(id){const t=templates.find(t=>t.id===id);if(t?.archived)throw new Error('此模板已归档，可从历史版本复制后编辑');editor=await api('editor/open',{id});editor.templateId=id;const header=el('header',{class:'editor-head'},el('div',{class:'row spread'},row(button('← 模板',async()=>{await flush();await catalog();showTemplates()},'subtle'),el('h2',{},t?.name||'模板'),el('span',{class:'badge',id:'revision'},'草稿 r'+editor.revision)),row(button('仓库角色',editRoles),button('保存草稿',async()=>{await flush();notice('草稿已保存')}),button('发布版本',async()=>{const saved=await flush();const v=await api('publish',{id,expectedRevision:saved.revision});await catalog();notice('已发布 v'+v.version+'，可在项目中选用')},'primary'))));editorFrame=el('iframe',{class:'canvas',title:'工作流模板画布'});const inspector=el('aside',{class:'inspector',id:'inspector'});root.replaceChildren(el('section',{class:'editor-page'},header,el('div',{class:'editor-body'},editorFrame,inspector)));editorFrame.src='/api/workbuddy-delivery?document=editor&editorId='+editor.editorId;await refreshInspector()}
-async function refreshInspector(){if(!editor||!$('inspector'))return;await syncRevision();$('revision').textContent='草稿 r'+editor.revision;const d=editor.definition;$('inspector').replaceChildren(el('div',{class:'eyebrow'},'NODE CAPABILITIES'),el('h3',{style:'margin:6px 0'},'节点能力与完成条件'),muted('在画布安排依赖，在这里为节点绑定仓库、专家、技能和规范。'),el('div',{class:'sep'}),...d.graph.nodes.map(n=>{const b=(d.nodeBindings||[]).find(b=>b.nodeId===n.id),quality=d.qualityPolicies?.some(p=>p.nodeId===n.id);return button([n.data?.label||n.id,(n.type==='agent'?(b?.repositoryRole?' · 已配置':' · 待配置'):' · '+n.type),quality?' · 需验收':''].join(''),()=>nodeDialog(n.id),'node-item')}),el('div',{class:'sep'}),muted('仓库角色：'+(d.repositoryRoles||[]).map(r=>r.id).join('、')),muted('发布版本后，在项目中选择版本并映射实际仓库。'))}
-async function editRoles(){await flush();const state=await syncRevision(),roles=input((state.definition.repositoryRoles||[]).map(r=>r.id).join(', '),'例如：frontend, backend');modal('模板仓库角色',label('角色标识',roles,'用逗号分隔；项目选用模板时再映射到具体仓库。已有节点使用的角色请勿直接删除。'),async()=>{await api('roles/save',{id:editor.templateId,expectedRevision:state.revision,roles:roles.value.split(/[,，]/).map(s=>s.trim()).filter(Boolean).map(id=>({id}))});await openEditor(editor.templateId)},'保存角色')}
-async function nodeDialog(nodeId){await flush();await syncRevision();const node=editor.definition.graph.nodes.find(n=>n.id===nodeId),binding=editor.definition.nodeBindings?.find(b=>b.nodeId===nodeId),name=input(node.data?.label||nodeId),system=area(node.data?.prompt||''),prompt=area(node.data?.inputTemplate||''),required=el('input',{type:'checkbox',checked:editor.definition.qualityPolicies?.some(p=>p.nodeId===nodeId)});capabilities=(await api('capabilities')).capabilities;const role=select([{value:'',label:'选择仓库角色'},...(editor.definition.repositoryRoles||[]).map(r=>({value:r.id,label:r.id}))],binding?.repositoryRole||'');const provider=select([{value:'',label:'使用 DSH 当前模型'},...(bootstrap.providers||[]).map(p=>({value:p.id,label:p.name||p.id}))],node.data?.provider||''),model=select([{value:'',label:'默认模型'}]),choices=new Map();async function models(){model.replaceChildren(el('option',{value:''},'默认模型'));if(provider.value){const data=await api('models',{provider:provider.value});model.append(...data.models.map(m=>el('option',{value:m.id},m.name||m.id)));model.value=node.data?.model||''}}provider.onchange=()=>models().catch(e=>notice(e.message,true));await models();const controls=[];if(node.type==='agent'){controls.push(label('仓库角色',role),el('div',{class:'fields'},label('模型提供方',provider),label('模型',model)),label('系统指令',system),label('任务提示词',prompt,'使用画布中的变量选择器插入上游输出和运行输入。'));for(const [kind,key,title]of [['expert','experts','专家 / 专家团'],['skill','skills','Skills'],['connector','connectors','MCP'],['rule','rules','规范']]){const options=capabilities.filter(c=>c.kind===kind),holder=el('div',{class:'choices'});for(const c of options){const check=el('input',{type:kind==='expert'?'radio':'checkbox',name:key,checked:binding?.capabilities?.[key]?.includes(c.reference),disabled:!!c.unavailable});choices.set(c.reference,{check,key,c});holder.append(el('label',{class:'choice'},check,el('span',{},c.name||c.reference,el('small',{},c.reference),c.unavailable?el('small',{},c.unavailable):null)))}if(kind==='expert')holder.prepend(el('label',{class:'choice'},el('input',{type:'radio',name:key,checked:!binding?.capabilities?.experts?.length}),el('span',{},'不绑定专家')));controls.push(label(title,options.length?holder:muted('暂无可选项，可在能力库中添加或同步资源。')))}}modal('配置节点 · '+(node.data?.label||nodeId),stack(label('节点名称',name),controls,el('label',{class:'choice'},required,el('span',{},'执行完成后需要人工验收',el('small',{},'通过前，下游节点保持等待。脚本检查等形式后续接入。')))),async()=>{let state=await syncRevision();if(node.type==='agent'){const selected={experts:[],skills:[],connectors:[],rules:[]},expectedHashes={};for(const [ref,{check,key,c}]of choices)if(check.checked){selected[key].push(ref);expectedHashes[ref]=c.hash}if(!role.value)throw new Error('请选择仓库角色');await api('node/save',{id:editor.templateId,editorId:editor.editorId,expectedRevision:state.revision,nodeId,repositoryRole:role.value,capabilities:selected,expectedHashes});state=await syncRevision();state=await api('node/config',{id:editor.templateId,editorId:editor.editorId,expectedRevision:state.revision,nodeId,label:name.value,prompt:system.value,inputTemplate:prompt.value,provider:provider.value,model:model.value})}await api('quality-policy/save',{id:editor.templateId,editorId:editor.editorId,expectedRevision:state.revision,nodeId,required:required.checked});await openEditor(editor.templateId);notice('节点配置已保存')},'保存节点',true)}
-function runTable(runs){return el('table',{class:'table'},el('thead',{},el('tr',{},['项目 / 运行','执行状态','质量验收','开始时间'].map(s=>el('th',{},s)))),el('tbody',{},runs.map(r=>el('tr',{onclick:()=>{activeRun=r.requestId;activeNode=null;showRun(r)}},el('td',{},el('strong',{},names(r.projectId)),el('div',{class:'muted mono'},r.requestId.slice(0,8))),el('td',{},badge(r.status)),el('td',{},badge(r.qualityStatus)),el('td',{class:'muted'},time(r.startedAt))))))}
-async function showRuns(){editor=null;editorFrame=null;const runs=(await api('runs/list')).runs;mount(head('每一次交付，都有据可查','查看 DAG 进度、节点输出、待验收项和代码产物。',[button('刷新',showRuns)]),runs.length?el('section',{class:'card',style:'padding:0;overflow:auto'},runTable(runs)):empty('还没有运行记录','从项目发起一次运行，执行进度和产物会出现在这里。'))}
-const svgNS='http://www.w3.org/2000/svg';function svgEl(tag,attrs,text){const n=document.createElementNS(svgNS,tag);for(const[k,v]of Object.entries(attrs))n.setAttribute(k,v);if(text!==undefined)n.textContent=text;return n}
-function dag(run){const graph=run.graph||{nodes:[],edges:[]},levels=new Map(),positions=new Map();function level(id,visiting=new Set()){if(levels.has(id))return levels.get(id);if(visiting.has(id))return 0;const parents=graph.edges.filter(e=>e.target===id).map(e=>e.source),v=parents.length?1+Math.max(...parents.map(p=>level(p,new Set(visiting).add(id)))):0;levels.set(id,v);return v}const columns=new Map();for(const n of graph.nodes){const l=level(n.id);columns.set(l,[...(columns.get(l)||[]),n])}for(const[l,nodes]of columns)nodes.forEach((n,i)=>positions.set(n.id,{x:25+l*210,y:30+i*100}));const w=Math.max(420,(Math.max(...columns.keys(),0)+1)*210),h=Math.max(140,Math.max(...[...columns.values()].map(n=>n.length),1)*100+35),svg=svgEl('svg',{viewBox:`0 0 ${w} ${h}`,role:'img','aria-label':'DAG 运行进度'});for(const e of graph.edges){const a=positions.get(e.source),b=positions.get(e.target);if(a&&b)svg.append(svgEl('path',{d:`M${a.x+165} ${a.y+27}C${a.x+190} ${a.y+27},${b.x-25} ${b.y+27},${b.x} ${b.y+27}`,fill:'none',stroke:'#b7cbd1','stroke-width':1.5}))}for(const n of graph.nodes){const p=positions.get(n.id),status=run.nodeStates?.[n.id]?.status||'pending',g=svgEl('g',{role:'button',tabindex:0,'aria-label':(n.data?.label||n.id)+' '+(states[status]||'等待执行'),style:'cursor:pointer'}),color=status==='success'?'#298a6d':status==='error'?'#c6665b':status==='waiting_quality'?'#d5a13b':'#8a9aa9';g.append(svgEl('rect',{x:p.x,y:p.y,width:165,height:58,rx:8,fill:activeNode===n.id?'#eff8f7':'#fff',stroke:activeNode===n.id?'#087e8b':'#dce6ec','stroke-width':activeNode===n.id?2:1}),svgEl('circle',{cx:p.x+16,cy:p.y+19,r:3,fill:color}),svgEl('text',{x:p.x+26,y:p.y+23,'font-size':12,fill:'#284456'},(n.data?.label||n.id).slice(0,15)),svgEl('text',{x:p.x+14,y:p.y+44,'font-size':10,fill:color},status==='pending'?'等待执行':states[status]||status));g.addEventListener('click',()=>{activeNode=n.id;showRun(run)});g.addEventListener('keydown',e=>{if(e.key==='Enter'){activeNode=n.id;showRun(run)}});svg.append(g)}return el('div',{class:'dag'},svg)}
-async function showRun(value){const run=await api('runs/detail',{requestId:value.requestId});const viewHash=JSON.stringify(run)+activeNode;if(root.querySelector('.run-layout')&&runViewHash===viewHash)return;runViewHash=viewHash;activeRun=run.requestId;const nodes=run.graph?.nodes||[];if(!nodes.some(n=>n.id===activeNode))activeNode=nodes.find(n=>run.nodeStates[n.id]?.status==='waiting_quality')?.id||nodes[0]?.id;const node=nodes.find(n=>n.id===activeNode),state=run.nodeStates[activeNode]||{},subject=run.qualitySubjects?.filter(s=>s.evidence.nodeId===activeNode).at(-1),outputs=run.outputs||{};const controls=[];if(['running','preparing','ready','starting','recovering'].includes(run.status))controls.push(button('取消运行',async()=>{await api('runs/cancel',{requestId:run.requestId});await showRun(run)},'danger'));if(run.status==='interrupted'&&run.recovery?.eligible)controls.push(button('恢复运行',async()=>{await api('runs/recover',{requestId:run.requestId,recoveryId:uuid(),expectedNativeRunId:run.nativeRunId,expectedPlanDigest:run.recovery.digest});showRun(run)},'primary'));controls.push(button('刷新',()=>showRun(run)));const detail=node?stack(el('div',{class:'row spread'},el('h2',{},node.data?.label||node.id),badge(state.status||'未开始')),run.models?.[node.id]?muted(run.models[node.id].provider+' / '+run.models[node.id].model):null,state.error?el('div',{class:'inline-error'},state.error):null,subject?qualityCard(run,subject):null,el('div',{},el('h3',{class:'section-title'},'节点输出'),el('pre',{},outputs[node.id]||subject?.evidence.output||'节点尚未返回输出。')),el('div',{},el('h3',{class:'section-title'},'文件产物'),(run.artifacts||[]).filter(a=>a.nodeId===node.id).map(a=>el('div',{class:'artifact'},button(a.name,async()=>{const file=await api('runs/artifact',{requestId:run.requestId,artifactId:a.id});modal(file.name,el('pre',{},file.content),async()=>download(file.name.split(/[\\/]/).at(-1),file.content,'text/plain'),'下载文件')} ,'subtle'),el('span',{class:'badge'},({updated:'已修改',added:'新增',deleted:'已删除'}[a.change]||a.change)))),!(run.artifacts||[]).some(a=>a.nodeId===node.id)?muted('本节点暂无文件变更。'):null),(run.codeHandoffs[node.id]?.repositories||[]).map(repo=>button('下载 '+repo.alias+' 累计补丁',async()=>{const p=await api('runs/patch',{requestId:run.requestId,nodeId:node.id,alias:repo.alias}),bytes=Uint8Array.from(atob(p.content),c=>c.charCodeAt(0));download(p.name,bytes,'application/octet-stream')}))):muted('运行尚未生成节点记录');mount(el('div',{class:'trail'},button('← 运行记录',()=>{activeRun=null;page==='projects'?showProjects():showRuns()},'subtle')),head(names(run.projectId),'运行 '+run.requestId.slice(0,8)+' · '+time(run.startedAt),controls),run.error?el('div',{class:'banner',style:'margin-bottom:18px'},run.error):null,el('div',{class:'run-layout'},stack(el('section',{class:'card'},el('div',{class:'row spread'},el('h2',{},'工作流进度'),row(badge(run.status),run.qualityStatus==='passed'&&run.qualityUnconfiguredNodes.length?el('span',{class:'badge good'},'已配置项验收通过'):badge(run.qualityStatus))),dag(run),muted('点击节点查看输出、产物与验收记录。')),el('section',{class:'card'},el('h3',{class:'section-title'},'本次运行快照'),el('p',{},'工作流版本 v'+(run.template?.version||'—')),run.repositories.map(r=>el('div',{class:'repo'},el('strong',{},r.alias),el('code',{},r.commit.slice(0,12)))),run.qualityUnconfiguredNodes.length?muted(run.qualityUnconfiguredNodes.length+' 个节点未配置质量验收；执行完成不会标记为验收通过。'):null)),el('section',{class:'card node-detail'},detail)))}
-function qualityCard(run,s){const last=s.reviews.at(-1),content=stack(row(el('strong',{},'节点质量验收'),badge(s.status)),muted('固定检查对象：本次节点输出与代码产物。'),s.reviews.map(r=>r.decision?muted('第 '+r.sequence+' 轮 · '+states[r.decision.outcome]+' · '+r.decision.note):null));if(run.status==='running'&&s.status==='pending')content.append(row(button('验收通过',()=>decide('passed'),'primary'),button('不通过',()=>decide('failed'),'danger')));if(run.status==='running'&&s.status==='failed')content.append(button('开始新一轮验收',async()=>{await api('quality/recheck',{requestId:run.requestId,subjectId:s.id,subjectDigest:s.digest,nodeId:s.evidence.nodeId,attempt:s.evidence.attempt,expectedReviewId:last.id});await showRun(run)}));async function decide(outcome){const note=area('','填写检查范围、结果和依据…');modal(outcome==='passed'?'确认验收通过':'记录不通过',stack(label('验收说明',note),muted(outcome==='passed'?'通过后将继续执行下游节点。':'记录会保留；节点继续等待，可重新发起验收。')),async()=>{await api('quality/decide',{decisionId:uuid(),requestId:run.requestId,subjectId:s.id,subjectDigest:s.digest,nodeId:s.evidence.nodeId,attempt:s.evidence.attempt,reviewId:last.id,outcome,note:note.value});await showRun(run)},'提交结果')}return el('section',{class:'quality'},content)}
-async function init(){try{bootstrap=await api('bootstrap');await catalog();if(page==='templates')await showTemplates();else if(page==='runs')await showRuns();else await showProjects()}catch(error){mount(empty('项目交付尚未就绪',error.message,button('重新连接',init)))}}
-setInterval(async()=>{if(!activeRun||polling||overlays.children.length||editor)return;polling=true;try{await showRun({requestId:activeRun})}catch(e){notice(e.message,true)}finally{polling=false}},2500);
-init();
-</script></body></html>
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>项目交付</title>
+    <style>
+      :root {
+        font:
+          14px/1.6 -apple-system,
+          BlinkMacSystemFont,
+          "Segoe UI",
+          "Microsoft YaHei",
+          sans-serif;
+        color: #223448;
+        background: #f5f7fa;
+        font-synthesis: none;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+      }
+      button,
+      input,
+      select,
+      textarea {
+        font: inherit;
+      }
+      button {
+        cursor: pointer;
+        background: white;
+        border: 1px solid #d9e1e9;
+        border-radius: 7px;
+        padding: 7px 14px;
+        color: #304659;
+        transition: 0.15s;
+      }
+      button:hover {
+        border-color: #10848e;
+        background: #f0faf9;
+      }
+      button:disabled {
+        opacity: 0.45;
+        cursor: default;
+      }
+      .primary {
+        background: #087e8b;
+        border-color: #087e8b;
+        color: white;
+      }
+      .primary:hover {
+        background: #096c77;
+        color: white;
+      }
+      .danger {
+        color: #ad3434;
+      }
+      input,
+      select,
+      textarea {
+        width: 100%;
+        border: 1px solid #d7e0e9;
+        border-radius: 7px;
+        background: #fff;
+        color: #223448;
+        padding: 9px 11px;
+        outline: none;
+      }
+      input:focus,
+      select:focus,
+      textarea:focus {
+        border-color: #087e8b;
+        box-shadow: 0 0 0 3px #087e8b12;
+      }
+      textarea {
+        resize: vertical;
+        min-height: 95px;
+      }
+      input[type="checkbox"] {
+        width: auto;
+        accent-color: #087e8b;
+      }
+      h1,
+      h2,
+      h3,
+      p {
+        margin: 0;
+      }
+      h1 {
+        font-size: 23px;
+        letter-spacing: -0.4px;
+      }
+      h2 {
+        font-size: 17px;
+      }
+      h3 {
+        font-size: 14px;
+      }
+      .muted {
+        color: #7b8897;
+        font-size: 12px;
+      }
+      .eyebrow {
+        font-size: 11px;
+        letter-spacing: 1.6px;
+        color: #087e8b;
+        font-weight: 650;
+      }
+      .row {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        flex-wrap: wrap;
+      }
+      .spread {
+        justify-content: space-between;
+      }
+      .stack {
+        display: flex;
+        flex-direction: column;
+        gap: 18px;
+      }
+      .grow {
+        flex: 1;
+        min-width: 0;
+      }
+      .page {
+        max-width: 1400px;
+        margin: auto;
+        padding: 28px 30px 40px;
+      }
+      .heading {
+        margin-bottom: 24px;
+      }
+      .heading p {
+        color: #748396;
+        margin-top: 6px;
+      }
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
+        gap: 18px;
+      }
+      .card {
+        background: #fff;
+        border: 1px solid #e1e7ee;
+        border-radius: 11px;
+        padding: 21px;
+        box-shadow: 0 2px 5px #23344703;
+      }
+      .clickable {
+        cursor: pointer;
+      }
+      .clickable:hover {
+        border-color: #6fabb1;
+        box-shadow: 0 6px 20px #23344708;
+      }
+      .card.selected {
+        border-color: #087e8b;
+        background: #f9fdfd;
+      }
+      .badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        border-radius: 5px;
+        background: #eef3f8;
+        color: #576d82;
+        font-size: 11px;
+        padding: 2px 7px;
+        white-space: nowrap;
+      }
+      .badge.good {
+        color: #197253;
+        background: #eaf7ee;
+      }
+      .badge.wait {
+        color: #9c6818;
+        background: #fff4da;
+      }
+      .badge.bad {
+        color: #b54242;
+        background: #fff0ed;
+      }
+      .dot {
+        display: inline-block;
+        border-radius: 50%;
+        width: 6px;
+        height: 6px;
+        background: currentColor;
+      }
+      .empty {
+        padding: 65px 30px;
+        text-align: center;
+        border: 1px dashed #d3dfe7;
+        border-radius: 12px;
+        background: #ffffff80;
+        color: #728397;
+      }
+      .empty h2 {
+        color: #30465a;
+        margin: 13px 0 7px;
+      }
+      .empty button {
+        margin-top: 20px;
+      }
+      .stats {
+        display: flex;
+        gap: 30px;
+        margin: 18px 0 0;
+        padding-top: 15px;
+        border-top: 1px solid #eef1f4;
+      }
+      .stats strong {
+        font-size: 22px;
+        display: block;
+        font-weight: 600;
+      }
+      .stats span {
+        font-size: 11px;
+        color: #8793a1;
+      }
+      .project-layout {
+        display: grid;
+        grid-template-columns: 260px 1fr;
+        gap: 22px;
+      }
+      .list {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+      .repo {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 12px 0;
+        border-bottom: 1px solid #eef2f6;
+      }
+      .repo:last-child {
+        border: 0;
+      }
+      .repo code {
+        font-size: 12px;
+        word-break: break-all;
+        color: #66788b;
+      }
+      .section-title {
+        margin-bottom: 15px;
+      }
+      .banner {
+        padding: 15px 19px;
+        border: 1px solid #cfe4e6;
+        background: #eff8f8;
+        border-radius: 9px;
+        color: #326671;
+        font-size: 13px;
+      }
+      .sep {
+        height: 1px;
+        background: #e7edf3;
+        margin: 16px 0;
+      }
+      .mono,
+      pre,
+      code {
+        font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+      }
+      pre {
+        white-space: pre-wrap;
+        overflow-wrap: anywhere;
+        font-size: 12px;
+        background: #f5f7fa;
+        border: 1px solid #e5ebf1;
+        border-radius: 7px;
+        padding: 14px;
+        max-height: 420px;
+        overflow: auto;
+      }
+      .table {
+        width: 100%;
+        border-collapse: collapse;
+        text-align: left;
+        font-size: 13px;
+      }
+      .table th {
+        color: #8a97a5;
+        font-size: 11px;
+        font-weight: 550;
+        padding: 12px 14px;
+        border-bottom: 1px solid #e7edf3;
+      }
+      .table td {
+        padding: 14px;
+        border-bottom: 1px solid #eef2f6;
+      }
+      .table tbody tr:hover {
+        background: #f6fafa;
+        cursor: pointer;
+      }
+      .toast {
+        position: fixed;
+        bottom: 24px;
+        left: 50%;
+        transform: translateX(-50%);
+        padding: 11px 20px;
+        border-radius: 8px;
+        box-shadow: 0 5px 25px #18344322;
+        background: #223e4a;
+        color: #fff;
+        z-index: 100;
+        max-width: 90%;
+        white-space: pre-wrap;
+      }
+      .toast.error {
+        background: #9a3d3d;
+      }
+      .modal-wrap {
+        position: fixed;
+        inset: 0;
+        background: #172c4050;
+        display: grid;
+        place-items: center;
+        z-index: 50;
+        padding: 24px;
+        backdrop-filter: blur(2px);
+      }
+      .modal {
+        background: #fff;
+        border-radius: 13px;
+        width: min(680px, 100%);
+        max-height: 90vh;
+        overflow: auto;
+        box-shadow: 0 18px 80px #10243433;
+      }
+      .modal.wide {
+        width: min(860px, 100%);
+      }
+      .modal-head {
+        padding: 21px 24px;
+        border-bottom: 1px solid #e5ebf0;
+      }
+      .modal-body {
+        padding: 24px;
+        display: flex;
+        flex-direction: column;
+        gap: 17px;
+      }
+      .modal-foot {
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+        padding: 17px 24px;
+        border-top: 1px solid #e5ebf0;
+        background: #fafbfd;
+      }
+      .field {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+      }
+      .field > span,
+      .field > label {
+        font-size: 12px;
+        font-weight: 600;
+        color: #597085;
+      }
+      .fields {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 15px;
+      }
+      .repo-fields {
+        display: grid;
+        grid-template-columns: 110px 1fr 100px 34px;
+        gap: 8px;
+      }
+      .subtle {
+        border: 0;
+        background: none;
+        color: #768a9a;
+        padding: 4px 7px;
+      }
+      .editor-page {
+        height: 100vh;
+        display: flex;
+        flex-direction: column;
+        background: white;
+      }
+      .editor-head {
+        padding: 15px 22px;
+        border-bottom: 1px solid #e2e9ef;
+      }
+      .editor-body {
+        display: flex;
+        min-height: 0;
+        flex: 1;
+      }
+      .canvas {
+        flex: 1;
+        border: 0;
+        min-width: 0;
+        height: 100%;
+      }
+      .inspector > .muted {
+        display: block;
+        margin: 8px 0;
+      }
+      .inspector {
+        width: 265px;
+        flex-shrink: 0;
+        background: #f9fbfc;
+        border-left: 1px solid #e2e9ef;
+        padding: 18px;
+        overflow: auto;
+      }
+      .node-item {
+        width: 100%;
+        text-align: left;
+        margin-top: 10px;
+        padding: 12px;
+        background: #fff;
+      }
+      .node-item small {
+        display: block;
+        color: #8291a0;
+      }
+      .choices {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+        max-height: 220px;
+        overflow: auto;
+      }
+      .choice {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        border: 1px solid #e3eaf0;
+        border-radius: 7px;
+        padding: 8px;
+        font-size: 12px;
+      }
+      .choice small {
+        display: block;
+        color: #8b97a5;
+        font-size: 10px;
+      }
+      .run-layout {
+        display: grid;
+        grid-template-columns: minmax(300px, 1.4fr) minmax(270px, 1fr);
+        gap: 20px;
+      }
+      .dag {
+        overflow: auto;
+        padding: 10px 0;
+      }
+      .dag svg {
+        display: block;
+        width: 100%;
+        min-width: 380px;
+        height: auto;
+      }
+      .node-detail {
+        max-height: 680px;
+        overflow: auto;
+      }
+      .quality {
+        background: #fffaf0;
+        border: 1px solid #f0dcaf;
+        padding: 15px;
+        border-radius: 8px;
+      }
+      .pill {
+        font-size: 12px;
+        padding: 6px 10px;
+        border-radius: 20px;
+        background: #edf4f5;
+        color: #42747c;
+      }
+      .metric {
+        font-variant-numeric: tabular-nums;
+      }
+      .trail {
+        font-size: 12px;
+        color: #8b97a5;
+        margin-bottom: 10px;
+      }
+      .artifact {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        padding: 10px 0;
+        border-bottom: 1px solid #ecf0f4;
+      }
+      .artifact button {
+        text-align: left;
+        word-break: break-all;
+      }
+      .inline-error {
+        color: #ad3434;
+        font-size: 12px;
+        white-space: pre-wrap;
+      }
+      .file-input {
+        display: none;
+      }
+      @media (max-width: 850px) {
+        .project-layout,
+        .run-layout {
+          grid-template-columns: 1fr;
+        }
+        .page {
+          padding: 22px 18px;
+        }
+        .inspector > .muted {
+          display: block;
+          margin: 8px 0;
+        }
+        .inspector {
+          width: 220px;
+        }
+        .fields {
+          grid-template-columns: 1fr;
+        }
+        .repo-fields {
+          grid-template-columns: 80px 1fr;
+        }
+        .choices {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main id="app"></main>
+    <div id="overlays"></div>
+    <script>
+      "use strict";
+      const page = "__INITIAL_PAGE__",
+        $ = (id) => document.getElementById(id),
+        root = $("app"),
+        overlays = $("overlays");
+      let runViewHash = "",
+        templates = [],
+        projects = [],
+        bootstrap = {},
+        activeProject = null,
+        activeRun = null,
+        activeNode = null,
+        editor = null,
+        editorFrame = null,
+        capabilities = [],
+        polling = false;
+      const uuid = () => crypto.randomUUID();
+      function el(tag, attrs = {}, ...children) {
+        const n = document.createElement(tag);
+        for (const [key, value] of Object.entries(attrs)) {
+          if (key === "class") n.className = value;
+          else if (key.startsWith("on"))
+            n.addEventListener(key.slice(2), value);
+          else if (key === "checked") n.checked = value;
+          else if (key === "disabled") n.disabled = value;
+          else if (value !== undefined && value !== null)
+            n.setAttribute(key, value);
+        }
+        for (const child of children.flat(Infinity)) {
+          if (child !== null && child !== undefined && child !== false)
+            n.append(
+              child instanceof Node
+                ? child
+                : document.createTextNode(String(child)),
+            );
+        }
+        return n;
+      }
+      const row = (...children) => el("div", { class: "row" }, ...children),
+        stack = (...children) => el("div", { class: "stack" }, ...children),
+        muted = (text) => el("span", { class: "muted" }, text),
+        label = (text, input, hint) => {
+          const control = ["INPUT", "SELECT", "TEXTAREA"].includes(
+            input.tagName,
+          );
+          if (control && !input.id) input.id = "field-" + uuid();
+          return el(
+            "div",
+            { class: "field" },
+            el(
+              control ? "label" : "span",
+              control ? { for: input.id } : {},
+              text,
+            ),
+            input,
+            hint ? muted(hint) : null,
+          );
+        };
+      function input(value = "", placeholder = "", type = "text") {
+        const n = el("input", { type, placeholder });
+        n.value = value;
+        return n;
+      }
+      function area(value = "", placeholder = "") {
+        const n = el("textarea", { placeholder });
+        n.value = value;
+        return n;
+      }
+      function select(options, value) {
+        const n = el(
+          "select",
+          {},
+          options.map((o) =>
+            el(
+              "option",
+              { value: typeof o === "string" ? o : o.value },
+              typeof o === "string" ? o : o.label,
+            ),
+          ),
+        );
+        if (value !== undefined) n.value = value;
+        return n;
+      }
+      function button(text, fn, style = "") {
+        return el(
+          "button",
+          {
+            class: style,
+            onclick: async (event) => {
+              const b = event.currentTarget;
+              b.disabled = true;
+              try {
+                await fn();
+              } catch (error) {
+                notice(error.message, true);
+              } finally {
+                b.disabled = false;
+              }
+            },
+          },
+          text,
+        );
+      }
+      function notice(text, error = false) {
+        document.querySelector(".toast")?.remove();
+        const n = el("div", { class: "toast" + (error ? " error" : "") }, text);
+        document.body.append(n);
+        setTimeout(() => n.remove(), 6000);
+      }
+      async function api(action, payload = {}) {
+        const response = await fetch("/api/workbuddy-delivery", {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify({ action, ...payload }),
+        });
+        const value = await response.json();
+        if (!response.ok || value.error)
+          throw new Error(value.error || "请求失败");
+        return value;
+      }
+      async function catalog() {
+        const data = await api("catalog");
+        templates = data.templates;
+        projects = data.projects;
+      }
+      const names = (id) => projects.find((p) => p.id === id)?.name || "项目";
+      const time = (s) =>
+        s ? new Date(s).toLocaleString("zh-CN", { hour12: false }) : "—";
+      const states = {
+        preparing: "准备中",
+        ready: "已就绪",
+        starting: "启动中",
+        running: "运行中",
+        recovering: "恢复中",
+        execution_succeeded: "执行完成",
+        execution_failed: "执行失败",
+        preparation_failed: "启动失败",
+        interrupted: "已中断",
+        canceled: "已取消",
+        success: "已完成",
+        error: "失败",
+        skipped: "未执行",
+        pending: "待验收",
+        waiting_quality: "待验收",
+        passed: "验收通过",
+        failed: "未通过",
+        not_evaluated: "未配置验收",
+      };
+      function badge(status) {
+        return el(
+          "span",
+          {
+            class:
+              "badge " +
+              (["success", "passed", "execution_succeeded"].includes(status)
+                ? "good"
+                : [
+                      "failed",
+                      "error",
+                      "execution_failed",
+                      "preparation_failed",
+                    ].includes(status)
+                  ? "bad"
+                  : [
+                        "pending",
+                        "waiting_quality",
+                        "running",
+                        "preparing",
+                        "recovering",
+                      ].includes(status)
+                    ? "wait"
+                    : ""),
+          },
+          el("i", { class: "dot" }),
+          states[status] || status,
+        );
+      }
+      function head(title, description, actions = []) {
+        return el(
+          "div",
+          { class: "row spread heading" },
+          el(
+            "div",
+            {},
+            el("div", { class: "eyebrow" }, "WORKBUDDY / DELIVERY"),
+            el("h1", {}, title),
+            el("p", {}, description),
+          ),
+          row(actions),
+        );
+      }
+      function empty(title, description, action) {
+        return el(
+          "div",
+          { class: "empty" },
+          el("div", { style: "font-size:32px;color:#7da1ac" }, "◇"),
+          el("h2", {}, title),
+          el("p", {}, description),
+          action,
+        );
+      }
+      function mount(...children) {
+        root.replaceChildren(el("div", { class: "page" }, ...children));
+      }
+      function modal(title, content, onSave, saveText = "保存", wide = false) {
+        const wrap = el("div", { class: "modal-wrap" }),
+          error = el("div", { class: "inline-error" });
+        function close() {
+          wrap.remove();
+        }
+        const cancel = button("取消", close),
+          save = button(
+            saveText,
+            async () => {
+              try {
+                await onSave();
+                close();
+              } catch (e) {
+                error.textContent = e.message;
+                throw e;
+              }
+            },
+            "primary",
+          );
+        wrap.append(
+          el(
+            "section",
+            { class: "modal" + (wide ? " wide" : "") },
+            el("div", { class: "modal-head" }, el("h2", {}, title)),
+            el("div", { class: "modal-body" }, content, error),
+            el("div", { class: "modal-foot" }, cancel, save),
+          ),
+        );
+        overlays.append(wrap);
+        return { close, wrap };
+      }
+      function download(name, content, type = "application/json") {
+        const url = URL.createObjectURL(new Blob([content], { type })),
+          a = el("a", { href: url, download: name });
+        a.click();
+        setTimeout(() => URL.revokeObjectURL(url), 1000);
+      }
+      function repoForm(project) {
+        const name = input(project?.name || "", "例如：客户服务平台"),
+          container = el("div", { class: "stack", style: "gap:9px" }),
+          rows = [];
+        function add(repo = {}) {
+          const alias = input(repo.alias || "", "别名"),
+            path = input(repo.url || "", "本机 Git 仓库根目录"),
+            ref = input(repo.ref || "HEAD", "分支 / 标签");
+          const r = el(
+            "div",
+            { class: "repo-fields" },
+            alias,
+            path,
+            ref,
+            button(
+              "×",
+              () => {
+                r.remove();
+                rows.splice(rows.indexOf(entry), 1);
+              },
+              "subtle",
+            ),
+          );
+          const entry = { alias, path, ref };
+          rows.push(entry);
+          container.append(r);
+        }
+        for (const repo of project?.repositories || [{}]) add(repo);
+        modal(
+          project ? "编辑项目" : "新建项目",
+          stack(
+            label("项目名称", name),
+            label(
+              "Git 仓库",
+              container,
+              "先在本机克隆仓库；每次运行固定所选分支的提交，未提交内容不包含在内。",
+            ),
+            button("＋ 添加仓库", () => add()),
+          ),
+          async () => {
+            const repositories = rows.map((r) => ({
+              alias: r.alias.value.trim(),
+              url: r.path.value.trim(),
+              ref: r.ref.value.trim(),
+            }));
+            const saved = await api(
+              project ? "project/update" : "project/create",
+              {
+                id: project?.id,
+                expectedRevision: project?.revision,
+                name: name.value.trim(),
+                repositories,
+              },
+            );
+            await catalog();
+            activeProject = saved.id;
+            await showProjects();
+            notice("项目已保存");
+          },
+          "保存项目",
+          true,
+        );
+      }
+      async function showProjects() {
+        if (activeProject) {
+          const p = projects.find((p) => p.id === activeProject);
+          if (p) return projectDetail(p);
+          activeProject = null;
+        }
+        mount(
+          head(
+            "把业务需求带到交付",
+            "为项目绑定仓库，选择工作流，开始一次可追踪的交付。",
+            [button("新建项目", () => repoForm(), "primary")],
+          ),
+          projects.length
+            ? el(
+                "div",
+                { class: "grid" },
+                projects.map((p) =>
+                  el(
+                    "article",
+                    {
+                      class: "card clickable",
+                      onclick: () => {
+                        activeProject = p.id;
+                        showProjects();
+                      },
+                    },
+                    el(
+                      "div",
+                      { class: "row spread" },
+                      el("h2", {}, p.name),
+                      el(
+                        "span",
+                        { class: "badge" },
+                        p.binding ? "已选工作流" : "待配置",
+                      ),
+                    ),
+                    el(
+                      "p",
+                      { class: "muted", style: "margin-top:10px" },
+                      p.repositories.map((r) => r.alias).join(" · "),
+                    ),
+                    el(
+                      "div",
+                      { class: "stats" },
+                      el(
+                        "div",
+                        {},
+                        el("strong", {}, p.repositories.length),
+                        el("span", {}, "Git 仓库"),
+                      ),
+                      el(
+                        "div",
+                        {},
+                        el(
+                          "strong",
+                          {},
+                          p.binding ? "v" + p.binding.version : "—",
+                        ),
+                        el(
+                          "span",
+                          {},
+                          p.binding
+                            ? templates.find(
+                                (t) => t.id === p.binding.templateId,
+                              )?.name || "工作流版本"
+                            : "选择工作流",
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              )
+            : empty(
+                "创建第一个项目",
+                "项目把仓库、工作流和每次运行的交付记录联系在一起。",
+                button("新建项目", () => repoForm(), "primary"),
+              ),
+        );
+      }
+      async function projectDetail(p) {
+        const runs = (await api("runs/list", { projectId: p.id })).runs;
+        const template =
+          p.binding && templates.find((t) => t.id === p.binding.templateId);
+        const repos = el(
+          "section",
+          { class: "card" },
+          el(
+            "h3",
+            { class: "section-title" },
+            "仓库 · " + p.repositories.length,
+          ),
+          p.repositories.map((r) =>
+            el(
+              "div",
+              { class: "repo" },
+              el(
+                "div",
+                {},
+                el("strong", {}, r.alias),
+                el("div", {}, el("code", {}, r.url)),
+                muted(r.ref),
+              ),
+            ),
+          ),
+        );
+        const binding = p.binding
+          ? stack(
+              row(
+                el("h3", {}, template?.name || "工作流"),
+                el("span", { class: "badge good" }, "v" + p.binding.version),
+              ),
+              row(
+                Object.entries(p.binding.repositoryMap).map(([role, alias]) =>
+                  el("span", { class: "pill" }, role + " → " + alias),
+                ),
+              ),
+              muted("项目固定使用发布版本；编辑模板草稿不会改变这个绑定。"),
+            )
+          : el(
+              "div",
+              { class: "banner" },
+              "选择一个已发布的工作流版本，并把模板的仓库角色映射到项目仓库。",
+            );
+        const workflow = el(
+          "section",
+          { class: "card" },
+          el(
+            "div",
+            { class: "row spread section-title" },
+            el("h2", {}, "项目工作流"),
+            button(p.binding ? "更换版本" : "选择工作流", () => bindDialog(p)),
+          ),
+          binding,
+        );
+        const history = el(
+          "section",
+          { class: "card" },
+          el(
+            "div",
+            { class: "row spread section-title" },
+            el("h2", {}, "最近运行"),
+            muted(runs.length + " 次"),
+          ),
+          runs.length
+            ? runTable(runs)
+            : muted("还没有运行记录，配置工作流后即可发起。"),
+        );
+        mount(
+          el(
+            "div",
+            { class: "trail" },
+            button(
+              "← 全部项目",
+              () => {
+                activeProject = null;
+                showProjects();
+              },
+              "subtle",
+            ),
+          ),
+          head(p.name, "管理仓库与工作流，查看这个项目的交付记录。", [
+            button("编辑项目", () => repoForm(p)),
+            button("发起运行", () => startDialog(p), "primary"),
+          ]),
+          el(
+            "div",
+            { class: "project-layout" },
+            stack(repos),
+            stack(workflow, history),
+          ),
+        );
+      }
+      async function bindDialog(p) {
+        const available = templates.filter((t) => !t.archived),
+          template = select([
+            { value: "", label: "选择模板" },
+            ...available.map((t) => ({ value: t.id, label: t.name })),
+          ]),
+          version = select([{ value: "", label: "先选择模板" }]),
+          mapping = el("div", { class: "stack", style: "gap:10px" });
+        let versions = [];
+        async function updateVersion() {
+          mapping.replaceChildren();
+          const v = versions.find((v) => String(v.version) === version.value);
+          for (const role of v?.definition.repositoryRoles || [])
+            mapping.append(
+              label(
+                role.id,
+                select(
+                  p.repositories.map((r) => r.alias),
+                  p.binding?.repositoryMap[role.id],
+                ),
+              ),
+            );
+          for (const [i, node] of [...mapping.children].entries())
+            node.dataset.role = v.definition.repositoryRoles[i].id;
+        }
+        template.onchange = async () => {
+          try {
+            versions = template.value
+              ? (await api("detail", { id: template.value })).versions.filter(
+                  (v) => v.ready,
+                )
+              : [];
+            version.replaceChildren(
+              ...versions.map((v) =>
+                el("option", { value: v.version }, "v" + v.version),
+              ),
+            );
+            if (!versions.length)
+              version.append(el("option", { value: "" }, "尚无已发布版本"));
+            updateVersion();
+          } catch (e) {
+            notice(e.message, true);
+          }
+        };
+        version.onchange = updateVersion;
+        modal(
+          "选择项目工作流",
+          stack(
+            label("工作流模板", template),
+            label("发布版本", version),
+            label("仓库角色映射", mapping),
+          ),
+          async () => {
+            if (!template.value || !version.value)
+              throw new Error("请选择已发布版本");
+            await api("project/bind", {
+              id: p.id,
+              expectedRevision: p.revision,
+              binding: {
+                templateId: template.value,
+                version: Number(version.value),
+                repositoryMap: Object.fromEntries(
+                  [...mapping.children].map((n) => [
+                    n.dataset.role,
+                    n.querySelector("select").value,
+                  ]),
+                ),
+              },
+            });
+            await catalog();
+            showProjects();
+            notice("项目工作流已更新");
+          },
+          "使用此版本",
+        );
+        if (p.binding) {
+          template.value = p.binding.templateId;
+          await template.onchange();
+          version.value = String(p.binding.version);
+          updateVersion();
+        }
+      }
+      async function startDialog(p) {
+        if (!p.binding) {
+          await bindDialog(p);
+          return;
+        }
+        const { version } = await api("project/workflow", { projectId: p.id }),
+          task = area("", "描述这次业务需求、验收标准和需要关注的内容…"),
+          fields = new Map();
+        const inputs = el("div", { class: "stack" });
+        for (const f of version.definition.inputSchema?.fields || []) {
+          const node =
+            f.type === "boolean"
+              ? select(["true", "false"], String(f.defaultValue ?? false))
+              : input(
+                  typeof f.defaultValue === "object"
+                    ? JSON.stringify(f.defaultValue)
+                    : (f.defaultValue ?? ""),
+                  f.description || f.key,
+                );
+          fields.set(f.key, { field: f, node });
+          inputs.append(label(f.key + (f.required ? " *" : ""), node));
+        }
+        modal(
+          "发起项目运行",
+          stack(
+            el(
+              "div",
+              { class: "banner" },
+              p.name +
+                " · " +
+                (templates.find((t) => t.id === p.binding.templateId)?.name ||
+                  "工作流") +
+                " v" +
+                p.binding.version,
+            ),
+            label("本次需求", task),
+            inputs,
+            muted(
+              "Agent 使用节点指定模型或 DSH 当前模型。运行开始时固定版本、能力包、模型和仓库提交。",
+            ),
+          ),
+          async () => {
+            const values = {};
+            for (const [key, { field: f, node }] of fields) {
+              const v = node.value;
+              if (v !== "" || f.required)
+                values[key] =
+                  f.type === "number"
+                    ? Number(v)
+                    : f.type === "boolean"
+                      ? v === "true"
+                      : ["object", "array", "json", "string[]"].includes(f.type)
+                        ? JSON.parse(v)
+                        : v;
+            }
+            const run = await api("runs/start", {
+              requestId: uuid(),
+              projectId: p.id,
+              expectedProjectRevision: p.revision,
+              triggerInput: task.value,
+              inputs: values,
+            });
+            activeRun = run.requestId;
+            await showRun(run);
+            notice(
+              run.status === "preparation_failed" ? run.error : "运行已启动",
+              run.status === "preparation_failed",
+            );
+          },
+          "开始运行",
+        );
+      }
+      function newTemplate() {
+        const name = input("", "例如：版本发布评审");
+        modal(
+          "新建工作流模板",
+          stack(
+            label("模板名称", name),
+            muted(
+              "从一个 Agent 节点开始；在画布中添加、连接和删除节点，形成适合业务的 DAG。",
+            ),
+          ),
+          async () => {
+            const id = "agent_" + uuid().slice(0, 8);
+            const created = await api("template/import", {
+              name: name.value,
+              definition: {
+                graph: {
+                  nodes: [
+                    {
+                      id,
+                      type: "agent",
+                      position: { x: 100, y: 120 },
+                      data: {
+                        label: "执行任务",
+                        prompt:
+                          "根据本次业务需求完成任务，使用需要的工具检查结果。",
+                        inputTemplate: "{{$trigger}}\n\n{{$upstream}}",
+                      },
+                    },
+                  ],
+                  edges: [],
+                },
+                repositoryRoles: [{ id: "main" }],
+              },
+            });
+            await catalog();
+            await openEditor(created.templateId);
+          },
+          "创建并编辑",
+        );
+      }
+      async function showTemplates() {
+        editor = null;
+        editorFrame = null;
+        mount(
+          head(
+            "让交付方式可以复用",
+            "自由创建 DAG，配置节点能力，发布稳定版本供项目选用。",
+            [
+              button("导入模板", () => importTemplate()),
+              button("新建模板", newTemplate, "primary"),
+            ],
+          ),
+          templates.length
+            ? el(
+                "div",
+                { class: "grid" },
+                templates.map((t) =>
+                  el(
+                    "article",
+                    { class: "card" },
+                    el(
+                      "div",
+                      { class: "row spread" },
+                      el("h2", {}, t.name),
+                      el(
+                        "span",
+                        { class: "badge" },
+                        t.archived ? "已归档" : "草稿 r" + t.revision,
+                      ),
+                    ),
+                    el(
+                      "p",
+                      { class: "muted", style: "margin:12px 0 20px" },
+                      t.source
+                        ? "从已有模板复制，可独立编辑"
+                        : "可复用的业务工作流模板",
+                    ),
+                    row(
+                      button("编辑模板", () => openEditor(t.id)),
+                      button("版本与管理", () => manageTemplate(t)),
+                    ),
+                  ),
+                ),
+              )
+            : empty(
+                "沉淀你的工作流",
+                "节点、依赖与能力组合都由你定义。",
+                button("新建模板", newTemplate, "primary"),
+              ),
+        );
+      }
+      async function importTemplate() {
+        const picker = el("input", {
+          type: "file",
+          accept: ".json,application/json",
+          class: "file-input",
+          onchange: async () => {
+            try {
+              const data = JSON.parse(await picker.files[0].text());
+              const created = await api("template/import", {
+                name: data.name || picker.files[0].name.replace(/\.json$/, ""),
+                definition: data.definition || data,
+              });
+              await catalog();
+              openEditor(created.templateId);
+              notice("模板已导入，请核对能力并重新保存节点配置");
+            } catch (e) {
+              notice(e.message, true);
+            } finally {
+              picker.remove();
+            }
+          },
+        });
+        document.body.append(picker);
+        picker.click();
+      }
+      async function manageTemplate(t) {
+        const d = await api("detail", { id: t.id }),
+          content = stack(
+            el(
+              "div",
+              {},
+              el("strong", {}, t.name),
+              el(
+                "p",
+                { class: "muted" },
+                "草稿 r" +
+                  d.draft.revision +
+                  " · " +
+                  d.versions.length +
+                  " 个发布版本",
+              ),
+            ),
+            d.versions.map((v) =>
+              el(
+                "div",
+                { class: "row spread" },
+                row(
+                  el("strong", {}, "v" + v.version),
+                  el(
+                    "span",
+                    { class: "badge " + (v.ready ? "good" : "wait") },
+                    v.ready ? "可选用" : "待发布完成",
+                  ),
+                ),
+                button("从此版本复制", async () => {
+                  const c = await api("template/restore", {
+                    id: t.id,
+                    version: v.version,
+                    name: t.name + " · v" + v.version + " 副本",
+                  });
+                  dialog.close();
+                  await catalog();
+                  openEditor(c.templateId);
+                }),
+              ),
+            ),
+            row(
+              !t.archived
+                ? button("重命名", () => {
+                    const name = input(t.name);
+                    modal(
+                      "重命名模板",
+                      label("模板名称", name),
+                      async () => {
+                        await api("template/rename", {
+                          id: t.id,
+                          expectedRevision: d.draft.revision,
+                          name: name.value,
+                        });
+                        dialog.close();
+                        await catalog();
+                        showTemplates();
+                      },
+                      "保存名称",
+                    );
+                  })
+                : null,
+              button("导出草稿", () =>
+                download(
+                  t.name + ".json",
+                  JSON.stringify(
+                    {
+                      schemaVersion: 1,
+                      name: t.name,
+                      definition: {
+                        ...d.draft.definition,
+                        nodeBindings: (
+                          d.draft.definition.nodeBindings || []
+                        ).map((b) => ({ ...b, packages: {} })),
+                      },
+                    },
+                    null,
+                    2,
+                  ),
+                ),
+              ),
+              button("复制草稿", async () => {
+                const c = await api("copy", {
+                  id: t.id,
+                  expectedRevision: d.draft.revision,
+                  name: t.name + " 副本",
+                });
+                dialog.close();
+                await catalog();
+                openEditor(c.templateId);
+              }),
+              !t.archived
+                ? button(
+                    "归档",
+                    async () => {
+                      await api("archive", { id: t.id });
+                      dialog.close();
+                      await catalog();
+                      showTemplates();
+                    },
+                    "danger",
+                  )
+                : null,
+            ),
+          );
+        const dialog = modal("模板版本与管理", content, async () => {}, "关闭");
+      }
+      const flushWaiters = new Map();
+      window.addEventListener("message", async (event) => {
+        if (
+          event.origin === location.origin &&
+          event.source === window.parent &&
+          event.data?.type === "delivery-prepare-navigation"
+        ) {
+          try {
+            if (overlays.children.length)
+              throw new Error("请先保存或取消当前配置。");
+            if (editor) await flush();
+            window.parent.postMessage(
+              { type: "delivery-navigation-ready" },
+              location.origin,
+            );
+          } catch (error) {
+            window.parent.postMessage(
+              { type: "delivery-navigation-ready", error: error.message },
+              location.origin,
+            );
+          }
+          return;
+        }
+        if (
+          event.origin !== location.origin ||
+          event.source !== editorFrame?.contentWindow
+        )
+          return;
+        if (event.data?.type === "wf1-ready") {
+          editorFrame.contentWindow.postMessage(
+            { type: "wf1-session", sessionId: "delivery-editor" },
+            location.origin,
+          );
+          return;
+        }
+        if (event.data?.type === "delivery-save-result") {
+          const waiter = flushWaiters.get(event.data.requestId);
+          if (waiter) {
+            flushWaiters.delete(event.data.requestId);
+            clearTimeout(waiter.timer);
+            event.data.ok
+              ? waiter.resolve(event.data)
+              : waiter.reject(new Error(event.data.error || "保存失败"));
+          }
+          if (event.data.ok)
+            refreshInspector().catch((e) => notice(e.message, true));
+        }
+      });
+      function flush() {
+        if (!editorFrame) throw new Error("请先打开模板");
+        const requestId = uuid();
+        return new Promise((resolve, reject) => {
+          const timer = setTimeout(() => {
+            flushWaiters.delete(requestId);
+            reject(new Error("画布尚未就绪，请稍后重试"));
+          }, 12000);
+          flushWaiters.set(requestId, { resolve, reject, timer });
+          editorFrame.contentWindow.postMessage(
+            { type: "delivery-flush", requestId },
+            location.origin,
+          );
+        });
+      }
+      async function syncRevision() {
+        const state = await api("editor/state", { editorId: editor.editorId });
+        editor.revision = state.revision;
+        editor.definition = state.definition;
+        editorFrame.contentWindow.postMessage(
+          { type: "delivery-revision", revision: state.revision },
+          location.origin,
+        );
+        return state;
+      }
+      async function openEditor(id) {
+        const t = templates.find((t) => t.id === id);
+        if (t?.archived)
+          throw new Error("此模板已归档，可从历史版本复制后编辑");
+        editor = await api("editor/open", { id });
+        editor.templateId = id;
+        const header = el(
+          "header",
+          { class: "editor-head" },
+          el(
+            "div",
+            { class: "row spread" },
+            row(
+              button(
+                "← 模板",
+                async () => {
+                  await flush();
+                  await catalog();
+                  showTemplates();
+                },
+                "subtle",
+              ),
+              el("h2", {}, t?.name || "模板"),
+              el(
+                "span",
+                { class: "badge", id: "revision" },
+                "草稿 r" + editor.revision,
+              ),
+            ),
+            row(
+              button("仓库角色", editRoles),
+              button("保存草稿", async () => {
+                await flush();
+                notice("草稿已保存");
+              }),
+              button(
+                "发布版本",
+                async () => {
+                  const saved = await flush();
+                  const v = await api("publish", {
+                    id,
+                    expectedRevision: saved.revision,
+                  });
+                  await catalog();
+                  notice("已发布 v" + v.version + "，可在项目中选用");
+                },
+                "primary",
+              ),
+            ),
+          ),
+        );
+        editorFrame = el("iframe", {
+          class: "canvas",
+          title: "工作流模板画布",
+        });
+        const inspector = el("aside", { class: "inspector", id: "inspector" });
+        root.replaceChildren(
+          el(
+            "section",
+            { class: "editor-page" },
+            header,
+            el("div", { class: "editor-body" }, editorFrame, inspector),
+          ),
+        );
+        editorFrame.src =
+          "/api/workbuddy-delivery?document=editor&editorId=" + editor.editorId;
+        await refreshInspector();
+      }
+      async function refreshInspector() {
+        if (!editor || !$("inspector")) return;
+        await syncRevision();
+        $("revision").textContent = "草稿 r" + editor.revision;
+        const d = editor.definition;
+        $("inspector").replaceChildren(
+          el("div", { class: "eyebrow" }, "NODE CAPABILITIES"),
+          el("h3", { style: "margin:6px 0" }, "节点能力与完成条件"),
+          muted("在画布安排依赖，在这里为节点绑定仓库、专家、技能和规范。"),
+          el("div", { class: "sep" }),
+          ...d.graph.nodes.map((n) => {
+            const b = (d.nodeBindings || []).find((b) => b.nodeId === n.id),
+              quality = d.qualityPolicies?.some((p) => p.nodeId === n.id);
+            return button(
+              [
+                n.data?.label || n.id,
+                n.type === "agent"
+                  ? b?.repositoryRole
+                    ? " · 已配置"
+                    : " · 待配置"
+                  : " · " +
+                    ({ script: "JavaScript", input: "输入", output: "输出" }[
+                      n.type
+                    ] || n.type),
+                quality ? " · 需验收" : "",
+              ].join(""),
+              () => nodeDialog(n.id),
+              "node-item",
+            );
+          }),
+          el("div", { class: "sep" }),
+          muted(
+            "仓库角色：" +
+              (d.repositoryRoles || []).map((r) => r.id).join("、"),
+          ),
+          muted("发布版本后，在项目中选择版本并映射实际仓库。"),
+        );
+      }
+      async function editRoles() {
+        await flush();
+        const state = await syncRevision(),
+          roles = input(
+            (state.definition.repositoryRoles || [])
+              .map((r) => r.id)
+              .join(", "),
+            "例如：frontend, backend",
+          );
+        modal(
+          "模板仓库角色",
+          label(
+            "角色标识",
+            roles,
+            "用逗号分隔；项目选用模板时再映射到具体仓库。已有节点使用的角色请勿直接删除。",
+          ),
+          async () => {
+            await api("roles/save", {
+              id: editor.templateId,
+              expectedRevision: state.revision,
+              roles: roles.value
+                .split(/[,，]/)
+                .map((s) => s.trim())
+                .filter(Boolean)
+                .map((id) => ({ id })),
+            });
+            await openEditor(editor.templateId);
+          },
+          "保存角色",
+        );
+      }
+      async function nodeDialog(nodeId) {
+        await flush();
+        await syncRevision();
+        const node = editor.definition.graph.nodes.find((n) => n.id === nodeId),
+          binding = editor.definition.nodeBindings?.find(
+            (b) => b.nodeId === nodeId,
+          ),
+          name = input(node.data?.label || nodeId),
+          system = area(node.data?.prompt || ""),
+          prompt = area(node.data?.inputTemplate || ""),
+          required = el("input", {
+            type: "checkbox",
+            checked: editor.definition.qualityPolicies?.some(
+              (p) => p.nodeId === nodeId,
+            ),
+          });
+        capabilities = (await api("capabilities")).capabilities;
+        const role = select(
+          [
+            { value: "", label: "选择仓库角色" },
+            ...(editor.definition.repositoryRoles || []).map((r) => ({
+              value: r.id,
+              label: r.id,
+            })),
+          ],
+          binding?.repositoryRole || "",
+        );
+        const provider = select(
+            [
+              { value: "", label: "使用 DSH 当前模型" },
+              ...(bootstrap.providers || []).map((p) => ({
+                value: p.id,
+                label: p.name || p.id,
+              })),
+            ],
+            node.data?.provider || "",
+          ),
+          model = select([{ value: "", label: "默认模型" }]),
+          choices = new Map(),
+          upgrade = el("input", { type: "checkbox" });
+        async function models() {
+          model.replaceChildren(el("option", { value: "" }, "默认模型"));
+          if (provider.value) {
+            const data = await api("models", { provider: provider.value });
+            model.append(
+              ...data.models.map((m) =>
+                el("option", { value: m.id }, m.name || m.id),
+              ),
+            );
+            model.value = node.data?.model || "";
+          }
+        }
+        provider.onchange = () =>
+          models().catch((e) => notice(e.message, true));
+        await models();
+        const controls = [];
+        if (node.type === "agent") {
+          controls.push(
+            label("仓库角色", role),
+            el(
+              "div",
+              { class: "fields" },
+              label("模型提供方", provider),
+              label("模型", model),
+            ),
+            label("系统指令", system),
+            label(
+              "任务提示词",
+              prompt,
+              "使用画布中的变量选择器插入上游输出和运行输入。",
+            ),
+          );
+          for (const [kind, key, title] of [
+            ["expert", "experts", "专家 / 专家团"],
+            ["skill", "skills", "Skills"],
+            ["connector", "connectors", "MCP"],
+            ["rule", "rules", "规范"],
+          ]) {
+            const options = capabilities.filter((c) => c.kind === kind),
+              holder = el("div", { class: "choices" });
+            for (const c of options) {
+              const check = el("input", {
+                type: kind === "expert" ? "radio" : "checkbox",
+                name: key,
+                checked: binding?.capabilities?.[key]?.includes(c.reference),
+                disabled: !!c.unavailable,
+              });
+              choices.set(c.reference, { check, key, c });
+              holder.append(
+                el(
+                  "label",
+                  { class: "choice" },
+                  check,
+                  el(
+                    "span",
+                    {},
+                    c.name || c.reference,
+                    el("small", {}, c.reference),
+                    c.unavailable ? el("small", {}, c.unavailable) : null,
+                  ),
+                ),
+              );
+            }
+            if (kind === "expert")
+              holder.prepend(
+                el(
+                  "label",
+                  { class: "choice" },
+                  el("input", {
+                    type: "radio",
+                    name: key,
+                    checked: !binding?.capabilities?.experts?.length,
+                  }),
+                  el("span", {}, "不绑定专家"),
+                ),
+              );
+            const search = input("", "搜索" + title);
+            search.oninput = () => {
+              const q = search.value.trim().toLowerCase();
+              for (const item of holder.children)
+                item.style.display = item.textContent.toLowerCase().includes(q)
+                  ? ""
+                  : "none";
+            };
+            controls.push(
+              label(
+                title,
+                options.length
+                  ? stack(search, holder)
+                  : muted("暂无可选项，可在能力库中添加或同步资源。"),
+              ),
+            );
+          }
+        }
+        if (binding)
+          controls.push(
+            el(
+              "label",
+              { class: "choice" },
+              upgrade,
+              el(
+                "span",
+                {},
+                "升级到能力库当前版本",
+                el(
+                  "small",
+                  {},
+                  "默认保留已绑定快照；更改能力选择或勾选此项时才更新能力内容。",
+                ),
+              ),
+            ),
+          );
+        modal(
+          "配置节点 · " + (node.data?.label || nodeId),
+          stack(
+            label("节点名称", name),
+            controls,
+            el(
+              "label",
+              { class: "choice" },
+              required,
+              el(
+                "span",
+                {},
+                "执行完成后需要人工验收",
+                el(
+                  "small",
+                  {},
+                  "通过前，下游节点保持等待。脚本检查等形式后续接入。",
+                ),
+              ),
+            ),
+          ),
+          async () => {
+            let state = await syncRevision();
+            if (node.type === "agent") {
+              const selected = {
+                  experts: [],
+                  skills: [],
+                  connectors: [],
+                  rules: [],
+                },
+                expectedHashes = {};
+              for (const [ref, { check, key, c }] of choices)
+                if (check.checked) {
+                  selected[key].push(ref);
+                  expectedHashes[ref] = c.hash;
+                }
+              if (!role.value) throw new Error("请选择仓库角色");
+              await api("node/save", {
+                id: editor.templateId,
+                editorId: editor.editorId,
+                expectedRevision: state.revision,
+                nodeId,
+                repositoryRole: role.value,
+                capabilities: selected,
+                expectedHashes,
+                keepSnapshot:
+                  !!binding &&
+                  !upgrade.checked &&
+                  Object.keys(selected).every(
+                    (key) =>
+                      JSON.stringify([...selected[key]].sort()) ===
+                      JSON.stringify(
+                        [...(binding.capabilities[key] || [])].sort(),
+                      ),
+                  ),
+              });
+              state = await syncRevision();
+              state = await api("node/config", {
+                id: editor.templateId,
+                editorId: editor.editorId,
+                expectedRevision: state.revision,
+                nodeId,
+                label: name.value,
+                prompt: system.value,
+                inputTemplate: prompt.value,
+                provider: provider.value,
+                model: model.value,
+              });
+            }
+            await api("quality-policy/save", {
+              id: editor.templateId,
+              editorId: editor.editorId,
+              expectedRevision: state.revision,
+              nodeId,
+              required: required.checked,
+            });
+            await openEditor(editor.templateId);
+            notice("节点配置已保存");
+          },
+          "保存节点",
+          true,
+        );
+      }
+      function runTable(runs) {
+        return el(
+          "table",
+          { class: "table" },
+          el(
+            "thead",
+            {},
+            el(
+              "tr",
+              {},
+              ["项目 / 运行", "执行状态", "质量验收", "开始时间"].map((s) =>
+                el("th", {}, s),
+              ),
+            ),
+          ),
+          el(
+            "tbody",
+            {},
+            runs.map((r) =>
+              el(
+                "tr",
+                {
+                  onclick: () => {
+                    activeRun = r.requestId;
+                    activeNode = null;
+                    showRun(r);
+                  },
+                },
+                el(
+                  "td",
+                  {},
+                  el("strong", {}, names(r.projectId)),
+                  el("div", { class: "muted mono" }, r.requestId.slice(0, 8)),
+                ),
+                el("td", {}, badge(r.status)),
+                el("td", {}, badge(r.qualityStatus)),
+                el("td", { class: "muted" }, time(r.startedAt)),
+              ),
+            ),
+          ),
+        );
+      }
+      async function showRuns() {
+        editor = null;
+        editorFrame = null;
+        const runs = (await api("runs/list")).runs;
+        mount(
+          head(
+            "每一次交付，都有据可查",
+            "查看 DAG 进度、节点输出、待验收项和代码产物。",
+            [button("刷新", showRuns)],
+          ),
+          runs.length
+            ? el(
+                "section",
+                { class: "card", style: "padding:0;overflow:auto" },
+                runTable(runs),
+              )
+            : empty(
+                "还没有运行记录",
+                "从项目发起一次运行，执行进度和产物会出现在这里。",
+              ),
+        );
+      }
+      const svgNS = "http://www.w3.org/2000/svg";
+      function svgEl(tag, attrs, text) {
+        const n = document.createElementNS(svgNS, tag);
+        for (const [k, v] of Object.entries(attrs)) n.setAttribute(k, v);
+        if (text !== undefined) n.textContent = text;
+        return n;
+      }
+      function dag(run) {
+        const graph = run.graph || { nodes: [], edges: [] },
+          levels = new Map(),
+          positions = new Map();
+        function level(id, visiting = new Set()) {
+          if (levels.has(id)) return levels.get(id);
+          if (visiting.has(id)) return 0;
+          const parents = graph.edges
+              .filter((e) => e.target === id)
+              .map((e) => e.source),
+            v = parents.length
+              ? 1 +
+                Math.max(
+                  ...parents.map((p) => level(p, new Set(visiting).add(id))),
+                )
+              : 0;
+          levels.set(id, v);
+          return v;
+        }
+        const columns = new Map();
+        for (const n of graph.nodes) {
+          const l = level(n.id);
+          columns.set(l, [...(columns.get(l) || []), n]);
+        }
+        for (const [l, nodes] of columns)
+          nodes.forEach((n, i) =>
+            positions.set(n.id, { x: 25 + l * 210, y: 30 + i * 100 }),
+          );
+        const w = Math.max(420, (Math.max(...columns.keys(), 0) + 1) * 210),
+          h = Math.max(
+            140,
+            Math.max(...[...columns.values()].map((n) => n.length), 1) * 100 +
+              35,
+          ),
+          svg = svgEl("svg", {
+            viewBox: `0 0 ${w} ${h}`,
+            role: "img",
+            "aria-label": "DAG 运行进度",
+          });
+        for (const e of graph.edges) {
+          const a = positions.get(e.source),
+            b = positions.get(e.target);
+          if (a && b)
+            svg.append(
+              svgEl("path", {
+                d: `M${a.x + 165} ${a.y + 27}C${a.x + 190} ${a.y + 27},${b.x - 25} ${b.y + 27},${b.x} ${b.y + 27}`,
+                fill: "none",
+                stroke: "#b7cbd1",
+                "stroke-width": 1.5,
+              }),
+            );
+        }
+        for (const n of graph.nodes) {
+          const p = positions.get(n.id),
+            status = run.nodeStates?.[n.id]?.status || "pending",
+            g = svgEl("g", {
+              role: "button",
+              tabindex: 0,
+              "aria-label":
+                (n.data?.label || n.id) + " " + (states[status] || "等待执行"),
+              style: "cursor:pointer",
+            }),
+            color =
+              status === "success"
+                ? "#298a6d"
+                : status === "error"
+                  ? "#c6665b"
+                  : status === "waiting_quality"
+                    ? "#d5a13b"
+                    : "#8a9aa9";
+          g.append(
+            svgEl("rect", {
+              x: p.x,
+              y: p.y,
+              width: 165,
+              height: 58,
+              rx: 8,
+              fill: activeNode === n.id ? "#eff8f7" : "#fff",
+              stroke: activeNode === n.id ? "#087e8b" : "#dce6ec",
+              "stroke-width": activeNode === n.id ? 2 : 1,
+            }),
+            svgEl("circle", { cx: p.x + 16, cy: p.y + 19, r: 3, fill: color }),
+            svgEl(
+              "text",
+              { x: p.x + 26, y: p.y + 23, "font-size": 12, fill: "#284456" },
+              (n.data?.label || n.id).slice(0, 15),
+            ),
+            svgEl(
+              "text",
+              { x: p.x + 14, y: p.y + 44, "font-size": 10, fill: color },
+              status === "pending" ? "等待执行" : states[status] || status,
+            ),
+          );
+          g.addEventListener("click", () => {
+            activeNode = n.id;
+            showRun(run);
+          });
+          g.addEventListener("keydown", (e) => {
+            if (e.key === "Enter") {
+              activeNode = n.id;
+              showRun(run);
+            }
+          });
+          svg.append(g);
+        }
+        return el("div", { class: "dag" }, svg);
+      }
+      async function showRun(value) {
+        const run = await api("runs/detail", { requestId: value.requestId });
+        const viewHash = JSON.stringify(run) + activeNode;
+        if (root.querySelector(".run-layout") && runViewHash === viewHash)
+          return;
+        runViewHash = viewHash;
+        activeRun = run.requestId;
+        const nodes = run.graph?.nodes || [];
+        if (!nodes.some((n) => n.id === activeNode))
+          activeNode =
+            nodes.find(
+              (n) => run.nodeStates[n.id]?.status === "waiting_quality",
+            )?.id || nodes[0]?.id;
+        const node = nodes.find((n) => n.id === activeNode),
+          state = run.nodeStates[activeNode] || {},
+          subject = run.qualitySubjects
+            ?.filter((s) => s.evidence.nodeId === activeNode)
+            .at(-1),
+          outputs = run.outputs || {};
+        const controls = [];
+        if (
+          ["running", "preparing", "ready", "starting", "recovering"].includes(
+            run.status,
+          )
+        )
+          controls.push(
+            button(
+              "取消运行",
+              async () => {
+                await api("runs/cancel", { requestId: run.requestId });
+                await showRun(run);
+              },
+              "danger",
+            ),
+          );
+        if (run.status === "interrupted" && run.recovery?.eligible)
+          controls.push(
+            button(
+              "恢复运行",
+              async () => {
+                await api("runs/recover", {
+                  requestId: run.requestId,
+                  recoveryId: uuid(),
+                  expectedNativeRunId: run.nativeRunId,
+                  expectedPlanDigest: run.recovery.digest,
+                });
+                showRun(run);
+              },
+              "primary",
+            ),
+          );
+        controls.push(button("刷新", () => showRun(run)));
+        const detail = node
+          ? stack(
+              el(
+                "div",
+                { class: "row spread" },
+                el("h2", {}, node.data?.label || node.id),
+                badge(state.status || "未开始"),
+              ),
+              run.models?.[node.id]
+                ? muted(
+                    run.models[node.id].provider +
+                      " / " +
+                      run.models[node.id].model,
+                  )
+                : null,
+              state.error
+                ? el("div", { class: "inline-error" }, state.error)
+                : null,
+              subject ? qualityCard(run, subject) : null,
+              el(
+                "div",
+                {},
+                el("h3", { class: "section-title" }, "节点输出"),
+                el(
+                  "pre",
+                  {},
+                  outputs[node.id] ||
+                    subject?.evidence.output ||
+                    "节点尚未返回输出。",
+                ),
+              ),
+              el(
+                "div",
+                {},
+                el("h3", { class: "section-title" }, "文件产物"),
+                (run.artifacts || [])
+                  .filter((a) => a.nodeId === node.id)
+                  .map((a) =>
+                    el(
+                      "div",
+                      { class: "artifact" },
+                      button(
+                        a.name,
+                        async () => {
+                          const file = await api("runs/artifact", {
+                            requestId: run.requestId,
+                            artifactId: a.id,
+                          });
+                          modal(
+                            file.name,
+                            el("pre", {}, file.content),
+                            async () =>
+                              download(
+                                file.name.split(/[\\/]/).at(-1),
+                                file.content,
+                                "text/plain",
+                              ),
+                            "下载文件",
+                          );
+                        },
+                        "subtle",
+                      ),
+                      el(
+                        "span",
+                        { class: "badge" },
+                        { updated: "已修改", added: "新增", deleted: "已删除" }[
+                          a.change
+                        ] || a.change,
+                      ),
+                    ),
+                  ),
+                !(run.artifacts || []).some((a) => a.nodeId === node.id)
+                  ? muted("本节点暂无文件变更。")
+                  : null,
+              ),
+              (run.codeHandoffs[node.id]?.repositories || []).map((repo) =>
+                button("下载 " + repo.alias + " 累计补丁", async () => {
+                  const p = await api("runs/patch", {
+                      requestId: run.requestId,
+                      nodeId: node.id,
+                      alias: repo.alias,
+                    }),
+                    bytes = Uint8Array.from(atob(p.content), (c) =>
+                      c.charCodeAt(0),
+                    );
+                  download(p.name, bytes, "application/octet-stream");
+                }),
+              ),
+            )
+          : muted("运行尚未生成节点记录");
+        mount(
+          el(
+            "div",
+            { class: "trail" },
+            button(
+              "← 运行记录",
+              () => {
+                activeRun = null;
+                page === "projects" ? showProjects() : showRuns();
+              },
+              "subtle",
+            ),
+          ),
+          head(
+            names(run.projectId),
+            "运行 " + run.requestId.slice(0, 8) + " · " + time(run.startedAt),
+            controls,
+          ),
+          run.error
+            ? el(
+                "div",
+                { class: "banner", style: "margin-bottom:18px" },
+                run.error,
+              )
+            : null,
+          el(
+            "div",
+            { class: "run-layout" },
+            stack(
+              el(
+                "section",
+                { class: "card" },
+                el(
+                  "div",
+                  { class: "row spread" },
+                  el("h2", {}, "工作流进度"),
+                  row(
+                    badge(run.status),
+                    run.qualityStatus === "passed" &&
+                      run.qualityUnconfiguredNodes.length
+                      ? el("span", { class: "badge good" }, "已配置项验收通过")
+                      : badge(run.qualityStatus),
+                  ),
+                ),
+                dag(run),
+                muted("点击节点查看输出、产物与验收记录。"),
+              ),
+              el(
+                "section",
+                { class: "card" },
+                el("h3", { class: "section-title" }, "本次运行快照"),
+                el("p", {}, "工作流版本 v" + (run.template?.version || "—")),
+                run.repositories.map((r) =>
+                  el(
+                    "div",
+                    { class: "repo" },
+                    el("strong", {}, r.alias),
+                    el("code", {}, r.commit.slice(0, 12)),
+                  ),
+                ),
+                run.qualityUnconfiguredNodes.length
+                  ? muted(
+                      run.qualityUnconfiguredNodes.length +
+                        " 个节点未配置质量验收；执行完成不会标记为验收通过。",
+                    )
+                  : null,
+              ),
+            ),
+            el("section", { class: "card node-detail" }, detail),
+          ),
+        );
+      }
+      function qualityCard(run, s) {
+        const last = s.reviews.at(-1),
+          content = stack(
+            row(el("strong", {}, "节点质量验收"), badge(s.status)),
+            muted("固定检查对象：本次节点输出与代码产物。"),
+            s.reviews.map((r) =>
+              r.decision
+                ? muted(
+                    "第 " +
+                      r.sequence +
+                      " 轮 · " +
+                      states[r.decision.outcome] +
+                      " · " +
+                      r.decision.note,
+                  )
+                : null,
+            ),
+          );
+        if (run.status === "running" && s.status === "pending")
+          content.append(
+            row(
+              button("验收通过", () => decide("passed"), "primary"),
+              button("不通过", () => decide("failed"), "danger"),
+            ),
+          );
+        if (run.status === "running" && s.status === "failed")
+          content.append(
+            button("开始新一轮验收", async () => {
+              await api("quality/recheck", {
+                requestId: run.requestId,
+                subjectId: s.id,
+                subjectDigest: s.digest,
+                nodeId: s.evidence.nodeId,
+                attempt: s.evidence.attempt,
+                expectedReviewId: last.id,
+              });
+              await showRun(run);
+            }),
+          );
+        async function decide(outcome) {
+          const note = area("", "填写检查范围、结果和依据…");
+          modal(
+            outcome === "passed" ? "确认验收通过" : "记录不通过",
+            stack(
+              label("验收说明", note),
+              muted(
+                outcome === "passed"
+                  ? "通过后将继续执行下游节点。"
+                  : "记录会保留；节点继续等待，可重新发起验收。",
+              ),
+            ),
+            async () => {
+              await api("quality/decide", {
+                decisionId: uuid(),
+                requestId: run.requestId,
+                subjectId: s.id,
+                subjectDigest: s.digest,
+                nodeId: s.evidence.nodeId,
+                attempt: s.evidence.attempt,
+                reviewId: last.id,
+                outcome,
+                note: note.value,
+              });
+              await showRun(run);
+            },
+            "提交结果",
+          );
+        }
+        return el("section", { class: "quality" }, content);
+      }
+      async function init() {
+        try {
+          bootstrap = await api("bootstrap");
+          await catalog();
+          if (page === "templates") await showTemplates();
+          else if (page === "runs") await showRuns();
+          else await showProjects();
+        } catch (error) {
+          mount(
+            empty("项目交付尚未就绪", error.message, button("重新连接", init)),
+          );
+        }
+      }
+      setInterval(async () => {
+        if (!activeRun || polling || overlays.children.length || editor) return;
+        polling = true;
+        try {
+          await showRun({ requestId: activeRun });
+        } catch (e) {
+          notice(e.message, true);
+        } finally {
+          polling = false;
+        }
+      }, 2500);
+      init();
+    </script>
+  </body>
+</html>
