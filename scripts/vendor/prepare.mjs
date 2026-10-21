@@ -46,7 +46,7 @@ if (runtime) {
   patch('lib/engine.js', 'if (!canceled0 && !s.run.canceled && kind?.retryable !== false', 'if (!canceled0 && !err?.handoffBlocked && !s.run.canceled && kind?.retryable !== false')
   patch('lib/engine.js', "if (!canceled && err?.code !== 'UNKNOWN_NODE_TYPE' && node.data?.continueOnFail)", "if (!canceled && !err?.handoffBlocked && err?.code !== 'UNKNOWN_NODE_TYPE' && node.data?.continueOnFail)")
   patch('lib/index.js', "export const inject = ['agents', 'agentDefaultModel', 'sessions', 'tools', 'webServer', 'agentPresets', 'sessionPersistence', 'llm', 'skills'];", "export const inject = ['agents', 'agentDefaultModel', 'sessions', 'tools', 'webServer', 'agentPresets', 'sessionPersistence', 'llm', 'skills', 'deliveryRuntime'];")
-  patch('lib/index.js', '  orch = new Orchestrator(ctx, { onEvent: onOrchestratorEvent, renderTemplate });', `  const deliveryRuntime = ctx.get('deliveryRuntime');
+  patch('lib/index.js', '  orch = new Orchestrator(ctx, { onEvent: onOrchestratorEvent, renderTemplate });', `  const deliveryRuntime = ctx.get('deliveryRuntime', false);
   orch = new Orchestrator(ctx, { onEvent: onOrchestratorEvent, renderTemplate });
   orch.admitNode = deliveryRuntime.admitNode;
   orch.executeNode = deliveryRuntime.executeNode;
@@ -85,6 +85,9 @@ if (runtime) {
   patch('lib/index.js', '          if (restrictList) {', '          if (restrictList && !deployment) {')
 }
 patch('lib/index.js', '  ensureWorkflowSkill({ log: (msg) => ctx.logger?.info?.(`[orchestrator] ${msg}`) });', '  // WorkBuddy owns the product entry; no standalone workflow skill is seeded.\n  // ensureWorkflowSkill disabled by the embedded product adapter.');
+patch('lib/index.js', "    const outputDir = relative(store.workspaceRoot, ws).split(sep).join('/');\n", '');
+patch('lib/index.js', '    const deployment = deliveryRuntime.deploymentFor(node, run);', "    const deployment = deliveryRuntime.deploymentFor(node, run);\n    const outputDir = deployment ? '.delivery/outputs' : relative(store.workspaceRoot, ws).split(sep).join('/');\n    if (deployment) mkdirSync(resolve(deployment.cwd, outputDir), { recursive: true });");
+patch('lib/index.js', '- 本节点的专属输出目录是 ${outputDir}；交付物（报告/工单/回复稿等）必须写入该目录，中间产物也应写入该目录，不要修改工作区中的其他文件。', "${deployment ? '- 在当前运行仓库中完成实现和测试；报告放入 ' + outputDir + '。当前目录和列出的其他仓库目录属于本次运行，按需求修改代码并检查结果。' : '- 本节点的专属输出目录是 ' + outputDir + '；报告和中间产物写入该目录。'}");
 // Validate all pins/anchors before creating an experimental target.
 cpSync(source, target, { recursive: true })
 for (const [file, contents] of edited) writeFileSync(join(target, file), contents)
