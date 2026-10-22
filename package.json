@@ -1,6 +1,6 @@
 {
   "name": "dsh-workbuddy-project",
-  "version": "0.4.0-preview.3",
+  "version": "0.4.0-preview.4",
   "description": "DSH 项目交付：多仓库项目、可复用工作流、节点能力和运行验收",
   "type": "module",
   "main": "lib/index.js",
@@ -46,7 +46,7 @@
     "@deepseek-ai/dsh-session": "~0.2.1-rc.2"
   },
   "scripts": {
-    "test": "node test/packages.mjs && node test/library-sync.mjs",
+    "test": "node test/packages.mjs && node test/library-sync.mjs && node --experimental-vm-modules test/windows-package-paths.mjs",
     "test:host": "node test/packages-host.mjs",
     "test:ui": "node test/packages-ui.cjs",
     "test:preset": "node test/preset-host.mjs",

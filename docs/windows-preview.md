@@ -1,4 +1,4 @@
-# Windows 封闭环境验证：WorkBuddy 项目交付 0.4.0-preview.3
+# Windows 封闭环境验证：WorkBuddy 项目交付 0.4.0-preview.4
 
 目标宿主：**DSH 0.2.1-rc2（npm 版本 0.2.1-rc.2）**，Windows 10/11，Node.js >=22.15（含 node:sqlite），Git for Windows。使用 DSH CLI 的 web profile，浏览器地址为本机 localhost。DSH 桌面壳暂未验证。
 
@@ -12,7 +12,7 @@ npm run build:client
 npm run prepare:offline
 ```
 
-生成 `dist/dsh-workbuddy-project-0.4.0-preview.3-offline.tgz`、同名 `.sha256`、`install-windows.ps1` 和本说明。离线包已包含固定依赖与画布资源。DSH 及其宿主依赖复用目标机已有安装，不包含在插件包内。
+生成 `dist/dsh-workbuddy-project-0.4.0-preview.4-offline.tgz`、同名 `.sha256`、`install-windows.ps1` 和本说明。离线包已包含固定依赖与画布资源。DSH 及其宿主依赖复用目标机已有安装，不包含在插件包内。
 
 将这四个文件复制到验证机。**目标机安装和运行插件不执行 npm install、npx 或联网下载。** 模型请求仍需要可访问的模型服务；完全断外网时，请先在 DSH 中配置可访问的本地/内网模型。MCP、Skill 脚本及项目构建工具的运行依赖须由所在环境另行具备。
 
@@ -24,7 +24,7 @@ npm run prepare:offline
 $env:DSH_HOME = 'D:\dsh-validation'
 # 在此 home 下启动 DSH、配置模型后退出，再执行安装：
 powershell -ExecutionPolicy Bypass -File .\install-windows.ps1 `
-  -Archive .\dsh-workbuddy-project-0.4.0-preview.3-offline.tgz `
+  -Archive .\dsh-workbuddy-project-0.4.0-preview.4-offline.tgz `
   -Profile web `
   -DshHome $env:DSH_HOME `
   -DshRoot 'D:\tools\dsh'
@@ -63,6 +63,12 @@ powershell -ExecutionPolicy Bypass -File .\install-windows.ps1 `
 - 重启后可查看历史；有完整检查点的中断运行支持显式恢复，不确定的执行不自动重复。
 - 当前每个节点的文件变更快照上限为 50 个文件、5 MB；文本预览上限为 256 KB。大批量修改应拆分节点，二进制文件可通过累计补丁交付。
 - 普通运行沿用 DSH 文件访问和命令审批策略。若 bash/MCP 操作需要宿主批准，按 DSH 当前策略处理。
+
+## Windows 能力包路径修复
+
+若旧版出现 `Package paths must remain relative to the package root`，请停止 DSH，使用 preview.4 的离线包、同名校验文件和安装脚本，按第 2 节原路径、原 profile 安装后重启。不需要修改能力包目录、manifest 或关闭路径校验。旧配置和数据会保留。
+
+此问题来自插件内部把 Windows 扫描结果的反斜杠传给标准包引用校验；preview.4 在内部扫描边界转换分隔符。若先前创建模板失败，升级后重新点击“使用标准研发模板”；模板不会因安装插件而自动出现在列表。
 
 ## 5. 升级、回退与反馈
 

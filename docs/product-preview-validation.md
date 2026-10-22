@@ -1,6 +1,6 @@
 # 产品预览验证记录
 
-版本：`dsh-workbuddy-project@0.4.0-preview.3`。日期：2026-10-22。
+版本：`dsh-workbuddy-project@0.4.0-preview.4`。日期：2026-10-22。
 
 ## 已验证
 
@@ -23,6 +23,10 @@
 ## 标准研发模板验证
 
 本版另外验证内置需求→设计→编码→测试模板。四个阶段分别加载绑定能力，经本地仓库 MCP 读取实际上游文档；每阶段固定报告后验收放行。编码与测试 Agent 通过 DSH bash 实际执行 7 项测试，累计补丁在新 clone 中应用后复测仍为 7 通过、0 失败。模型决策为测试适配器，未调用外部模型。详情见 [模板说明](software-delivery-starter.md)、[执行记录](validation/software-delivery.json) 和 [复测输出](validation/software-delivery-tests.txt)。
+
+## Windows 路径回归
+
+针对 Windows 实机反馈的包路径错误，使用 Windows 路径语义和映射文件系统运行实际能力包扫描代码：修复前复现原报错；修复后，盘符、中文/空格路径中的专家元数据、附带 Skill、引用文件和 MCP 包读取通过，内容哈希与本机扫描一致。绝对路径和越界引用仍被拒绝。此项是 Windows 路径语义验证，不是 Windows 系统实测。
 
 ## 尚未验证
 
