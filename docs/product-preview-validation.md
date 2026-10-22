@@ -1,6 +1,6 @@
 # 产品预览验证记录
 
-版本：`dsh-workbuddy-project@0.4.0-preview.5`。日期：2026-10-22。
+版本：`dsh-workbuddy-project@0.4.0-preview.6`。日期：2026-10-22。
 
 ## 已验证
 
@@ -31,6 +31,10 @@
 ## Windows 模块导入与离线字体
 
 本地复现 Node 将原生 Windows 盘符路径解释为 URL 协议的失败。四阶段真实编译结果中的节点规范与连接器入口均检查为存在的 file URL；模块缺失的诊断保留组件名及原始错误码。安装验证还检查画布实际 CSS 响应不包含 Google Fonts 外网导入。另核对画布初始化所查询的工具、技能、模型、运行时、凭据和运行列表接口；用户反馈的 lark-auth 400 已改为明确的未启用响应。Windows 系统本身仍需实测。
+
+## 本轮 Windows 路径检查
+
+preview.6 扩展原生路径范围、目录身份、Git 地址及本地 MCP 入口的回归。真实 Git 同步采用中文/空格源路径；离线自检在特殊字符目录内编译四阶段能力、导入组件、处理超过 260 字符路径、调用 MCP 并交接代码。检查范围和目标机命令见 [Windows 路径检查](windows-path-audit.md)。隔离安装后的[自检输出](validation/windows-path-smoke-macos.json)明确标记 `nativeWindows: false`，不冒充 Windows 实测。
 
 ## 尚未验证
 

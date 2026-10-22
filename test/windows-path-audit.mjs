@@ -2,7 +2,7 @@
 import assert from 'node:assert/strict'
 import * as fs from 'node:fs'
 import * as path from 'node:path'
-import { fileURLToPath, pathToFileURL } from 'node:url'
+import { fileURLToPath } from 'node:url'
 import vm from 'node:vm'
 
 const win = path.win32, root = fileURLToPath(new URL('../', import.meta.url))

@@ -1,6 +1,6 @@
 {
   "name": "dsh-workbuddy-project",
-  "version": "0.4.0-preview.5",
+  "version": "0.4.0-preview.6",
   "description": "DSH 项目交付：多仓库项目、可复用工作流、节点能力和运行验收",
   "type": "module",
   "main": "lib/index.js",
@@ -53,7 +53,8 @@
     "check:package": "node scripts/check-package.mjs",
     "test:delivery": "node test/delivery/check-store.mjs && node test/delivery/check-code-handoff.mjs && node test/delivery/check-quality-ledger.mjs && node test/delivery/check-run-checkpoints.mjs",
     "build:client": "node scripts/build-client.mjs",
-    "prepare:offline": "node scripts/prepare-offline.mjs"
+    "prepare:offline": "node scripts/prepare-offline.mjs",
+    "check:paths": "node scripts/check-paths.mjs"
   },
   "dependencies": {
     "yaml": "2.9.1",

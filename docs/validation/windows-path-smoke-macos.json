@@ -1,0 +1,30 @@
+{
+  "version": "0.4.0-preview.6",
+  "platform": "darwin",
+  "node": "25.6.1",
+  "nativeWindows": false,
+  "passed": true,
+  "checks": [
+    {
+      "name": "file URL import with Chinese, spaces, # and %",
+      "passed": true
+    },
+    {
+      "name": "local Git library with spaces; starter capability snapshots and four presets",
+      "passed": true
+    },
+    {
+      "name": "Git private worktree and paths exceeding 260 characters",
+      "passed": true
+    },
+    {
+      "name": "bundled MCP stdio startup and document reads in the private worktree",
+      "passed": true
+    },
+    {
+      "name": "snapshot, downstream checkout and unchanged source repository",
+      "passed": true
+    }
+  ],
+  "externalModelCalls": 0
+}
