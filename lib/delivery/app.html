@@ -457,7 +457,7 @@
       }
       .run-layout {
         display: grid;
-        grid-template-columns: minmax(300px, 1.4fr) minmax(270px, 1fr);
+        grid-template-columns: minmax(300px, 0.85fr) minmax(420px, 1.15fr);
         gap: 20px;
       }
       .dag {
@@ -471,8 +471,8 @@
         height: auto;
       }
       .node-detail {
-        max-height: 680px;
-        overflow: auto;
+        min-width: 0;
+        overflow: visible;
       }
       .quality {
         background: #fffaf0;
@@ -515,6 +515,21 @@
       .file-input {
         display: none;
       }
+      .dialogue-stream { max-height: min(46vh, 440px); min-height: 160px; overflow: auto; display: flex; flex-direction: column; gap: 10px; padding: 12px; border: 1px solid #e2e9ec; border-radius: 12px; background: #f8fafb; }
+      .dialogue-entry { padding: 12px 14px; border-radius: 10px; background: white; border: 1px solid #e6ecee; }
+      .dialogue-entry.user { background: #edf7f5; border-color: #cae5dd; }
+      .dialogue-entry.notice { background: transparent; border: none; padding: 2px 6px; color: #687a87; font-size: 12px; }
+      .dialogue-entry.notice strong { display: none; }
+      .dialogue-entry .muted { font-size: 11px; }
+      .dialogue-text { white-space: pre-wrap; overflow-wrap: anywhere; line-height: 1.7; margin-top: 7px; }
+      .dialogue-attempt { color: #728593; font-size: 11px; text-align: center; padding: 4px; }
+      .trace-entry { border: 1px solid #e1e8ed; border-radius: 8px; padding: 10px 12px; background: white; }
+      .trace-entry summary { cursor: pointer; color: #566d7e; font-size: 12px; }
+      .trace-entry summary .badge { margin-left: 8px; }
+      .trace-entry pre { max-height: 250px; overflow: auto; font-size: 12px; margin: 10px 0 0; }
+      .trace-entry.reasoning { background: #f3f1fa; border-color: #e4def1; }
+      .tool-result { border-top: 1px dashed #d8e1e7; padding-top: 10px; }
+      .dialogue-question { padding: 14px; border: 1px solid #e9cf96; background: #fff8e8; border-radius: 10px; }
       @media (max-width: 850px) {
         .project-layout,
         .run-layout {
@@ -562,6 +577,8 @@
         editorFrame = null,
         capabilities = [],
         polling = false;
+      let nodeTab = 'activity';
+      const dialoguePanels = new Map();
       const uuid = () => crypto.randomUUID();
       function el(tag, attrs = {}, ...children) {
         const n = document.createElement(tag);
@@ -2151,11 +2168,75 @@
         }
         return el("div", { class: "dag" }, svg);
       }
+      function conversationPanel(run, node) {
+        const key = run.requestId + ':' + node.id;
+        if (dialoguePanels.has(key)) return dialoguePanels.get(key).root;
+        const status = muted('正在读取节点会话…'), question = el('div'), stream = el('div', {class:'dialogue-stream', role:'log', 'aria-label':'节点对话与运行过程'});
+        const message = area('', '补充要求、回答问题，或在验收前提出修改…');
+        message.setAttribute('aria-label','给当前节点发送消息');
+        const view = {key, run, node, status, question, stream, message, data:null, signature:'', sending:false};
+        const send = el('button', {class:'primary', onclick: async () => {
+          if (!(view.data?.canSend||view.data?.canExplain) || view.sending || !message.value.trim()) return;
+          view.sending = true; send.disabled=true;
+          const isExplanation=view.data.canExplain;
+          try {
+            const receipt = await api('nodes/message', {messageId:view.pendingId || (view.pendingId=uuid()),requestId:run.requestId,nodeId:node.id,expectedNativeRunId:view.data.nativeRunId,expectedAttempt:view.data.attempt,text:message.value,...(view.data.canExplain?{mode:'explain'}:{}), ...(view.data.thread?.question ? {questionId:view.data.thread.question.id}: {})});
+            if (receipt.status === 'rejected') throw new Error('消息未被节点接收，请刷新后重试。');
+            message.value=''; view.pendingId=null;
+            notice(receipt.status==='consumed'?'节点已接收消息':isExplanation?'消息已提交，正在只读讨论。':'消息已提交；运行中的补充将在后续推理步骤接收。');
+            await refreshDialogue(run,node);
+          } catch(error) { notice(error.message,true); } finally { view.sending=false; send.disabled=!(view.data?.canSend||view.data?.canExplain); }
+        }},'发送');
+        message.addEventListener('input',()=>{view.pendingId=null});
+        const phaseHint = muted(''), root = stack(
+          el('div',{class:'row spread'},el('h3',{class:'section-title'},'对话与运行过程'),status),
+          question,stream,
+          muted('只展示模型服务实际返回的思考、回复和工具过程；模型未返回的内部思考无法展示。'),
+          label('与当前节点交互',message),row(send,phaseHint),
+        );
+        Object.assign(view,{root,send,phaseHint});dialoguePanels.set(key,view);
+        if(node.type!=='agent'){message.disabled=true;send.disabled=true;phaseHint.textContent='该节点不是 Agent，不支持对话。'}
+        return root;
+      }
+      async function refreshDialogue(run,node) {
+        const view=dialoguePanels.get(run.requestId+':'+node.id);if(!view)return;
+        try {
+          const data=await api('runs/node',{requestId:run.requestId,nodeId:node.id});view.data=data;
+          const phases={executing:'运行中',waiting_user:'等待你的回答',waiting_quality:'等待验收，可继续对话',revising:'正在继续对话',sealing:'正在固定产物',explaining:'正在只读讨论',completed:'节点已完成',interrupted:'会话已中断'};
+          view.status.textContent=(phases[data.thread?.phase]||'尚未开始')+(data.attempt?' · 第 '+data.attempt+' 次执行':'');
+          view.send.disabled=view.sending||!(data.canSend||data.canExplain);view.message.disabled=!(data.canSend||data.canExplain);
+          view.send.textContent=data.canExplain?'询问结果（只读）':data.thread?.question?'回答并继续':data.thread?.phase==='waiting_quality'?'继续对话并重新验收':'发送';
+          view.phaseHint.textContent=data.canExplain?'只读讨论不改变已固定的代码、输出和验收结果。':data.thread?.phase==='waiting_quality'?'继续对话会生成新的输出与验收记录，下游继续等待。':data.canSend?'消息只发送给本次运行的当前节点。':'可查看已有记录；当前节点暂不接收消息。';
+          const q=data.thread?.question;
+          view.question.replaceChildren(...(q?[el('div',{class:'dialogue-question'},el('strong',{},'节点需要你补充信息'),el('p',{},q.text),row((q.options||[]).map(option=>button(option,()=>{view.message.value=option;view.pendingId=null;view.message.focus()},'subtle'))))]:[]));
+          const signature=JSON.stringify(data.entries);if(signature===view.signature)return;view.signature=signature;
+          const nearBottom=view.stream.scrollHeight-view.stream.scrollTop-view.stream.clientHeight<70,oldTop=view.stream.scrollTop;
+          const open=new Set([...view.stream.querySelectorAll('details[open]')].map(item=>item.dataset.id)),existingDetails=new Set([...view.stream.querySelectorAll('details')].map(item=>item.dataset.id));
+          const entries=[];let attempt=null;
+          for(const entry of data.entries) {
+            if(entry.attempt!==attempt){attempt=entry.attempt;entries.push(el('div',{class:'dialogue-attempt'},'第 '+attempt+' 次执行'))}
+            const title={user:'你',assistant:entry.channel==='explanation'?'Agent · 只读讨论':'Agent',reasoning:'模型返回的思考',tool:'工具 · '+entry.name,question:'节点提问',context:'运行上下文',notice:'运行记录'}[entry.kind]||entry.kind;
+            if(['reasoning','tool','context'].includes(entry.kind)) {
+              const details=el('details',{class:'trace-entry '+entry.kind,'data-id':entry.id},el('summary',{},title,entry.status?el('span',{class:'badge'},({running:'执行中',success:'成功',error:'失败',consumed:'已接收',queued:'待接收'})[entry.status]||entry.status):entry.streaming?el('span',{class:'badge'},'生成中'):entry.interrupted?el('span',{class:'badge'},'已中断'):null),el('pre',{},entry.text),entry.result!==undefined?el('pre',{class:'tool-result'},entry.result):null,entry.truncated?muted('内容较长，当前显示已截断。'):null);
+              details.open=existingDetails.has(String(entry.id))?open.has(String(entry.id)):(entry.kind==='reasoning'&&entry.streaming);entries.push(details);
+            } else entries.push(el('article',{class:'dialogue-entry '+entry.kind},el('div',{class:'row spread'},el('strong',{},title),muted(time(entry.time))),el('div',{class:'dialogue-text'},entry.text),entry.status==='queued'?muted('已提交，等待节点接收'):['discarded','rejected','failed'].includes(entry.status)?muted('消息未完成接收或执行，请查看节点状态。'):null,entry.truncated?muted('内容较长，当前显示已截断。'):null));
+          }
+          if(!entries.length)entries.push(muted(data.canExplain?'此运行没有采集到过程记录；可以询问已固定的结果。':'节点开始执行后，这里会显示实时回复与工具过程。'));
+          if(data.truncated)entries.unshift(muted('当前显示最近的过程记录，部分较早内容已省略。'));
+          view.stream.replaceChildren(...entries);
+          view.stream.scrollTop=nearBottom?view.stream.scrollHeight:oldTop;
+        } catch(error) {view.status.textContent=error.message}
+      }
       async function showRun(value) {
         const run = await api("runs/detail", { requestId: value.requestId });
         const viewHash = JSON.stringify(run) + activeNode;
-        if (root.querySelector(".run-layout") && runViewHash === viewHash)
+        if (root.querySelector(".run-layout") && runViewHash === viewHash) {
+          const node=run.graph?.nodes.find(item=>item.id===activeNode);
+          if(node && nodeTab==='activity') await refreshDialogue(run,node);
           return;
+        }
+        const focused = document.activeElement;
+        const selection = focused instanceof HTMLTextAreaElement ? [focused.selectionStart, focused.selectionEnd] : null;
         runViewHash = viewHash;
         activeRun = run.requestId;
         const nodes = run.graph?.nodes || [];
@@ -2221,6 +2302,8 @@
               state.error
                 ? el("div", { class: "inline-error" }, state.error)
                 : null,
+              row(button('对话与过程',()=>{nodeTab='activity';runViewHash='';return showRun(run)},nodeTab==='activity'?'primary':'subtle'),button('产物与验收',()=>{nodeTab='artifacts';runViewHash='';return showRun(run)},nodeTab==='artifacts'?'primary':'subtle'),subject&&nodeTab==='activity'?button('查看验收',()=>{nodeTab='artifacts';runViewHash='';return showRun(run)},'subtle'):null),
+              nodeTab==='activity' ? conversationPanel(run,node) : stack(
               subject ? qualityCard(run, subject) : null,
               el(
                 "div",
@@ -2290,6 +2373,7 @@
                     );
                   download(p.name, bytes, "application/octet-stream");
                 }),
+              ),
               ),
             )
           : muted("运行尚未生成节点记录");
@@ -2364,6 +2448,8 @@
             el("section", { class: "card node-detail" }, detail),
           ),
         );
+        if(focused?.isConnected && focused instanceof HTMLTextAreaElement) { focused.focus({preventScroll:true}); if(selection)focused.setSelectionRange(...selection); }
+        if(node && nodeTab==='activity') await refreshDialogue(run,node);
       }
       function qualityCard(run, s) {
         const last = s.reviews.at(-1),
