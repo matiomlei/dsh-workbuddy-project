@@ -13,15 +13,15 @@ export async function* restartResponse(options) {
   const users=options.messages.filter(m=>m.role==='user').flatMap(m=>m.content??[]).filter(b=>b.type==='text').map(b=>b.text).join('\n')
   const token=users.match(/RESTART_TOKEN:([a-f0-9-]+)/)?.[1]
   if(!token)throw new Error('missing restart probe token')
-  const continuation=options.system.includes('本节点执行曾中断')
-  if(!failedTokens.has(token)) {
+  const continuation=users.includes('保留进度并继续')||users.includes('从中断处继续')
+  if(!failedTokens.has(token)&&!continuation) {
     if(!done('partial-write')){yield*call('write',{file_path:'partial.txt',content:'PARTIAL_WORK\n'},'partial-write');return}
     failedTokens.add(token);throw new Error('运行已取消')
   }
   if(!done('probe-read')){yield*call('read',{file_path:'partial.txt'},'probe-read');return}
   const partial=JSON.stringify(results.find(r=>r.toolCallId==='probe-read')).includes('PARTIAL_WORK')
   if(continuation?!partial:partial)throw new Error('restart did not preserve/reset partial work correctly')
-  if(continuation&&!options.system.includes('保留进度并继续'))throw new Error('continuation lost user instructions')
+  if(continuation&&!done('partial-write'))throw new Error('persisted original tool results were not restored')
   if(!done('final-write')){yield*call('write',{file_path:'result.json',content:JSON.stringify({continued:continuation,partialPreserved:partial})+'\n'},'final-write');return}
   const text='节点已恢复，等待验收。';yield{type:'block-start',index:0,blockType:'text'};yield{type:'text-delta',index:0,text};yield{type:'block-end',index:0,block:{type:'text',text}};yield{type:'finish',reason:{kind:'stop'}}
 }
@@ -38,7 +38,8 @@ export async function* dialogueResponse(options) {
     const text='下游读取了验收后的 product.json。'
     yield {type:'block-start',index:0,blockType:'text'};yield{type:'text-delta',index:0,text};yield{type:'block-end',index:0,block:{type:'text',text}};yield{type:'finish',reason:{kind:'stop'}};return
   }
-  if(!completed('dialogue-question')){yield*call('delivery_ask_user',{question:'请选择数据格式',options:['JSON','CSV']},'dialogue-question');return}
+  const questions=results.filter(result=>result.toolCallId?.startsWith('dialogue-question'));
+  if(!questions.some(result=>!result.isError)){yield*call('delivery_ask_user',{question:'请选择数据格式',options:['JSON','CSV']},'dialogue-question-'+questions.length);return}
   const revision=users.includes('修改为v2'),id=revision?'dialogue-write-v2':'dialogue-write-v1'
   if(!completed(id)) {
     yield {type:'block-start',index:0,blockType:'reasoning'}

@@ -3,7 +3,7 @@
   "hashes": {
     "lib/index.js": {
       "original": "6f7aae750285a7fb02463ddaf9d4ba6153557f8d297d9541bfaba9aa96f57c03",
-      "adapted": "5c214d28c593c76db9390403b1dac64875b698e1f3a53fa15de6bfaacdf6dcbc"
+      "adapted": "620ae678dc0a9117140b1146184da867ab11e810acd21fc2477aa439322af7dc"
     },
     "lib/sqlite-store.js": {
       "original": "3471d185662e4c9d84e9b3ecd9788d79601908a51efd993e7219cf4586db9e3a",

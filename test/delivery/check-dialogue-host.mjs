@@ -75,8 +75,8 @@ const stopped=await api('runs/node',{requestId:run.requestId,nodeId:'coder'});as
 assert.ok(!(await api('runs/node',{requestId:first,nodeId:'coder'})).entries.some(item=>item.sessionId===stopped.thread.sessionId))
 assert.equal(stopped.canContinue,true);assert.equal(stopped.canRetry,true)
 await api('nodes/message',{messageId:randomUUID(),requestId:run.requestId,nodeId:'coder',expectedNativeRunId:stopped.nativeRunId,expectedAttempt:stopped.attempt,mode:'continue',text:'保留进度并继续'})
-await wait((r,d)=>d.attempt===2&&d.thread?.phase==='waiting_user')
+await wait((r,d)=>d.attempt===1&&d.thread?.phase==='waiting_user')
 await api('runs/cancel',{requestId:run.requestId})
-checks.push('cancelled human questions drain correctly, can explicitly continue in a new attempt, and independent runs keep separate histories')
+checks.push('cancelled human questions drain correctly, can explicitly resume the same session and attempt, and independent runs keep separate histories')
 const report={date:new Date().toISOString(),platform:process.platform,node:process.version,externalModelCalls:0,requestId:first,cancelledRequestId:run.requestId,checks}
 writeFileSync(join(root,'dialogue-report.json'),JSON.stringify(report,null,2));console.log(JSON.stringify(report,null,2))

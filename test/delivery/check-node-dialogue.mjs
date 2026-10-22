@@ -33,5 +33,12 @@ await dialogue.close('run','node')
 assert.ok(dialogue.history('run','node').entries.some(entry=>entry.text==='取消前已经返回的前缀'&&entry.streaming===false))
 const reopened=new NodeDialogue(db);assert.ok(reopened.history('run','node').reasoningAvailable);assert.equal(reopened.history('run','node').thread.phase,'completed')
 assert.ok(!JSON.stringify(reopened.history('run','node')).includes('systemPrompt'))
+// A restored session already has the complete prefix; it must not be rendered again.
+const restoredAgent={...agent,session:{seq:1,snapshotEvents:()=>events}}
+const before=dialogue.history('run','node').entries
+const restoredLive=dialogue.attach({requestId:'run',nodeId:'node',nativeRunId:'resumed',attempt:1,agentCtx,agent:restoredAgent,startSeq:1})
+dialogue.scan(restoredLive)
+assert.deepEqual(dialogue.history('run','node').entries,before)
+await dialogue.close('run','node')
 db.close()
 console.log('PASS published reasoning streams and settlement, per-node durable history, idempotent steering with consumption receipts, stale-attempt rejection, human answer/cancellation and timeout pause')

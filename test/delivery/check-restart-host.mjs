@@ -26,16 +26,24 @@ let run=await start(),state=await wait(run.requestId,(r,d)=>r.status==='executio
 assert.equal(state.run.nodeStates.coder.status,'error');assert.equal(state.run.codeHandoffs.coder,undefined);assert.equal(state.run.qualitySubjects.length,0)
 assert.ok(state.detail.entries.some(e=>e.kind==='tool'&&e.name==='write'&&e.status==='success'));assert.equal(state.detail.canRetry,true)
 checks.push('provider error named 运行已取消 becomes a model failure, never user cancellation, a successful handoff or a quality gate')
-const sourceOutput=state.run.outputs.source,sourceHandoff=JSON.stringify(state.run.codeHandoffs.source)
+if(process.argv.includes('--prepare-resume')){
+  writeFileSync(join(root,'cold-resume.json'),JSON.stringify({requestId:run.requestId,sessionId:state.detail.thread.sessionId,partialTrace:state.detail.entries.find(e=>e.kind==='tool'&&e.name==='write')}))
+  console.log('Prepared interrupted session for host restart');process.exit(0)
+}
+const sourceOutput=state.run.outputs.source,sourceHandoff=JSON.stringify(state.run.codeHandoffs.source),originalSession=state.detail.thread.sessionId,oldTrace=state.detail.entries.find(e=>e.kind==='tool'&&e.name==='write')
 const message={messageId:randomUUID(),requestId:run.requestId,nodeId:'coder',expectedNativeRunId:state.detail.nativeRunId,expectedAttempt:1,mode:'continue',text:'保留进度并继续'}
 await api('nodes/message',message);await api('nodes/message',message)
 state=await wait(run.requestId,r=>r.nodeStates.coder?.status==='waiting_quality')
 assert.equal(state.run.codeAttempts.source.length,1);assert.equal(JSON.stringify(state.run.codeHandoffs.source),sourceHandoff);assert.equal(state.run.outputs.source,sourceOutput)
-assert.equal(state.run.codeAttempts.coder.length,2);assert.equal(state.run.nodeStates.tester,undefined)
+assert.equal(state.run.codeAttempts.coder.length,1);assert.equal(state.detail.attempt,1);assert.equal(state.detail.thread.sessionId,originalSession);assert.equal(state.detail.attempts[0].continuationCount,1);assert.equal(state.run.nodeStates.tester,undefined)
 assert.equal(state.detail.entries.filter(e=>e.kind==='user'&&e.text===message.text).length,1)
-assert.ok(state.detail.entries.some(e=>e.kind==='tool'&&e.result?.includes('PARTIAL_WORK')&&e.attempt===2))
+assert.ok(state.detail.entries.some(e=>e.kind==='tool'&&e.result?.includes('PARTIAL_WORK')&&e.attempt===1))
 let artifact=await api('runs/artifact',{requestId:run.requestId,artifactId:state.run.artifacts.find(a=>a.name==='result.json').id});assert.deepEqual(JSON.parse(artifact.content),{continued:true,partialPreserved:true})
-checks.push('sending continue carries user instructions/history and partial files into a new attempt; upstream is reused and downstream stays gated')
+assert.deepEqual(state.detail.entries.find(e=>e.id===oldTrace.id),oldTrace)
+assert.equal(state.detail.entries.filter(e=>e.kind==='tool'&&e.name==='write'&&e.callId==='partial-write').length,1)
+const requests=readFileSync(join(root,'test-model-requests.jsonl'),'utf8').trim().split('\n').map(line=>JSON.parse(line)).filter(r=>JSON.stringify(r.messages).includes(message.text))
+assert.ok(requests.some(r=>r.messages.some(m=>m.role==='tool'&&m.toolCallId==='partial-write')))
+checks.push('continue restores the same persisted session and attempt with original tool results, does not repeat the completed write, and preserves upstream and downstream gating')
 await approve(state.run);await wait(run.requestId,r=>r.status==='execution_succeeded');const continued=run.requestId
 run=await start();state=await wait(run.requestId,(r,d)=>r.status==='execution_failed'&&d.canRetry)
 const retry={commandId:randomUUID(),requestId:run.requestId,nodeId:'coder',expectedNativeRunId:state.detail.nativeRunId,expectedAttempt:1}
