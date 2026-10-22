@@ -1,9 +1,9 @@
 {
-  "scope": "immutable workflow projections, business execution and completion adapter",
+  "scope": "immutable workflow projections, business execution, node dialogue retention and human-input timeout suspension",
   "hashes": {
     "lib/index.js": {
       "original": "6f7aae750285a7fb02463ddaf9d4ba6153557f8d297d9541bfaba9aa96f57c03",
-      "adapted": "b41f8ef15f33796f151cbf49b79ef2215ad1d9f920b16fdb722756506412cca2"
+      "adapted": "52a18e5e00a001b8031e3bc18244bd44b439a44610ebe5f88348202389fb978c"
     },
     "lib/sqlite-store.js": {
       "original": "3471d185662e4c9d84e9b3ecd9788d79601908a51efd993e7219cf4586db9e3a",
@@ -11,7 +11,7 @@
     },
     "lib/engine.js": {
       "original": "a428c533cdeaa9a6cb2a38d2f82dacf58ea36288aaa6d910091d56df485a307e",
-      "adapted": "b63d0fe78fadda092b08719e7149ddcc9a474f5dcec10b2083940f7e8ed9aecf"
+      "adapted": "fa3b1b1d714a77da2d29a1dba2b12c08c80f7ab81c22a8d8d972872ba2521d1f"
     }
   }
 }

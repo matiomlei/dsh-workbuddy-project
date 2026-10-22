@@ -26,6 +26,8 @@ patch('lib/sqlite-store.js', '  deleteWorkflow(id) {\n    return Number', "  del
 patch('lib/index.js', '    if (res.writableEnded) return undefined;\n    if (error instanceof RequestBodyError) {', "    if (res.writableEnded) return undefined;\n    if (String(error?.code || '').startsWith('DELIVERY_')) return json(res, error.status || 409, { error: error.message, code: error.code });\n    if (error instanceof RequestBodyError) {")
 if (runtime) {
   patch('lib/engine.js', '    this.nodeRunner = null;', '    this.admitNode = null;\n    this.executeNode = null;\n    this.awaitNodeCompletion = null;\n    this.nodeRunner = null;')
+  patch('lib/engine.js', '    const timer = setTimeout(() => { timedOut = true; ac.abort(); }, timeoutMs);', '    let remainingMs = timeoutMs, activeSince = Date.now(), timeoutSuspended = false;\n    let timer = setTimeout(() => { timedOut = true; ac.abort(); }, remainingMs);\n    const pauseTimeout = () => {\n      if (timeoutSuspended || ac.signal.aborted) return () => {};\n      clearTimeout(timer); remainingMs = Math.max(1, remainingMs - (Date.now() - activeSince));\n      let resumed = false;\n      return () => { if (!resumed && !timeoutSuspended && !ac.signal.aborted) { resumed = true; activeSince = Date.now(); timer = setTimeout(() => { timedOut = true; ac.abort(); }, remainingMs); } };\n    };')
+  patch('lib/engine.js', '        node, s, engine: this, signal: ac.signal,', '        node, s, engine: this, signal: ac.signal, pauseTimeout,')
   patch('lib/engine.js', '    if (node.__retryLeft === undefined) node.__retryLeft = this._retryTotal(node);', `    const admission = this.admitNode?.({ node, run, s });
     if (admission?.blocked) {
       run.nodeStates[nodeId] = { status: 'skipped', blockedBy: admission.blockedBy, error: admission.reason };
@@ -38,7 +40,7 @@ if (runtime) {
   patch('lib/engine.js', "Object.values(run.nodeStates).some((st) => st.status === 'error')", "Object.values(run.nodeStates).some((st) => st.status === 'error' || st.blockedBy?.length)")
   patch('lib/engine.js', 'result = normalizeExecutionResult(await kind.execute(execCtx), { meta: { nodeType: node.type } });', 'result = normalizeExecutionResult(await (this.executeNode ? this.executeNode(execCtx, () => kind.execute(execCtx)) : kind.execute(execCtx)), { meta: { nodeType: node.type } });')
   patch('lib/engine.js', '      output = result.output;', `      await this.awaitNodeCompletion?.(execCtx, result, () => {
-        clearTimeout(timer);
+        clearTimeout(timer); timeoutSuspended = true;
         if (releaseSlot) { s.activeCount -= 1; releaseSlot = false; this._pump(s); }
       });
       if (run.canceled) throw new Error('运行已取消');
@@ -83,6 +85,7 @@ if (runtime) {
             try { await ctx.agentPresets.mount(agentCtx, 'standard'); } catch { /* upstream fallback */ }
           }`)
   patch('lib/index.js', '          if (restrictList) {', '          if (restrictList && !deployment) {')
+  patch('lib/index.js', '      try { await handle?.dispose?.(); } catch { /* noop */ }', '      if (!deployment?.retainAgent?.(handle)) { try { await handle?.dispose?.(); } catch { /* noop */ } }')
 }
 patch('lib/index.js', '  ensureWorkflowSkill({ log: (msg) => ctx.logger?.info?.(`[orchestrator] ${msg}`) });', '  // WorkBuddy owns the product entry; no standalone workflow skill is seeded.\n  // ensureWorkflowSkill disabled by the embedded product adapter.');
 patch('lib/index.js', "    const outputDir = relative(store.workspaceRoot, ws).split(sep).join('/');\n", '');
