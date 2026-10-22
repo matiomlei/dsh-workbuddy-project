@@ -98,6 +98,7 @@ writeFileSync(
   ),
 );
 await verifyHost(payload, profile, runtime.anchor);
+cpSync(new URL("./starter-fixture.mjs", import.meta.url), join(root,"starter-fixture.mjs"));
 cpSync(
   new URL("./test-provider.mjs", import.meta.url),
   join(root, "test-provider.mjs"),

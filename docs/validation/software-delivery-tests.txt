@@ -1,0 +1,15 @@
+✔ AC-01 sums cents and quantities (2.17971ms)
+✔ AC-02 discounts and rounds down (0.188838ms)
+✔ AC-02 full discount (0.156843ms)
+✔ AC-03 empty cart (0.147301ms)
+✔ AC-04 rejects invalid items (0.592894ms)
+✔ AC-04 rejects invalid discount and cart (0.250265ms)
+✔ AC-04 rejects overflow (0.18189ms)
+ℹ tests 7
+ℹ suites 0
+ℹ pass 7
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 235.963003

@@ -1,4 +1,5 @@
 /** Deterministic local adapter for isolated product acceptance, never packaged. */
+import { starterOperations, starterStageNames } from "./starter-fixture.mjs";
 import { LlmAdapter } from "@deepseek-ai/dsh-llm";
 import { appendFileSync } from "node:fs";
 import { dirname, join } from "node:path";
@@ -81,10 +82,12 @@ export function apply(ctx) {
         .flatMap((m) => m.content ?? [])
         .filter((b) => b.type === "text")
         .map((b) => b.text)
-        .find((t) => t.startsWith("TEST_OPERATIONS:"));
+        .find((t) => t.startsWith("TEST_OPERATIONS:") || t.startsWith("当前阶段："));
       const operations =
         text && !options.purpose
-          ? JSON.parse(text.slice("TEST_OPERATIONS:".length).split("\n")[0])
+          ? text.startsWith("当前阶段：")
+            ? starterOperations[starterStageNames[text.split("\n")[0].slice("当前阶段：".length)]] ?? []
+            : JSON.parse(text.slice("TEST_OPERATIONS:".length).split("\n")[0])
           : [];
       const results = options.messages.filter((m) => m.role === "tool");
       for (let i = 0; i < results.length; i++)
@@ -93,7 +96,7 @@ export function apply(ctx) {
           (operations[i]?.expect &&
             !JSON.stringify(results[i]).includes(operations[i].expect))
         )
-          throw new Error("TEST_TOOL_RESULT_MISMATCH");
+          throw new Error("TEST_TOOL_RESULT_MISMATCH:" + (operations[i]?.name || "unknown") + ":" + JSON.stringify(results[i]).slice(0,1600));
       const next = operations[results.length];
       if (next) {
         const id = "test-" + results.length,

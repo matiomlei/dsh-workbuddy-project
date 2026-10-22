@@ -1,0 +1,45 @@
+{
+  "date": "2026-10-22T01:42:48.484Z",
+  "dsh": "0.2.1-rc.2",
+  "model": "test-only deterministic adapter; no external model calls",
+  "templateId": "e27ddeb9-b025-4c99-94d7-37fde147d4f6",
+  "templateVersion": 1,
+  "requestId": "f82a1b0c-1742-47c1-b8ab-b9fe562b379e",
+  "projectId": "c8289764-7b63-4644-8cc7-83d0ace33784",
+  "gates": [
+    {
+      "nodeId": "requirements",
+      "artifact": ".delivery/outputs/requirements.md",
+      "sha256": "5f3a42c8989fa5dbbf5db3a9147580392fed9914a054ce32f34efc35d39abd77"
+    },
+    {
+      "nodeId": "design",
+      "artifact": ".delivery/outputs/design.md",
+      "sha256": "1e2e8d461989d75ed8ae97bba2c76d456d150a51a604f33ca2c2ad9e59f0a381"
+    },
+    {
+      "nodeId": "implement",
+      "artifact": ".delivery/outputs/implementation.md",
+      "sha256": "1651f25c58efe5e403e7222bc1e0a5e16d317815605537c0d3686bca6b569adb"
+    },
+    {
+      "nodeId": "verify",
+      "artifact": ".delivery/outputs/test-report.md",
+      "sha256": "008ac8bb2eb2f0514265d0d60d82f3c3439a474e04297097ad133058506c4604"
+    }
+  ],
+  "tests": {
+    "passed": 7,
+    "failed": 0,
+    "runs": "implementation Agent, test Agent, clean patch consumer"
+  },
+  "checks": [
+    "configured production starter recipe created and published without graph edits",
+    "four distinct experts, Skills, shared/stage rules and repository MCP loaded",
+    "MCP reads the current node worktree and transferred upstream documents",
+    "four fixed reports verified before acceptance; downstream waits at every gate",
+    "both coding and test Agents execute real Node tests through DSH bash",
+    "cumulative patch applies in a clean checkout and passes seven tests",
+    "original source stays clean"
+  ]
+}
