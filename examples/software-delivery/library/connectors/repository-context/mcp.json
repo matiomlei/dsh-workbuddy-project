@@ -1,0 +1,15 @@
+{
+  "mcpServers": {
+    "delivery_repo": {
+      "type": "stdio",
+      "command": "node",
+      "args": [
+        "server.mjs"
+      ],
+      "env": {
+        "WORKBUDDY_WORKSPACE": "${WORKBUDDY_NODE_CWD}"
+      },
+      "timeout": 15000
+    }
+  }
+}

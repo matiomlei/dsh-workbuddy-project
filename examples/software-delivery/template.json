@@ -1,0 +1,244 @@
+{
+  "id": "software-delivery",
+  "name": "标准研发交付 · 需求到测试",
+  "version": 1,
+  "definition": {
+    "graph": {
+      "nodes": [
+        {
+          "id": "requirements",
+          "type": "agent",
+          "position": {
+            "x": 80,
+            "y": 130
+          },
+          "data": {
+            "label": "需求分析",
+            "prompt": "你负责标准研发交付的“需求分析”节点。遵循绑定的专家和规范。先调用 skill(name=\"delivery-requirements\") 并调用 mcp__delivery_repo__workspace_summary。读取 README、现有接口和用户需求，列出用户角色、使用场景、输入输出、业务规则、范围和非目标。每个验收条件编号 AC-01 等，采用 Given/When/Then 或输入/预期输出。涉及不确定事项时记录其影响，不能伪称已确认；阻塞事项应在验收前解决。\n主要报告写入 .delivery/outputs/requirements.md。完成摘要包含产物路径、AC 覆盖、验证证据及阻塞项；不能把未执行当作通过。",
+            "inputTemplate": "当前阶段：需求分析\n业务需求：\n{{$trigger}}\n运行参数：\n验证命令：{{inputs[\"validationCommand\"]}}\n补充约束：{{inputs[\"constraints\"]}}\n上游摘要：\n{{$upstream}}\n请读取已交接的上游文档后完成本阶段。",
+            "tools": [
+              "read",
+              "write",
+              "skill",
+              "bash"
+            ],
+            "timeoutSec": 900
+          }
+        },
+        {
+          "id": "design",
+          "type": "agent",
+          "position": {
+            "x": 510,
+            "y": 130
+          },
+          "data": {
+            "label": "方案设计",
+            "prompt": "你负责标准研发交付的“方案设计”节点。遵循绑定的专家和规范。先调用 skill(name=\"delivery-design\") 并调用 mcp__delivery_repo__workspace_summary。先读取 requirements.md 和仓库现状，逐项覆盖 AC。比较必要的方案并给出选型依据，列明文件改动计划、接口/数据契约、失败行为、依赖和迁移影响。形成 AC→模块→测试的追踪表。设计不完整或需求矛盾时标明阻塞，不编造现有实现。\n主要报告写入 .delivery/outputs/design.md。完成摘要包含产物路径、AC 覆盖、验证证据及阻塞项；不能把未执行当作通过。",
+            "inputTemplate": "当前阶段：方案设计\n业务需求：\n{{$trigger}}\n运行参数：\n验证命令：{{inputs[\"validationCommand\"]}}\n补充约束：{{inputs[\"constraints\"]}}\n上游摘要：\n{{$upstream}}\n请读取已交接的上游文档后完成本阶段。",
+            "tools": [
+              "read",
+              "write",
+              "skill",
+              "bash"
+            ],
+            "timeoutSec": 900
+          }
+        },
+        {
+          "id": "implement",
+          "type": "agent",
+          "position": {
+            "x": 940,
+            "y": 130
+          },
+          "data": {
+            "label": "编码实现",
+            "prompt": "你负责标准研发交付的“编码实现”节点。遵循绑定的专家和规范。先调用 skill(name=\"delivery-implement\") 并调用 mcp__delivery_repo__workspace_summary。先读取 requirements.md 和 design.md，检查目标模块及项目脚本，按计划修改实现与必要测试。调用仓库实际支持的测试、格式或构建命令，记录命令、退出码和摘要。验证失败必须修复或明确阻塞；不能靠删除用例或降低断言宣称通过。总结变更、AC 覆盖和交给独立测试的注意事项。\n主要报告写入 .delivery/outputs/implementation.md。完成摘要包含产物路径、AC 覆盖、验证证据及阻塞项；不能把未执行当作通过。",
+            "inputTemplate": "当前阶段：编码实现\n业务需求：\n{{$trigger}}\n运行参数：\n验证命令：{{inputs[\"validationCommand\"]}}\n补充约束：{{inputs[\"constraints\"]}}\n上游摘要：\n{{$upstream}}\n请读取已交接的上游文档后完成本阶段。",
+            "tools": [
+              "read",
+              "write",
+              "skill",
+              "bash"
+            ],
+            "timeoutSec": 900
+          }
+        },
+        {
+          "id": "verify",
+          "type": "agent",
+          "position": {
+            "x": 1370,
+            "y": 130
+          },
+          "data": {
+            "label": "测试验证",
+            "prompt": "你负责标准研发交付的“测试验证”节点。遵循绑定的专家和规范。先调用 skill(name=\"delivery-verify\") 并调用 mcp__delivery_repo__workspace_summary。读取需求、设计和实现报告，逐项执行 AC，增加必要测试但不修改业务实现。优先采用项目现有测试工具；依据 validationCommand 或仓库脚本执行测试并记录退出码。报告 AC→用例→实际结果、回归范围、缺陷和未验证事项。任何失败或阻塞都必须明确写为不通过，等待人工处理。\n主要报告写入 .delivery/outputs/test-report.md。完成摘要包含产物路径、AC 覆盖、验证证据及阻塞项；不能把未执行当作通过。",
+            "inputTemplate": "当前阶段：测试验证\n业务需求：\n{{$trigger}}\n运行参数：\n验证命令：{{inputs[\"validationCommand\"]}}\n补充约束：{{inputs[\"constraints\"]}}\n上游摘要：\n{{$upstream}}\n请读取已交接的上游文档后完成本阶段。",
+            "tools": [
+              "read",
+              "write",
+              "skill",
+              "bash"
+            ],
+            "timeoutSec": 900
+          }
+        },
+        {
+          "id": "delivery",
+          "type": "output",
+          "position": {
+            "x": 1800,
+            "y": 130
+          },
+          "data": {
+            "label": "交付汇总"
+          }
+        }
+      ],
+      "edges": [
+        {
+          "id": "requirements-design",
+          "source": "requirements",
+          "target": "design"
+        },
+        {
+          "id": "design-implement",
+          "source": "design",
+          "target": "implement"
+        },
+        {
+          "id": "implement-verify",
+          "source": "implement",
+          "target": "verify"
+        },
+        {
+          "id": "verify-delivery",
+          "source": "verify",
+          "target": "delivery"
+        }
+      ]
+    },
+    "repositoryRoles": [
+      {
+        "id": "main"
+      }
+    ],
+    "inputSchema": {
+      "fields": [
+        {
+          "key": "validationCommand",
+          "label": "验证命令",
+          "type": "string",
+          "defaultValue": "",
+          "required": false,
+          "description": "留空时由节点读取仓库脚本决定；填写例如 node --test。"
+        },
+        {
+          "key": "constraints",
+          "label": "补充约束",
+          "type": "string",
+          "defaultValue": "",
+          "required": false
+        }
+      ]
+    },
+    "qualityPolicies": [
+      {
+        "nodeId": "requirements",
+        "required": true
+      },
+      {
+        "nodeId": "design",
+        "required": true
+      },
+      {
+        "nodeId": "implement",
+        "required": true
+      },
+      {
+        "nodeId": "verify",
+        "required": true
+      }
+    ]
+  },
+  "bindings": [
+    {
+      "nodeId": "requirements",
+      "repositoryRole": "main",
+      "capabilities": {
+        "experts": [
+          "delivery-starter:experts/requirements"
+        ],
+        "skills": [
+          "delivery-starter:skills/delivery-requirements"
+        ],
+        "rules": [
+          "delivery-starter:rules/delivery-common",
+          "delivery-starter:rules/requirements"
+        ],
+        "connectors": [
+          "delivery-starter:connectors/repository-context"
+        ]
+      }
+    },
+    {
+      "nodeId": "design",
+      "repositoryRole": "main",
+      "capabilities": {
+        "experts": [
+          "delivery-starter:experts/design"
+        ],
+        "skills": [
+          "delivery-starter:skills/delivery-design"
+        ],
+        "rules": [
+          "delivery-starter:rules/delivery-common",
+          "delivery-starter:rules/design"
+        ],
+        "connectors": [
+          "delivery-starter:connectors/repository-context"
+        ]
+      }
+    },
+    {
+      "nodeId": "implement",
+      "repositoryRole": "main",
+      "capabilities": {
+        "experts": [
+          "delivery-starter:experts/implement"
+        ],
+        "skills": [
+          "delivery-starter:skills/delivery-implement"
+        ],
+        "rules": [
+          "delivery-starter:rules/delivery-common",
+          "delivery-starter:rules/implement"
+        ],
+        "connectors": [
+          "delivery-starter:connectors/repository-context"
+        ]
+      }
+    },
+    {
+      "nodeId": "verify",
+      "repositoryRole": "main",
+      "capabilities": {
+        "experts": [
+          "delivery-starter:experts/verify"
+        ],
+        "skills": [
+          "delivery-starter:skills/delivery-verify"
+        ],
+        "rules": [
+          "delivery-starter:rules/delivery-common",
+          "delivery-starter:rules/verify"
+        ],
+        "connectors": [
+          "delivery-starter:connectors/repository-context"
+        ]
+      }
+    }
+  ]
+}

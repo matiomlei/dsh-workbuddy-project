@@ -1,0 +1,5 @@
+{
+  "id": "repository-context",
+  "name": "本地仓库上下文（只读）",
+  "type": "mcp"
+}

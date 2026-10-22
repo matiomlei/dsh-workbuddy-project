@@ -1,0 +1,8 @@
+{
+  "name": "verify",
+  "agentName": "lead",
+  "expertType": "agent",
+  "displayName": {
+    "zh": "独立测试工程师"
+  }
+}

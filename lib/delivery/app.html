@@ -1182,6 +1182,24 @@
           "开始运行",
         );
       }
+      function starterTemplate() {
+        const name = input("标准研发交付 · 需求到测试");
+        modal(
+          "使用标准研发模板",
+          stack(
+            label("模板名称", name),
+            muted("需求分析 → 方案设计 → 编码实现 → 测试验证 → 交付汇总。四阶段均已绑定专用专家、Skill、规范和本地仓库只读 MCP，并开启人工验收。"),
+            muted("沿用 DSH 当前模型，仓库角色为 main；创建后可自由编辑，发布后即可供项目选用。无需外网连接器或额外账号。"),
+          ),
+          async () => {
+            const created = await api("template/starter", { name: name.value });
+            await catalog();
+            await openEditor(created.templateId);
+            notice("标准研发模板已创建，节点能力已固定");
+          },
+          "创建并编辑",
+        );
+      }
       function newTemplate() {
         const name = input("", "例如：版本发布评审");
         modal(
@@ -1231,6 +1249,7 @@
             "自由创建 DAG，配置节点能力，发布稳定版本供项目选用。",
             [
               button("导入模板", () => importTemplate()),
+              button("使用标准研发模板", starterTemplate),
               button("新建模板", newTemplate, "primary"),
             ],
           ),
@@ -1255,9 +1274,11 @@
                     el(
                       "p",
                       { class: "muted", style: "margin:12px 0 20px" },
-                      t.source
-                        ? "从已有模板复制，可独立编辑"
-                        : "可复用的业务工作流模板",
+                      t.source?.starter
+                        ? "内置标准研发模板，能力已配置，可独立编辑"
+                        : t.source
+                          ? "从已有模板复制，可独立编辑"
+                          : "可复用的业务工作流模板",
                     ),
                     row(
                       button("编辑模板", () => openEditor(t.id)),

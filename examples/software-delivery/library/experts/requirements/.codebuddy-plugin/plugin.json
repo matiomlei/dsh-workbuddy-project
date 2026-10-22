@@ -1,0 +1,8 @@
+{
+  "name": "requirements",
+  "agentName": "lead",
+  "expertType": "agent",
+  "displayName": {
+    "zh": "业务需求分析师"
+  }
+}
