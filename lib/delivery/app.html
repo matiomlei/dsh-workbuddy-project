@@ -529,7 +529,14 @@
       .trace-entry pre { max-height: 250px; overflow: auto; font-size: 12px; margin: 10px 0 0; }
       .trace-entry.reasoning { background: #f3f1fa; border-color: #e4def1; }
       .tool-result { border-top: 1px dashed #d8e1e7; padding-top: 10px; }
-      .dialogue-question { padding: 14px; border: 1px solid #e9cf96; background: #fff8e8; border-radius: 10px; }
+      .dialogue-question { padding: 16px; border: 1px solid #b9cde3; background: #f1f6fc; color: #244565; border-radius: 12px; }
+      .dialogue-question p { margin: 8px 0 12px; line-height: 1.65; }
+      .dialogue-options { display: flex; flex-direction: column; align-items: stretch; gap: 8px; }
+      .dialogue-options button { display: block; width: 100%; text-align: left; justify-content: flex-start; white-space: normal; background: #fff; color: #244565; border: 1px solid #c4d5e6; border-radius: 8px; padding: 10px 14px; }
+      .dialogue-options button:hover { background: #e5eef9; border-color: #7e9fc4; }
+      .dialogue-options button:focus-visible { outline: 2px solid #477eaf; outline-offset: 2px; }
+      .dialogue-options button[aria-pressed="true"] { background: #dceafa; border-color: #477eaf; color: #183d64; }
+      .dialogue-actions { display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-start; gap: 10px; }
       @media (max-width: 850px) {
         .project-layout,
         .run-layout {
@@ -2170,31 +2177,40 @@
       }
       function conversationPanel(run, node) {
         const key = run.requestId + ':' + node.id;
-        if (dialoguePanels.has(key)) return dialoguePanels.get(key).root;
+        if (dialoguePanels.has(key)) {const view=dialoguePanels.get(key);if(!view.root.isConnected)view.scrollLatest=true;else view.restoreScroll={top:view.stream.scrollTop,follow:view.stream.scrollHeight-view.stream.scrollTop-view.stream.clientHeight<70};return view.root;}
         const status = muted('正在读取节点会话…'), question = el('div'), stream = el('div', {class:'dialogue-stream', role:'log', 'aria-label':'节点对话与运行过程'});
         const message = area('', '补充要求、回答问题，或在验收前提出修改…');
         message.setAttribute('aria-label','给当前节点发送消息');
-        const view = {key, run, node, status, question, stream, message, data:null, signature:'', sending:false};
+        const view = {key, run, node, status, question, stream, message, data:null, signature:'', sending:false, scrollLatest:true};
         const send = el('button', {class:'primary', onclick: async () => {
-          if (!(view.data?.canSend||view.data?.canExplain) || view.sending || !message.value.trim()) return;
+          if (!(view.data?.canSend||view.data?.canExplain||view.data?.canContinue) || view.sending || !message.value.trim()) return;
           view.sending = true; send.disabled=true;
-          const isExplanation=view.data.canExplain;
+          const isContinuation=view.data.canContinue, isExplanation=view.data.canExplain&&!isContinuation;
           try {
-            const receipt = await api('nodes/message', {messageId:view.pendingId || (view.pendingId=uuid()),requestId:run.requestId,nodeId:node.id,expectedNativeRunId:view.data.nativeRunId,expectedAttempt:view.data.attempt,text:message.value,...(view.data.canExplain?{mode:'explain'}:{}), ...(view.data.thread?.question ? {questionId:view.data.thread.question.id}: {})});
+            const receipt = await api('nodes/message', {messageId:view.pendingId || (view.pendingId=uuid()),requestId:run.requestId,nodeId:node.id,expectedNativeRunId:view.data.nativeRunId,expectedAttempt:view.data.attempt,text:message.value,...(view.data.canContinue?{mode:'continue'}:view.data.canExplain?{mode:'explain'}:{}), ...(view.data.thread?.question ? {questionId:view.data.thread.question.id}: {})});
             if (receipt.status === 'rejected') throw new Error('消息未被节点接收，请刷新后重试。');
             message.value=''; view.pendingId=null;
-            notice(receipt.status==='consumed'?'节点已接收消息':isExplanation?'消息已提交，正在只读讨论。':'消息已提交；运行中的补充将在后续推理步骤接收。');
+            notice(receipt.status==='consumed'?'节点已接收消息':isExplanation?'消息已提交，正在只读讨论。':isContinuation?'已提交继续执行请求，保留已有修改并重新验收。':'消息已提交；运行中的补充将在后续推理步骤接收。');
             await refreshDialogue(run,node);
-          } catch(error) { notice(error.message,true); } finally { view.sending=false; send.disabled=!(view.data?.canSend||view.data?.canExplain); }
+          } catch(error) { notice(error.message,true); } finally { view.sending=false; send.disabled=!(view.data?.canSend||view.data?.canExplain||view.data?.canContinue); }
         }},'发送');
         message.addEventListener('input',()=>{view.pendingId=null});
+        const retry=el('button',{class:'subtle',disabled:true,onclick:async()=>{
+          if(!view.data?.canRetry||view.sending)return;
+          view.sending=true;retry.disabled=true;send.disabled=true;
+          try {
+            await api('nodes/retry',{requestId:run.requestId,nodeId:node.id,commandId:view.retryId||(view.retryId=uuid()),expectedNativeRunId:view.data.nativeRunId,expectedAttempt:view.data.attempt});
+            view.retryId=null;view.scrollLatest=true;runViewHash='';await showRun(run);
+            notice('已重试：从已验收的上游输入重新执行，原过程记录保留。');
+          }catch(error){notice(error.message,true)}finally{view.sending=false;await refreshDialogue(run,node)}
+        }},'重试节点');
         const phaseHint = muted(''), root = stack(
           el('div',{class:'row spread'},el('h3',{class:'section-title'},'对话与运行过程'),status),
           question,stream,
           muted('只展示模型服务实际返回的思考、回复和工具过程；模型未返回的内部思考无法展示。'),
-          label('与当前节点交互',message),row(send,phaseHint),
+          label('与当前节点交互',message),el('div',{class:'dialogue-actions'},send,retry,phaseHint),
         );
-        Object.assign(view,{root,send,phaseHint});dialoguePanels.set(key,view);
+        Object.assign(view,{root,send,retry,phaseHint});dialoguePanels.set(key,view);
         if(node.type!=='agent'){message.disabled=true;send.disabled=true;phaseHint.textContent='该节点不是 Agent，不支持对话。'}
         return root;
       }
@@ -2204,13 +2220,16 @@
           const data=await api('runs/node',{requestId:run.requestId,nodeId:node.id});view.data=data;
           const phases={executing:'运行中',waiting_user:'等待你的回答',waiting_quality:'等待验收，可继续对话',revising:'正在继续对话',sealing:'正在固定产物',explaining:'正在只读讨论',completed:'节点已完成',interrupted:'会话已中断'};
           view.status.textContent=(phases[data.thread?.phase]||'尚未开始')+(data.attempt?' · 第 '+data.attempt+' 次执行':'');
-          view.send.disabled=view.sending||!(data.canSend||data.canExplain);view.message.disabled=!(data.canSend||data.canExplain);
-          view.send.textContent=data.canExplain?'询问结果（只读）':data.thread?.question?'回答并继续':data.thread?.phase==='waiting_quality'?'继续对话并重新验收':'发送';
-          view.phaseHint.textContent=data.canExplain?'只读讨论不改变已固定的代码、输出和验收结果。':data.thread?.phase==='waiting_quality'?'继续对话会生成新的输出与验收记录，下游继续等待。':data.canSend?'消息只发送给本次运行的当前节点。':'可查看已有记录；当前节点暂不接收消息。';
+          view.send.disabled=view.sending||!(data.canSend||data.canExplain||data.canContinue);view.message.disabled=!(data.canSend||data.canExplain||data.canContinue);
+          view.retry.hidden=!data.canRetry;view.retry.disabled=view.sending||!data.canRetry;
+          view.send.textContent=data.canContinue?'发送并继续':data.canExplain?'询问结果（只读）':data.thread?.question?'回答并继续':data.thread?.phase==='waiting_quality'?'继续对话并重新验收':'发送';
+          view.phaseHint.textContent=data.canContinue?'继续会带入历史记录并保留已有修改；重试会清理该节点修改，从上游输入重新执行。其余未完成节点恢复执行，新结果仍需验收。':data.canExplain?'只读讨论不改变已固定的代码、输出和验收结果。':data.thread?.phase==='waiting_quality'?'继续对话会生成新的输出与验收记录，下游继续等待。':data.canSend?'消息只发送给本次运行的当前节点。':'可查看已有记录；当前节点暂不接收消息。';
           const q=data.thread?.question;
-          view.question.replaceChildren(...(q?[el('div',{class:'dialogue-question'},el('strong',{},'节点需要你补充信息'),el('p',{},q.text),row((q.options||[]).map(option=>button(option,()=>{view.message.value=option;view.pendingId=null;view.message.focus()},'subtle'))))]:[]));
-          const signature=JSON.stringify(data.entries);if(signature===view.signature)return;view.signature=signature;
-          const nearBottom=view.stream.scrollHeight-view.stream.scrollTop-view.stream.clientHeight<70,oldTop=view.stream.scrollTop;
+          view.question.replaceChildren(...(q?[el('div',{class:'dialogue-question'},el('strong',{},'节点需要你补充信息'),el('p',{},q.text),el('div',{class:'dialogue-options'},...(q.options||[]).map(option=>el('button',{class:'question-option','aria-pressed':String(view.message.value===option),onclick:()=>{view.message.value=option;view.pendingId=null;view.message.focus();for(const item of view.question.querySelectorAll('.question-option'))item.setAttribute('aria-pressed',String(item.textContent===option))}},option))))]:[]));
+          const scrollLatest=()=>{if(view.stream.isConnected&&view.stream.clientHeight>0){view.stream.scrollTop=view.stream.scrollHeight;view.scrollLatest=false}};
+          const restore=view.restoreScroll;view.restoreScroll=null;
+          const signature=JSON.stringify(data.entries);if(signature===view.signature){if(view.scrollLatest||restore?.follow)scrollLatest();else if(restore)view.stream.scrollTop=restore.top;return}view.signature=signature;
+          const nearBottom=restore?.follow??(view.stream.scrollHeight-view.stream.scrollTop-view.stream.clientHeight<70),oldTop=restore?.top??view.stream.scrollTop;
           const open=new Set([...view.stream.querySelectorAll('details[open]')].map(item=>item.dataset.id)),existingDetails=new Set([...view.stream.querySelectorAll('details')].map(item=>item.dataset.id));
           const entries=[];let attempt=null;
           for(const entry of data.entries) {
@@ -2224,7 +2243,7 @@
           if(!entries.length)entries.push(muted(data.canExplain?'此运行没有采集到过程记录；可以询问已固定的结果。':'节点开始执行后，这里会显示实时回复与工具过程。'));
           if(data.truncated)entries.unshift(muted('当前显示最近的过程记录，部分较早内容已省略。'));
           view.stream.replaceChildren(...entries);
-          view.stream.scrollTop=nearBottom?view.stream.scrollHeight:oldTop;
+          if(view.scrollLatest||nearBottom)scrollLatest();else view.stream.scrollTop=oldTop;
         } catch(error) {view.status.textContent=error.message}
       }
       async function showRun(value) {
