@@ -2,7 +2,7 @@
 
 在 DSH 中创建业务项目，绑定一个或多个 Git 仓库，选用可复用 DAG 模板，并跟踪每次运行的进度、节点产物和质量验收。
 
-当前分支为 **0.4.0-preview.1 产品预览版**，目标宿主是 **DSH 0.2.1-rc2（npm 0.2.1-rc.2）**。本分支未发布到 npm 或 GitHub Release；不要使用旧 0.3.1 的下载命令获取这个预览版。
+当前分支为 **0.4.0-preview.2 产品预览版**，目标宿主是 **DSH 0.2.1-rc2（npm 0.2.1-rc.2）**。本分支未发布到 npm 或 GitHub Release；不要使用旧 0.3.1 的下载命令获取这个预览版。
 
 ## 产品入口
 
@@ -33,7 +33,7 @@ npm run prepare:offline
 
 ```powershell
 powershell -ExecutionPolicy Bypass -File .\install-windows.ps1 `
-  -Archive .\dsh-workbuddy-project-0.4.0-preview.1-offline.tgz `
+  -Archive .\dsh-workbuddy-project-0.4.0-preview.2-offline.tgz `
   -Profile web -DshHome 'D:\dsh-validation' -DshRoot 'D:\tools\dsh'
 $env:DSH_HOME = 'D:\dsh-validation'
 dsh --profile web --no-open
@@ -44,11 +44,15 @@ dsh --profile web --no-open
 ## 第一次交付
 
 1. 在能力库中准备所需的专家、Skill、MCP 和规范。也可以先不绑定能力包。
-2. 新建工作流模板，在画布增删节点、建立依赖；右侧配置每个 Agent 节点的能力和仓库角色。需要人工检查的节点启用验收，再保存并发布 v1。
+2. 新建工作流模板，在画布增删节点、建立依赖；点击 Agent 节点，在右侧“节点能力库”配置专家、Skill、MCP 和规范；“节点设置”中配置仓库角色和基础工具。需要人工检查的节点启用验收，再保存并发布 v1。
 3. 手工 clone 业务仓库并提交初始内容，新建项目，填写本机仓库路径和 ref。
 4. 为项目选择模板 v1，将仓库角色映射到项目仓库。
 5. 输入本次需求并运行。需要验收的节点执行完成后等待，填写验收说明、通过后继续下游。
 6. 查看产物，下载所选节点的累计补丁，在干净分支上 `git apply --check` 后应用。
+
+基础工具只列出当前交付运行可用的 read、write、skill、bash；MCP 工具随连接器绑定自动提供，Skill 从能力库按节点加载。
+
+![Agent 节点能力配置入口](docs/screenshots/product-node-capabilities.png)
 
 “需求分析 → 设计 → 编码 → 测试”只是一个例子，模板不固定这几个阶段。发布版本、节点能力、运行模型和仓库提交均在运行开始时固定，后续修改不改变旧运行。
 

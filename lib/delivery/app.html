@@ -393,6 +393,13 @@
         padding: 15px 22px;
         border-bottom: 1px solid #e2e9ef;
       }
+      .editor-instructions {
+        padding: 8px 22px;
+        background: #eff8f8;
+        color: #42747c;
+        font-size: 12px;
+        border-bottom: 1px solid #dce9ec;
+      }
       .editor-body {
         display: flex;
         min-height: 0;
@@ -766,7 +773,12 @@
         wrap.append(
           el(
             "section",
-            { class: "modal" + (wide ? " wide" : "") },
+            {
+              class: "modal" + (wide ? " wide" : ""),
+              role: "dialog",
+              "aria-modal": "true",
+              "aria-label": title,
+            },
             el("div", { class: "modal-head" }, el("h2", {}, title)),
             el("div", { class: "modal-body" }, content, error),
             el("div", { class: "modal-foot" }, cancel, save),
@@ -1428,6 +1440,15 @@
           );
           return;
         }
+        if (
+          event.data?.type === "delivery-configure-node" &&
+          event.data.editorId === editor?.editorId
+        ) {
+          nodeDialog(event.data.nodeId, event.data.section).catch((error) =>
+            notice(error.message, true),
+          );
+          return;
+        }
         if (event.data?.type === "delivery-save-result") {
           const waiter = flushWaiters.get(event.data.requestId);
           if (waiter) {
@@ -1461,7 +1482,11 @@
         editor.revision = state.revision;
         editor.definition = state.definition;
         editorFrame.contentWindow.postMessage(
-          { type: "delivery-revision", revision: state.revision },
+          {
+            type: "delivery-revision",
+            revision: state.revision,
+            definition: state.definition,
+          },
           location.origin,
         );
         return state;
@@ -1496,6 +1521,10 @@
               ),
             ),
             row(
+              button("全部节点配置", () => {
+                const inspector = $("inspector");
+                inspector.hidden = !inspector.hidden;
+              }),
               button("仓库角色", editRoles),
               button("保存草稿", async () => {
                 await flush();
@@ -1522,11 +1551,17 @@
           title: "工作流模板画布",
         });
         const inspector = el("aside", { class: "inspector", id: "inspector" });
+        inspector.hidden = true;
         root.replaceChildren(
           el(
             "section",
             { class: "editor-page" },
             header,
+            el(
+              "div",
+              { class: "editor-instructions" },
+              "点击画布中的 Agent 节点，在“节点能力库”配置专家、Skill、MCP 和规范；也可使用“全部节点配置”。",
+            ),
             el("div", { class: "editor-body" }, editorFrame, inspector),
           ),
         );
@@ -1540,9 +1575,9 @@
         $("revision").textContent = "草稿 r" + editor.revision;
         const d = editor.definition;
         $("inspector").replaceChildren(
-          el("div", { class: "eyebrow" }, "NODE CAPABILITIES"),
-          el("h3", { style: "margin:6px 0" }, "节点能力与完成条件"),
-          muted("在画布安排依赖，在这里为节点绑定仓库、专家、技能和规范。"),
+          el("div", { class: "eyebrow" }, "节点配置"),
+          el("h3", { style: "margin:6px 0" }, "专家、Skill、MCP、规范"),
+          muted("点击下方节点，配置能力库绑定、模型、基础工具和完成条件。"),
           el("div", { class: "sep" }),
           ...d.graph.nodes.map((n) => {
             const b = (d.nodeBindings || []).find((b) => b.nodeId === n.id),
@@ -1603,11 +1638,12 @@
           "保存角色",
         );
       }
-      async function nodeDialog(nodeId) {
+      async function nodeDialog(nodeId, focusSection) {
         await flush();
         await syncRevision();
-        const node = editor.definition.graph.nodes.find((n) => n.id === nodeId),
-          binding = editor.definition.nodeBindings?.find(
+        const node = editor.definition.graph.nodes.find((n) => n.id === nodeId);
+        if (!node) throw new Error("节点已不存在，请重新选择。");
+        const binding = editor.definition.nodeBindings?.find(
             (b) => b.nodeId === nodeId,
           ),
           name = input(node.data?.label || nodeId),
@@ -1638,7 +1674,7 @@
                 label: p.name || p.id,
               })),
             ],
-            node.data?.provider || "",
+            node.data?.channel || node.data?.provider || "",
           ),
           model = select([{ value: "", label: "默认模型" }]),
           choices = new Map(),
@@ -1658,7 +1694,15 @@
         provider.onchange = () =>
           models().catch((e) => notice(e.message, true));
         await models();
-        const controls = [];
+        const controls = [],
+          capabilityFields = new Map(),
+          baseTools = new Map();
+        const baseOptions = [
+          ["read", "读取文件"],
+          ["write", "写入文件"],
+          ["skill", "加载 Skill"],
+          ["bash", "执行命令"],
+        ];
         if (node.type === "agent") {
           controls.push(
             label("仓库角色", role),
@@ -1675,10 +1719,46 @@
               "使用画布中的变量选择器插入上游输出和运行输入。",
             ),
           );
+          const toolChoices = el("div", { class: "choices" });
+          for (const [name, title] of baseOptions) {
+            const check = el("input", {
+              type: "checkbox",
+              checked: node.data?.tools?.includes(name),
+            });
+            baseTools.set(name, check);
+            toolChoices.append(
+              el(
+                "label",
+                { class: "choice" },
+                check,
+                el("span", {}, title, el("small", {}, name)),
+              ),
+            );
+          }
+          controls.push(
+            label(
+              "基础工具（可选限制）",
+              toolChoices,
+              "不勾选时使用默认基础工具；MCP 工具由下方绑定自动提供。",
+            ),
+          );
+          const oldTools = (node.data?.tools || []).filter(
+            (name) => !baseTools.has(name),
+          );
+          if (oldTools.length)
+            controls.push(
+              el(
+                "div",
+                { class: "banner" },
+                "旧工具选择将按当前规则更新：" +
+                  oldTools.join("、") +
+                  "。保存后保留所选基础工具，MCP 随绑定提供。",
+              ),
+            );
           for (const [kind, key, title] of [
             ["expert", "experts", "专家 / 专家团"],
-            ["skill", "skills", "Skills"],
-            ["connector", "connectors", "MCP"],
+            ["skill", "skills", "Skill 能力包"],
+            ["connector", "connectors", "MCP 连接器"],
             ["rule", "rules", "规范"],
           ]) {
             const options = capabilities.filter((c) => c.kind === kind),
@@ -1727,14 +1807,14 @@
                   ? ""
                   : "none";
             };
-            controls.push(
-              label(
-                title,
-                options.length
-                  ? stack(search, holder)
-                  : muted("暂无可选项，可在能力库中添加或同步资源。"),
-              ),
+            const capabilityField = label(
+              title,
+              options.length
+                ? stack(search, holder)
+                : muted("暂无可选项，可在能力库中添加或同步资源。"),
             );
+            capabilityField.dataset.capabilityKind = kind;
+            capabilityFields.set(kind, capabilityField);
           }
         }
         if (binding)
@@ -1755,11 +1835,36 @@
               ),
             ),
           );
+        const panels = new Map([
+          ["settings", stack(label("节点名称", name), controls)],
+          ...capabilityFields,
+        ]);
+        const tabs = row();
+        const tabButtons = new Map();
+        const activate = (key) => {
+          for (const [id, panel] of panels)
+            panel.style.display = id === key ? "" : "none";
+          for (const [id, tab] of tabButtons)
+            tab.className = id === key ? "primary" : "subtle";
+        };
+        for (const [key, title] of [
+          ["settings", "节点设置"],
+          ["expert", "专家 / 专家团"],
+          ["skill", "Skill"],
+          ["connector", "MCP"],
+          ["rule", "规范"],
+        ]) {
+          if (!panels.has(key)) continue;
+          const tab = button(title, () => activate(key), "subtle");
+          tabButtons.set(key, tab);
+          tabs.append(tab);
+        }
+        activate(panels.has(focusSection) ? focusSection : "settings");
         modal(
-          "配置节点 · " + (node.data?.label || nodeId),
+          "配置节点能力 · " + (node.data?.label || nodeId),
           stack(
-            label("节点名称", name),
-            controls,
+            tabs,
+            [...panels.values()],
             el(
               "label",
               { class: "choice" },
@@ -1822,6 +1927,9 @@
                 inputTemplate: prompt.value,
                 provider: provider.value,
                 model: model.value,
+                tools: [...baseTools]
+                  .filter(([, check]) => check.checked)
+                  .map(([name]) => name),
               });
             }
             await api("quality-policy/save", {
