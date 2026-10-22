@@ -2,7 +2,7 @@
 
 本仓库是独立发布包 `dsh-workbuddy-project`，运行时版本由 `package.json` 决定。npm 发布、GitHub Release 和插件市场收录是独立步骤；市场收录需要维护者审核。
 
-## 0.4.0-preview.4 产品预览
+## 0.4.0-preview.5 产品预览
 
 本分支交付源代码、固定依赖的离线制包脚本和 Windows 安装器，不自动发布 npm、标签或 GitHub Release。当前预览的检查结果见 [验证记录](product-preview-validation.md)。
 
@@ -22,7 +22,7 @@ npm run prepare:offline
 先制作离线包。以下准备工具只用于开发验证，目标目录必须不存在：
 
 ```sh
-node test/delivery/prepare-installed-host.mjs <new-test-root> dist/dsh-workbuddy-project-0.4.0-preview.4-offline.tgz <DSH-package-directory>
+node test/delivery/prepare-installed-host.mjs <new-test-root> dist/dsh-workbuddy-project-0.4.0-preview.5-offline.tgz <DSH-package-directory>
 ```
 
 工具解压并使用真实安装 helper 配置新 profile、验证宿主 peer，额外放入一个**仅用于测试**的确定性模型适配器。按输出设置 `DSH_HOME=<root>/home`，启动 `dsh --profile web --patch <root>/test.patch.yml --no-open --port 0` 并将输出保存到 `<root>/host.log`。再运行：

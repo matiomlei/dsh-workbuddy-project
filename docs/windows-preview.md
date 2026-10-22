@@ -1,4 +1,4 @@
-# Windows 封闭环境验证：WorkBuddy 项目交付 0.4.0-preview.4
+# Windows 封闭环境验证：WorkBuddy 项目交付 0.4.0-preview.5
 
 目标宿主：**DSH 0.2.1-rc2（npm 版本 0.2.1-rc.2）**，Windows 10/11，Node.js >=22.15（含 node:sqlite），Git for Windows。使用 DSH CLI 的 web profile，浏览器地址为本机 localhost。DSH 桌面壳暂未验证。
 
@@ -12,7 +12,7 @@ npm run build:client
 npm run prepare:offline
 ```
 
-生成 `dist/dsh-workbuddy-project-0.4.0-preview.4-offline.tgz`、同名 `.sha256`、`install-windows.ps1` 和本说明。离线包已包含固定依赖与画布资源。DSH 及其宿主依赖复用目标机已有安装，不包含在插件包内。
+生成 `dist/dsh-workbuddy-project-0.4.0-preview.5-offline.tgz`、同名 `.sha256`、`install-windows.ps1` 和本说明。离线包已包含固定依赖与画布资源。DSH 及其宿主依赖复用目标机已有安装，不包含在插件包内。
 
 将这四个文件复制到验证机。**目标机安装和运行插件不执行 npm install、npx 或联网下载。** 模型请求仍需要可访问的模型服务；完全断外网时，请先在 DSH 中配置可访问的本地/内网模型。MCP、Skill 脚本及项目构建工具的运行依赖须由所在环境另行具备。
 
@@ -24,7 +24,7 @@ npm run prepare:offline
 $env:DSH_HOME = 'D:\dsh-validation'
 # 在此 home 下启动 DSH、配置模型后退出，再执行安装：
 powershell -ExecutionPolicy Bypass -File .\install-windows.ps1 `
-  -Archive .\dsh-workbuddy-project-0.4.0-preview.4-offline.tgz `
+  -Archive .\dsh-workbuddy-project-0.4.0-preview.5-offline.tgz `
   -Profile web `
   -DshHome $env:DSH_HOME `
   -DshRoot 'D:\tools\dsh'
@@ -69,6 +69,14 @@ powershell -ExecutionPolicy Bypass -File .\install-windows.ps1 `
 若旧版出现 `Package paths must remain relative to the package root`，请停止 DSH，使用 preview.4 的离线包、同名校验文件和安装脚本，按第 2 节原路径、原 profile 安装后重启。不需要修改能力包目录、manifest 或关闭路径校验。旧配置和数据会保留。
 
 此问题来自插件内部把 Windows 扫描结果的反斜杠传给标准包引用校验；preview.4 在内部扫描边界转换分隔符。若先前创建模板失败，升级后重新点击“使用标准研发模板”；模板不会因安装插件而自动出现在列表。
+
+## Windows 节点组件与离线字体修复
+
+若需求分析节点显示 `delivery-node-policy ... never started` 与 `connector-delivery_repo ... never started`，请升级到 preview.5 后重启 DSH，再从项目发起新运行。已有模板和能力绑定可以继续使用。旧失败运行的状态作为历史保留。
+
+原因之一是动态节点注册把 `C:\...` 直接交给 ESM 导入，而该挂载入口不转换盘符路径。preview.5 为节点规范和连接器使用 `file:///C:/...`，并在挂载前检查本地模块导入、保留具体错误。另移除了画布 CSS 的 Google Fonts 外网导入。
+
+本次已确认 `/lark-auth?sessionId=delivery-editor` 的 HTTP 400 来自画布初始化查询被转发到不存在的内部接口，preview.5 已改为返回未启用状态。其它 HTTP 400 仍须根据 action/path 与 Response JSON 判断；它不等同于模型服务错误。新画布桥会在控制台打印失败路径、状态及服务端错误信息。升级后建议重新加载页面，再查看具体错误；反馈时不要公开 Cookie 或认证头。
 
 ## 5. 升级、回退与反馈
 
