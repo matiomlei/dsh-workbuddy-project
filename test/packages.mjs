@@ -58,7 +58,7 @@ try {
  const expertPath=join(cacheRoot,lock['team:experts/company'].hash)
  assert.equal(readFileSync(join(expertPath,'skills/design/scripts/run.py'),'utf8'),'print("design")')
  const rows=parseYaml(compiled.composition)
- const servers=rows.filter(row=>row.name.endsWith('/connector-client.js'));assert.equal(servers.length,2);assert.equal(servers[1].config.transport,'stdio');assert.equal(servers[1].config.cwd,join(cacheRoot,lock['team:connectors/search'].hash))
+ const servers=rows.filter(row=>row.name.endsWith('/connector-client.js'));assert.equal(servers.length,2);assert.ok(servers.every(row=>row.name.startsWith('file:///')));assert.equal(servers[1].config.transport,'stdio');assert.equal(servers[1].config.cwd,join(cacheRoot,lock['team:connectors/search'].hash))
  assert.match(compiled.composition,/process\.env\.SEARCH_TOKEN/)
  assert.match(compiled.composition,/CLI 连接器/)
  assert.match(compiled.composition,new RegExp(`${lock['team:connectors/cli'].hash}/cli\\.json`))
