@@ -9,7 +9,7 @@ import { listCapabilities, } from '../lib/catalog.js'
 const root=mkdtempSync(join(tmpdir(),'wb-library-sync-'))
 const git=(cwd,args)=>execFileSync('git',args,{cwd,encoding:'utf8',stdio:['ignore','pipe','pipe']}).trim()
 try {
- const origin=join(root,'origin.git'), source=join(root,'source'), target=join(root,'home/libraries/team'), projects=join(root,'home/projects')
+ const origin=join(root,'团队 能力库 #1.git'), source=join(root,'源代码 with spaces'), target=join(root,'home/libraries/team'), projects=join(root,'home/projects')
  mkdirSync(source);git(root,['init','--bare',origin]);git(origin,['symbolic-ref','HEAD','refs/heads/main']);git(source,['init']);git(source,['checkout','-b','main']);git(source,['config','user.name','Sync test']);git(source,['config','user.email','sync@example.test']);git(source,['remote','add','origin',origin]);mkdirSync(join(source,'rules/check'),{recursive:true});writeFileSync(join(source,'rules/check/RULE.md'),'# Rule v1');git(source,['add','.']);git(source,['commit','-m','Initial']);git(source,['push','-u','origin','main'])
  let now=new Date(2026,9,8,8,59), calls=0
  const manager=new TeamLibraries(projects,[],{now:()=>now,git:async(...args)=>{calls++;return gitAsync(...args)}})

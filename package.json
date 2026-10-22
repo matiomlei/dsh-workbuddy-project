@@ -46,7 +46,7 @@
     "@deepseek-ai/dsh-session": "~0.2.1-rc.2"
   },
   "scripts": {
-    "test": "node test/packages.mjs && node test/library-sync.mjs && node --experimental-vm-modules test/windows-package-paths.mjs && node test/delivery/check-plugin-urls.mjs",
+    "test": "node test/packages.mjs && node test/library-sync.mjs && node --experimental-vm-modules test/windows-package-paths.mjs && node --experimental-vm-modules test/windows-path-audit.mjs && node test/delivery/check-plugin-urls.mjs",
     "test:host": "node test/packages-host.mjs",
     "test:ui": "node test/packages-ui.cjs",
     "test:preset": "node test/preset-host.mjs",

@@ -35,10 +35,13 @@ try {
   put('connectors/repository/mcp.json', { mcpServers: { repo: { command: 'node', args: ['server.mjs'] } } })
   put('connectors/repository/server.mjs', '// stdio asset')
   const module = new vm.SourceTextModule(fs.readFileSync(new URL('../lib/bundles.js', import.meta.url), 'utf8'))
+  const nativePaths = new vm.SourceTextModule(fs.readFileSync(new URL('../lib/native-path.js', import.meta.url), 'utf8'))
   const dependencies = new Map([
     ['node:fs', synthetic(mappedFs)], ['node:path', synthetic(win)],
     ['node:crypto', synthetic({ createHash })], ['yaml', synthetic({ parse })],
   ])
+  await nativePaths.link(() => dependencies.get('node:path'))
+  dependencies.set('./native-path.js', nativePaths)
   await module.link(specifier => {
     assert.ok(dependencies.has(specifier), specifier)
     return dependencies.get(specifier)
@@ -56,7 +59,7 @@ try {
   assert.equal(bundles.scanPackages(win.join(windowsRoot, 'skills'), 'skill', 'team').length, 1)
   const connector = bundles.readPackage(win.join(windowsRoot, 'connectors/repository'), 'connector', 'repository')
   assert.equal(bundles.connectorServers(connector)[0].cwd, win.join(windowsRoot, 'connectors/repository'))
-  for (const invalid of ['../outside', '..\\outside', 'agents\\lead.md', 'C:\\outside.md', '/outside'])
+  for (const invalid of ['../outside', '..\\outside', 'agents\\lead.md', 'C:\\outside.md', 'D:agents/lead.md', '/outside'])
     assert.throws(() => bundles.packagePath(win.join(windowsRoot, 'experts/analyst'), invalid), /relative to the package root/)
   console.log('PASS Windows drive, Chinese/space paths, nested package scans, portable hashes, expert/Skill/MCP parsing and unchanged package-path rejection (mapped filesystem, not a native Windows run)')
 } finally { fs.rmSync(actualRoot, { recursive: true, force: true }) }

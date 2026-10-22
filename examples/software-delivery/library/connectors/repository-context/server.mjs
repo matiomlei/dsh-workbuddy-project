@@ -1,13 +1,13 @@
 /** Dependency-free, read-only MCP for the current delivery node's Git worktree. */
 import { createInterface } from 'node:readline'
 import { realpathSync, readdirSync, readFileSync, statSync } from 'node:fs'
-import { resolve, relative, sep, extname } from 'node:path'
+import { resolve, relative, sep, extname, isAbsolute } from 'node:path'
 const root = realpathSync(process.env.WORKBUDDY_WORKSPACE || process.cwd())
 const excluded = /^(?:\.git|node_modules|\.env(?:\..*)?|\.ssh|\.aws|\.azure|\.npmrc|\.netrc|credentials?|secrets?|.*\.(?:pem|key|p12|pfx))$/i
 function pathFor(input) {
   if (typeof input !== 'string' || input.split(/[\\/]/).some(part => excluded.test(part))) throw new Error('该路径不提供给仓库上下文工具')
   const path = realpathSync(resolve(root, input)), rel = relative(root, path)
-  if (rel === '..' || rel.startsWith('..' + sep) || resolve(path) !== root && !path.startsWith(root + sep)) throw new Error('路径必须位于当前运行仓库中')
+  if (rel === '..' || rel.startsWith('..' + sep) || isAbsolute(rel)) throw new Error('路径必须位于当前运行仓库中')
   if (rel.split(sep).some(part => excluded.test(part))) throw new Error('该路径不提供给仓库上下文工具')
   return path
 }
