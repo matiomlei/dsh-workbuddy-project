@@ -1,6 +1,6 @@
 # 标准研发交付 · 需求到测试
 
-DSH 0.2.1-rc2 / WorkBuddy 0.4.0-preview.8。
+DSH 0.2.1-rc2 / WorkBuddy 0.4.0-preview.9。
 
 ## 创建与使用
 

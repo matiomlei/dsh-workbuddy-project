@@ -1,0 +1,13 @@
+{
+  "date": "2026-10-22T12:56:15.790Z",
+  "platform": "darwin",
+  "node": "v25.6.1",
+  "externalModelCalls": 0,
+  "requestId": "0c3a1306-9f48-4604-bccc-16562cc20a1f",
+  "sessionId": "wf1-coder-c680b662",
+  "checks": [
+    "after a real host process restart, the original persisted session and attempt resume with original tool results",
+    "partial work is preserved, completed write is not repeated, and original history rows are not duplicated or reassigned",
+    "accepted upstream is reused and the resumed result waits for quality before releasing downstream"
+  ]
+}

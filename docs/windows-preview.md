@@ -1,4 +1,4 @@
-# Windows 封闭环境验证：WorkBuddy 项目交付 0.4.0-preview.8
+# Windows 封闭环境验证：WorkBuddy 项目交付 0.4.0-preview.9
 
 目标宿主：**DSH 0.2.1-rc2（npm 版本 0.2.1-rc.2）**，Windows 10/11，Node.js >=22.15（含 node:sqlite），Git for Windows。使用 DSH CLI 的 web profile，浏览器地址为本机 localhost。DSH 桌面壳暂未验证。
 
@@ -12,7 +12,7 @@ npm run build:client
 npm run prepare:offline
 ```
 
-生成 `dist/dsh-workbuddy-project-0.4.0-preview.8-offline.tgz`、同名 `.sha256`、`install-windows.ps1` 和本说明。离线包已包含固定依赖与画布资源。DSH 及其宿主依赖复用目标机已有安装，不包含在插件包内。
+生成 `dist/dsh-workbuddy-project-0.4.0-preview.9-offline.tgz`、同名 `.sha256`、`install-windows.ps1` 和本说明。离线包已包含固定依赖与画布资源。DSH 及其宿主依赖复用目标机已有安装，不包含在插件包内。
 
 将这四个文件复制到验证机。**目标机安装和运行插件不执行 npm install、npx 或联网下载。** 模型请求仍需要可访问的模型服务；完全断外网时，请先在 DSH 中配置可访问的本地/内网模型。MCP、Skill 脚本及项目构建工具的运行依赖须由所在环境另行具备。
 
@@ -24,7 +24,7 @@ npm run prepare:offline
 $env:DSH_HOME = 'D:\dsh-validation'
 # 在此 home 下启动 DSH、配置模型后退出，再执行安装：
 powershell -ExecutionPolicy Bypass -File .\install-windows.ps1 `
-  -Archive .\dsh-workbuddy-project-0.4.0-preview.8-offline.tgz `
+  -Archive .\dsh-workbuddy-project-0.4.0-preview.9-offline.tgz `
   -Profile web `
   -DshHome $env:DSH_HOME `
   -DshRoot 'D:\tools\dsh'
@@ -51,11 +51,11 @@ powershell -ExecutionPolicy Bypass -File .\install-windows.ps1 `
 
 运行在私有 Git worktree 中完成，不自动提交到源仓库、不自动 push。源仓库未提交文件不进入运行；先提交希望参与运行的内容。每个 Agent 指定一个主仓库作为 cwd；多仓库项目通过不同节点角色分工。
 
-## 节点对话与运行过程（preview.8）
+## 节点对话与运行过程（preview.9）
 
 在运行详情点击 DAG 的 Agent 节点，进入“对话与过程”：可以查看模型返回的思考、回复及工具执行，运行中补充要求，回答节点提出的问题。待验收时继续对话会生成新的产物和验收对象，下游仍等待新结果通过。已完成节点可询问结果，采用独立只读讨论，不修改原产物。另一个页签“产物与验收”用于预览、下载补丁及验收。详见 [节点交互说明](node-dialogue.md)。
 
-中断、失败或取消的运行结束后，选择未完成的 Agent 节点：输入补充要求，点击“发送并继续”可带入历史节选并保留已有修改；点击“重试节点”会清理该节点的残留修改，从已验收的上游输入重新执行。已成功且通过所配验收的节点复用固定结果，其余未完成节点恢复执行；新结果仍需按模板验收。长会话打开时自动定位最新消息，向上阅读时保留滚动位置，提问选项左对齐展示。
+中断、失败或取消的运行结束后，选择未完成的 Agent 节点：点击“继续本次执行”，或输入补充要求后点击“发送并继续”，通过 DSH 加载原持久化会话、工具结果和已有文件，从中断处继续，未固定输出时沿用本次执行编号；点击“重试节点”才清理该节点的残留修改，从已验收的上游输入重新执行并新增执行次数。已成功且通过所配验收的节点复用固定结果，其余未完成节点恢复执行；新结果仍需按模板验收。每次执行的对话可折叠，重试后旧组收起、新组展开；原会话恢复失败不会静默从头重跑。长会话打开时自动定位最新消息，向上阅读时保留滚动位置，提问选项左对齐展示。
 
 模型未返回的内部思考无法展示；升级不会补造旧运行的过程。已有工作流模板的新运行也能使用此功能，无需重新创建模板。
 
@@ -74,13 +74,13 @@ powershell -ExecutionPolicy Bypass -File .\install-windows.ps1 `
 
 ## Windows 能力包路径修复
 
-若旧版出现 `Package paths must remain relative to the package root`，请停止 DSH，使用 preview.8 的离线包、同名校验文件和安装脚本，按第 2 节原路径、原 profile 安装后重启。不需要修改能力包目录、manifest 或关闭路径校验。旧配置和数据会保留。
+若旧版出现 `Package paths must remain relative to the package root`，请停止 DSH，使用 preview.9 的离线包、同名校验文件和安装脚本，按第 2 节原路径、原 profile 安装后重启。不需要修改能力包目录、manifest 或关闭路径校验。旧配置和数据会保留。
 
 此问题来自插件内部把 Windows 扫描结果的反斜杠传给标准包引用校验；preview.4 在内部扫描边界转换分隔符。若先前创建模板失败，升级后重新点击“使用标准研发模板”；模板不会因安装插件而自动出现在列表。
 
 ## Windows 节点组件与离线字体修复
 
-若需求分析节点显示 `delivery-node-policy ... never started` 与 `connector-delivery_repo ... never started`，请升级到 preview.8 后重启 DSH，再从项目发起新运行。已有模板和能力绑定可以继续使用。旧失败运行的状态作为历史保留。
+若需求分析节点显示 `delivery-node-policy ... never started` 与 `connector-delivery_repo ... never started`，请升级到 preview.9 后重启 DSH，再从项目发起新运行。已有模板和能力绑定可以继续使用。旧失败运行的状态作为历史保留。
 
 原因之一是动态节点注册把 `C:\...` 直接交给 ESM 导入，而该挂载入口不转换盘符路径。preview.5 为节点规范和连接器使用 `file:///C:/...`，并在挂载前检查本地模块导入、保留具体错误。另移除了画布 CSS 的 Google Fonts 外网导入。
 

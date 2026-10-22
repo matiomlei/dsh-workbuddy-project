@@ -2,7 +2,7 @@
 
 本仓库是独立发布包 `dsh-workbuddy-project`，运行时版本由 `package.json` 决定。npm 发布、GitHub Release 和插件市场收录是独立步骤；市场收录需要维护者审核。
 
-## 0.4.0-preview.8 产品预览
+## 0.4.0-preview.9 产品预览
 
 本分支交付源代码、固定依赖的离线制包脚本和 Windows 安装器，不自动发布 npm、标签或 GitHub Release。当前预览的检查结果见 [验证记录](product-preview-validation.md)。
 
@@ -23,7 +23,7 @@ npm run prepare:offline
 先制作离线包。以下准备工具只用于开发验证，目标目录必须不存在：
 
 ```sh
-node test/delivery/prepare-installed-host.mjs <new-test-root> dist/dsh-workbuddy-project-0.4.0-preview.8-offline.tgz <DSH-package-directory>
+node test/delivery/prepare-installed-host.mjs <new-test-root> dist/dsh-workbuddy-project-0.4.0-preview.9-offline.tgz <DSH-package-directory>
 ```
 
 工具解压并使用真实安装 helper 配置新 profile、验证宿主 peer，额外放入一个**仅用于测试**的确定性模型适配器。按输出设置 `DSH_HOME=<root>/home`，启动 `dsh --profile web --patch <root>/test.patch.yml --no-open --port 0` 并将输出保存到 `<root>/host.log`。再运行：
@@ -34,6 +34,8 @@ node test/delivery/check-starter-host.mjs <root>
 node test/delivery/check-dialogue-host.mjs <root>
 node test/delivery/check-restart-host.mjs <root>
 ```
+
+原会话的跨进程恢复验收：先运行 `check-restart-host.mjs <root> --prepare-resume`，停止并重新启动同一隔离 DSH_HOME、将新启动日志写回 `<root>/host.log`，再运行 `node test/delivery/check-cold-resume-host.mjs <root>`。
 
 正常路径覆盖共享库专家/Skill/MCP/规范的实际加载调用、基础工具范围、能力快照、模型选择、模板发布、项目绑定、Agent 文件交接、人工验收放行、补丁应用与版本复用。测试不需要外部模型调用，不能代替真实模型效果或 Windows 实测。
 
