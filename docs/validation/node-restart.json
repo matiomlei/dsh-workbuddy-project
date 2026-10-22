@@ -1,0 +1,13 @@
+{
+  "date": "2026-10-22T12:13:01.050Z",
+  "platform": "darwin",
+  "node": "v25.6.1",
+  "externalModelCalls": 0,
+  "continuedRequestId": "f6fbf8f5-be08-4ad5-a204-5a21362dd3de",
+  "retriedRequestId": "478b0c7b-03c3-4d26-9640-c852d3a0d71b",
+  "checks": [
+    "provider error named 运行已取消 becomes a model failure, never user cancellation, a successful handoff or a quality gate",
+    "sending continue carries user instructions/history and partial files into a new attempt; upstream is reused and downstream stays gated",
+    "one-click retry is idempotent, cleans partial writes, reuses accepted parents and rejects stale-generation commands"
+  ]
+}
