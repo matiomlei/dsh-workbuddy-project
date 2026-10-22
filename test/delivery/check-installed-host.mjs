@@ -158,6 +158,14 @@ const toolCatalog = await api("editor/request", {
   path: "/tools",
   method: "GET",
 });
+const larkStatus = await api("editor/request", {
+  editorId: editor.editorId,
+  path: "/lark-auth?sessionId=delivery-editor",
+  method: "GET",
+});
+assert.deepEqual(larkStatus, { status: null, enabled: false });
+for (const path of ["/skills", "/llm-config", "/runtime-config", "/feishu-credentials", "/runs"])
+  await api("editor/request", { editorId: editor.editorId, path, method: "GET" });
 assert.deepEqual(
   toolCatalog.tools.map((t) => t.name),
   ["read", "write", "skill", "bash"],

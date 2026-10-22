@@ -12,6 +12,11 @@ const git=(cwd,...args)=>execFileSync('git',['-c','user.name=Starter validation'
 const repo=join(root,'starter-source');mkdirSync(repo,{recursive:true})
 if(!existsSync(join(repo,'.git'))) {git(repo,'init','-q');writeFileSync(join(repo,'README.md'),'# Shopping cart\nNode.js commonjs module, no dependencies. Use node --test test/cart.test.cjs.\n');git(repo,'add','.');git(repo,'commit','-qm','baseline')}
 const sourceHead=git(repo,'rev-parse','HEAD')
+const stylesheet = await fetch(base+'/wf1/assets/index-BMohP83o.css')
+assert.equal(stylesheet.status, 200)
+const css = await stylesheet.text()
+assert.ok(!css.includes('fonts.googleapis.com') && !css.includes('fonts.gstatic.com'))
+assert.ok(!/@import[^;]*https?:/i.test(css))
 const created=await api('template/starter'),id=created.templateId
 const detail=await api('detail',{id}),definition=detail.draft.definition
 const stages=['requirements','design','implement','verify']
