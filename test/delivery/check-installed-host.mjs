@@ -59,9 +59,32 @@ writeFileSync(
   join(home, "rules/release-check/RULE.md"),
   "---\nname: 交付检查规范\n---\nPRODUCT_RULE_SNAPSHOT: Check outputs before accepting completion.\n",
 );
+writeFileSync(
+  join(root, "library/connectors/library-probe/mcp.json"),
+  JSON.stringify({
+    mcpServers: {
+      library_probe: {
+        type: "streamableHttp",
+        url: base + "/test-library-mcp",
+      },
+    },
+  }),
+);
 const catalog = (await api("capabilities")).capabilities,
   rule = catalog.find((c) => c.reference === "personal:rules/release-check");
 assert.match(rule?.hash ?? "", /^[a-f0-9]{64}$/);
+const expectedKinds = {
+  expert: "acceptance:experts/reviewer",
+  skill: "acceptance:skills/library-review",
+  connector: "acceptance:connectors/library-probe",
+  rule: "acceptance:rules/library-quality",
+};
+for (const [kind, ref] of Object.entries(expectedKinds)) {
+  const item = catalog.find((c) => c.reference === ref);
+  assert.equal(item?.kind, kind);
+  assert.equal(item.unavailable, null);
+  assert.match(item.hash, /^[a-f0-9]{64}$/);
+}
 const bootstrap = await api("bootstrap");
 assert.equal(bootstrap.selection.provider, "delivery-test");
 assert.equal(bootstrap.selection.model, "local-test");
@@ -81,6 +104,7 @@ const op = (name, args, expect) => ({
       label,
       prompt: "完成本次节点任务。",
       inputTemplate: "TEST_OPERATIONS:" + JSON.stringify(operations),
+      tools: ["read", "write", "skill"],
     },
   });
 const graph = {
@@ -89,6 +113,8 @@ const graph = {
       "implement",
       "编码实现",
       [
+        op("skill", { name: "library-review" }, "SKILL_LIBRARY_PROOF"),
+        op("mcp__library_probe__inspect", {}, "LIBRARY_MCP_OK"),
         op("write", {
           file_path: "app.cjs",
           content: 'module.exports = () => "DELIVERY_OK";\n',
@@ -127,6 +153,22 @@ const template = await api("template/import", {
   id = template.templateId;
 let editor = await api("editor/open", { id }),
   revision = editor.revision;
+const toolCatalog = await api("editor/request", {
+  editorId: editor.editorId,
+  path: "/tools",
+  method: "GET",
+});
+assert.deepEqual(
+  toolCatalog.tools.map((t) => t.name),
+  ["read", "write", "skill", "bash"],
+);
+assert.equal(
+  toolCatalog.tools.some((t) => t.name === "working_directory"),
+  false,
+);
+checks.push(
+  "canvas tool catalog matches the executable base tool contract; capabilities use shared-library bindings",
+);
 for (const nodeId of ["implement", "verify"])
   revision = (
     await api("node/save", {
@@ -136,14 +178,34 @@ for (const nodeId of ["implement", "verify"])
       nodeId,
       repositoryRole: "main",
       capabilities: {
-        experts: [],
-        skills: [],
-        connectors: [],
-        rules: [rule.reference],
+        experts: [expectedKinds.expert],
+        skills: [expectedKinds.skill],
+        connectors: [expectedKinds.connector],
+        rules: [rule.reference, expectedKinds.rule],
       },
-      expectedHashes: { [rule.reference]: rule.hash },
+      expectedHashes: Object.fromEntries(
+        catalog.map((item) => [item.reference, item.hash]),
+      ),
     })
   ).revision;
+// Reopening the UI preserves a multi-rule snapshot even when catalog order differs.
+const originalBinding = (
+  await api("editor/state", { editorId: editor.editorId })
+).definition.nodeBindings.find((b) => b.nodeId === "implement");
+const preserved = await api("node/save", {
+  id,
+  editorId: editor.editorId,
+  expectedRevision: revision,
+  nodeId: "implement",
+  repositoryRole: "main",
+  capabilities: {
+    ...originalBinding.capabilities,
+    rules: [...originalBinding.capabilities.rules].reverse(),
+  },
+  keepSnapshot: true,
+});
+revision = preserved.revision;
+assert.deepEqual(preserved.binding.packages, originalBinding.packages);
 revision = (
   await api("quality-policy/save", {
     id,
@@ -291,7 +353,13 @@ checks.push(
 );
 const requests = readFileSync(join(root, "test-model-requests.jsonl"), "utf8");
 assert.ok(requests.includes("PRODUCT_RULE_SNAPSHOT"));
-assert.ok(requests.includes('"name":"bash"'));
+assert.ok(requests.includes("SKILL_LIBRARY_PROOF"));
+assert.ok(requests.includes("LIBRARY_MCP_OK"));
+assert.ok(requests.includes("EXPERT_LIBRARY_PROOF"));
+assert.ok(requests.includes("RULE_LIBRARY_PROOF"));
+checks.push(
+  "shared-library expert and rules reach the model; bound Skill loads and MCP executes with explicit base-tool selection",
+);
 const report = {
   date: new Date().toISOString(),
   dsh: "0.2.1-rc.2",

@@ -88,6 +88,8 @@ patch('lib/index.js', '  ensureWorkflowSkill({ log: (msg) => ctx.logger?.info?.(
 patch('lib/index.js', "    const outputDir = relative(store.workspaceRoot, ws).split(sep).join('/');\n", '');
 patch('lib/index.js', '    const deployment = deliveryRuntime.deploymentFor(node, run);', "    const deployment = deliveryRuntime.deploymentFor(node, run);\n    const outputDir = deployment ? '.delivery/outputs' : relative(store.workspaceRoot, ws).split(sep).join('/');\n    if (deployment) mkdirSync(resolve(deployment.cwd, outputDir), { recursive: true });");
 patch('lib/index.js', '- 本节点的专属输出目录是 ${outputDir}；交付物（报告/工单/回复稿等）必须写入该目录，中间产物也应写入该目录，不要修改工作区中的其他文件。', "${deployment ? '- 在当前运行仓库中完成实现和测试；报告放入 ' + outputDir + '。当前目录和列出的其他仓库目录属于本次运行，按需求修改代码并检查结果。' : '- 本节点的专属输出目录是 ' + outputDir + '；报告和中间产物写入该目录。'}");
+patch('lib/index.js', 'const skillIds = Array.isArray(d.skills) ? d.skills.slice() : [];', 'const skillIds = deployment ? [] : (Array.isArray(d.skills) ? d.skills.slice() : []);');
+patch('lib/index.js', "if (larkCliAvailable() && !skillIds.includes('feishu-cli'))", "if (!deployment && larkCliAvailable() && !skillIds.includes('feishu-cli'))");
 // Validate all pins/anchors before creating an experimental target.
 cpSync(source, target, { recursive: true })
 for (const [file, contents] of edited) writeFileSync(join(target, file), contents)

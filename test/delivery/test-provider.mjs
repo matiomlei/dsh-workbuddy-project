@@ -4,8 +4,46 @@ import { appendFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 export const name = "delivery-test-provider";
-export const inject = ["llm"];
+export const inject = ["llm", "webServer"];
 export function apply(ctx) {
+  ctx.webServer.register({
+    kind: "exact",
+    path: "/test-library-mcp",
+    async handler(req, res) {
+      if (req.method !== "POST") {
+        res.writeHead(405).end();
+        return;
+      }
+      let raw = "";
+      for await (const chunk of req) raw += chunk;
+      const message = JSON.parse(raw);
+      if (message.id === undefined) {
+        res.writeHead(202).end();
+        return;
+      }
+      const result =
+        message.method === "initialize"
+          ? {
+              protocolVersion: message.params.protocolVersion,
+              capabilities: { tools: {} },
+              serverInfo: { name: "library-probe", version: "1" },
+            }
+          : message.method === "tools/list"
+            ? {
+                tools: [
+                  {
+                    name: "inspect",
+                    description: "Library MCP acceptance probe",
+                    inputSchema: { type: "object", properties: {} },
+                  },
+                ],
+              }
+            : { content: [{ type: "text", text: "LIBRARY_MCP_OK" }] };
+      res
+        .writeHead(200, { "content-type": "application/json" })
+        .end(JSON.stringify({ jsonrpc: "2.0", id: message.id, result }));
+    },
+  });
   class TestAdapter extends LlmAdapter {
     providerInfo(provider) {
       return { id: provider, name: "Product acceptance adapter" };
