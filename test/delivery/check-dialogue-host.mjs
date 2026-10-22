@@ -11,7 +11,7 @@ const api=async(action,body={})=>{const r=await request(action,body);assert.ok(r
 const repo=join(root,'dialogue-source');mkdirSync(repo,{recursive:true})
 const git=(...args)=>execFileSync('git',['-c','user.name=Dialogue Test','-c','user.email=test@example.invalid','-c','commit.gpgsign=false','-C',repo,...args],{encoding:'utf8'}).trim()
 if(!existsSync(join(repo,'.git'))){git('init','-q');writeFileSync(join(repo,'README.md'),'Dialogue acceptance\n');git('add','.');git('commit','-qm','base')}
-const head=git('rev-parse','HEAD'),graph={nodes:[{id:'coder',type:'agent',position:{x:10,y:10},data:{label:'交互编码',prompt:'DIALOGUE_CODER_PROBE',inputTemplate:'完成产品数据格式实现',tools:['read','write'],timeoutSec:4}},{id:'tester',type:'agent',position:{x:300,y:10},data:{label:'下游校验',prompt:'DIALOGUE_TESTER_PROBE',inputTemplate:'检查上游 product.json',tools:['read']} }],edges:[{id:'a-b',source:'coder',target:'tester'}]}
+const head=git('rev-parse','HEAD'),graph={nodes:[{id:'coder',type:'agent',position:{x:10,y:10},data:{label:'交互编码',prompt:'DIALOGUE_CODER_PROBE',inputTemplate:'完成产品数据格式实现',tools:['read','write'],timeoutSec:6}},{id:'tester',type:'agent',position:{x:300,y:10},data:{label:'下游校验',prompt:'DIALOGUE_TESTER_PROBE',inputTemplate:'检查上游 product.json',tools:['read']} }],edges:[{id:'a-b',source:'coder',target:'tester'}]}
 const created=await api('template/import',{name:'节点对话验收',definition:{graph,repositoryRoles:[{id:'main'}]}}),id=created.templateId
 let editor=await api('editor/open',{id}),revision=editor.revision
 for(const nodeId of ['coder','tester'])revision=(await api('node/save',{id,editorId:editor.editorId,expectedRevision:revision,nodeId,repositoryRole:'main',capabilities:{experts:[],skills:[],rules:[],connectors:[]},expectedHashes:{}})).revision
@@ -26,7 +26,7 @@ const message=(text,extra={})=>({messageId:randomUUID(),requestId:run.requestId,
 const checks=[]
 await wait((r,d)=>d.thread?.phase==='waiting_user')
 assert.equal(run.nodeStates.tester,undefined)
-await new Promise(resolve=>setTimeout(resolve,4500))
+await new Promise(resolve=>setTimeout(resolve,6500))
 await wait((r,d)=>d.thread?.phase==='waiting_user');checks.push('human answer waiting pauses the node deadline rather than failing after timeoutSec')
 const answer=message('JSON',{questionId:detail.thread.question.id})
 await api('nodes/message',answer);await api('nodes/message',answer)
@@ -73,6 +73,10 @@ await wait((r,d)=>d.thread?.phase==='waiting_user');await api('runs/cancel',{req
 for(let i=0;i<100;i++){const r=await api('runs/detail',{requestId:run.requestId});if(r.status==='canceled')break;await new Promise(resolve=>setTimeout(resolve,100))}
 const stopped=await api('runs/node',{requestId:run.requestId,nodeId:'coder'});assert.equal(stopped.canSend,false);assert.equal(stopped.thread.question,null)
 assert.ok(!(await api('runs/node',{requestId:first,nodeId:'coder'})).entries.some(item=>item.sessionId===stopped.thread.sessionId))
-checks.push('cancelled human questions drain correctly and independent runs keep separate node sessions and histories')
+assert.equal(stopped.canContinue,true);assert.equal(stopped.canRetry,true)
+await api('nodes/message',{messageId:randomUUID(),requestId:run.requestId,nodeId:'coder',expectedNativeRunId:stopped.nativeRunId,expectedAttempt:stopped.attempt,mode:'continue',text:'保留进度并继续'})
+await wait((r,d)=>d.attempt===2&&d.thread?.phase==='waiting_user')
+await api('runs/cancel',{requestId:run.requestId})
+checks.push('cancelled human questions drain correctly, can explicitly continue in a new attempt, and independent runs keep separate histories')
 const report={date:new Date().toISOString(),platform:process.platform,node:process.version,externalModelCalls:0,requestId:first,cancelledRequestId:run.requestId,checks}
 writeFileSync(join(root,'dialogue-report.json'),JSON.stringify(report,null,2));console.log(JSON.stringify(report,null,2))

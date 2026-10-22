@@ -45,6 +45,8 @@ if (runtime) {
       });
       if (run.canceled) throw new Error('运行已取消');
       output = result.output;`)
+  patch('lib/engine.js', "      const canceled0 = run.canceled || String(err?.message || '') === '运行已取消';", "      const canceled0 = run.canceled || (!timedOut && ac.signal.aborted && String(err?.message || '') === '运行已取消');")
+  patch('lib/engine.js', "      const canceled = run.canceled || canceled0\n        || (timedOut === false && ac.signal.aborted === true && String(err?.message || '').includes('取消'))\n        || String(err?.message || '') === '运行已取消';", "      const canceled = run.canceled || canceled0\n        || (!timedOut && ac.signal.aborted && String(err?.message || '').includes('取消'));")
   patch('lib/engine.js', 'if (!canceled0 && !s.run.canceled && kind?.retryable !== false', 'if (!canceled0 && !err?.handoffBlocked && !s.run.canceled && kind?.retryable !== false')
   patch('lib/engine.js', "if (!canceled && err?.code !== 'UNKNOWN_NODE_TYPE' && node.data?.continueOnFail)", "if (!canceled && !err?.handoffBlocked && err?.code !== 'UNKNOWN_NODE_TYPE' && node.data?.continueOnFail)")
   patch('lib/index.js', "export const inject = ['agents', 'agentDefaultModel', 'sessions', 'tools', 'webServer', 'agentPresets', 'sessionPersistence', 'llm', 'skills'];", "export const inject = ['agents', 'agentDefaultModel', 'sessions', 'tools', 'webServer', 'agentPresets', 'sessionPersistence', 'llm', 'skills', 'deliveryRuntime'];")
@@ -85,6 +87,9 @@ if (runtime) {
             try { await ctx.agentPresets.mount(agentCtx, 'standard'); } catch { /* upstream fallback */ }
           }`)
   patch('lib/index.js', '          if (restrictList) {', '          if (restrictList && !deployment) {')
+  patch('lib/index.js', "import { graphFingerprint, resumeDiff, runMatchesGraphScope, selectScopedRun, summarizeNodeStates, summarizeOutputs, summarizeStructuredOutputs } from './run-scope.js';", "import { graphFingerprint, resumeDiff, runMatchesGraphScope, selectScopedRun, summarizeNodeStates, summarizeOutputs, summarizeStructuredOutputs } from './run-scope.js';\nimport { assertAgentCompletion } from '../../../delivery/node-restart.mjs';")
+  patch('lib/index.js', "      let structuredOutput;\n      let structuredMeta;", "      if (deployment) assertAgentCompletion(reason, signal);\n      let structuredOutput;\n      let structuredMeta;")
+  patch('lib/index.js', "            reason = repaired.reason;", "            reason = repaired.reason;\n            if (deployment) assertAgentCompletion(reason, signal);")
   patch('lib/index.js', '      try { await handle?.dispose?.(); } catch { /* noop */ }', '      if (!deployment?.retainAgent?.(handle)) { try { await handle?.dispose?.(); } catch { /* noop */ } }')
 }
 patch('lib/index.js', '  ensureWorkflowSkill({ log: (msg) => ctx.logger?.info?.(`[orchestrator] ${msg}`) });', '  // WorkBuddy owns the product entry; no standalone workflow skill is seeded.\n  // ensureWorkflowSkill disabled by the embedded product adapter.');

@@ -1,9 +1,9 @@
 {
-  "scope": "immutable workflow projections, business execution, node dialogue retention and human-input timeout suspension",
+  "scope": "isolated immutable projections plus business-run/preset/cwd bridge and required-prerequisite check",
   "hashes": {
     "lib/index.js": {
       "original": "6f7aae750285a7fb02463ddaf9d4ba6153557f8d297d9541bfaba9aa96f57c03",
-      "adapted": "52a18e5e00a001b8031e3bc18244bd44b439a44610ebe5f88348202389fb978c"
+      "adapted": "5c214d28c593c76db9390403b1dac64875b698e1f3a53fa15de6bfaacdf6dcbc"
     },
     "lib/sqlite-store.js": {
       "original": "3471d185662e4c9d84e9b3ecd9788d79601908a51efd993e7219cf4586db9e3a",
@@ -11,7 +11,7 @@
     },
     "lib/engine.js": {
       "original": "a428c533cdeaa9a6cb2a38d2f82dacf58ea36288aaa6d910091d56df485a307e",
-      "adapted": "fa3b1b1d714a77da2d29a1dba2b12c08c80f7ab81c22a8d8d972872ba2521d1f"
+      "adapted": "fc74cd9e1d303bde57ffc175498336ef3981b9e9f446cf089ad2d8580d0f11be"
     }
   }
 }

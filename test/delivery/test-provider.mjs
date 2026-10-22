@@ -1,5 +1,5 @@
 /** Deterministic local adapter for isolated product acceptance, never packaged. */
-import { dialogueResponse } from "./dialogue-fixture.mjs";
+import { dialogueResponse, restartResponse } from "./dialogue-fixture.mjs";
 import { starterOperations, starterStageNames } from "./starter-fixture.mjs";
 import { LlmAdapter } from "@deepseek-ai/dsh-llm";
 import { appendFileSync } from "node:fs";
@@ -79,6 +79,7 @@ export function apply(ctx) {
       );
       if (options.signal?.aborted) throw options.signal.reason;
       const system=(options.system??'')+options.messages.filter(message=>message.role==='system').flatMap(message=>message.content??[]).filter(block=>block.type==='text').map(block=>block.text).join('\n');
+      if(system.includes('RESTART_CODER_PROBE')) {yield*restartResponse({...options,system});return}
       if(system.includes('DIALOGUE_CODER_PROBE') || system.includes('DIALOGUE_TESTER_PROBE') || system.includes('这是工作流已固定结果的只读讨论')) { yield* dialogueResponse({...options,system}); return; }
       const text = options.messages
         .filter((m) => m.role === "user")

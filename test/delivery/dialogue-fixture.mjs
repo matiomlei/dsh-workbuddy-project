@@ -7,6 +7,24 @@ function* call(name,args,id,index=0) {
   yield {type:'block-end',index,block:{type:'tool-call',id,name,arguments:argumentsText}}
   yield {type:'finish',reason:{kind:'tool-calls'}}
 }
+const failedTokens=new Set()
+export async function* restartResponse(options) {
+  const results=options.messages.filter(m=>m.role==='tool'),done=id=>results.some(m=>m.toolCallId===id)
+  const users=options.messages.filter(m=>m.role==='user').flatMap(m=>m.content??[]).filter(b=>b.type==='text').map(b=>b.text).join('\n')
+  const token=users.match(/RESTART_TOKEN:([a-f0-9-]+)/)?.[1]
+  if(!token)throw new Error('missing restart probe token')
+  const continuation=options.system.includes('本节点执行曾中断')
+  if(!failedTokens.has(token)) {
+    if(!done('partial-write')){yield*call('write',{file_path:'partial.txt',content:'PARTIAL_WORK\n'},'partial-write');return}
+    failedTokens.add(token);throw new Error('运行已取消')
+  }
+  if(!done('probe-read')){yield*call('read',{file_path:'partial.txt'},'probe-read');return}
+  const partial=JSON.stringify(results.find(r=>r.toolCallId==='probe-read')).includes('PARTIAL_WORK')
+  if(continuation?!partial:partial)throw new Error('restart did not preserve/reset partial work correctly')
+  if(continuation&&!options.system.includes('保留进度并继续'))throw new Error('continuation lost user instructions')
+  if(!done('final-write')){yield*call('write',{file_path:'result.json',content:JSON.stringify({continued:continuation,partialPreserved:partial})+'\n'},'final-write');return}
+  const text='节点已恢复，等待验收。';yield{type:'block-start',index:0,blockType:'text'};yield{type:'text-delta',index:0,text};yield{type:'block-end',index:0,block:{type:'text',text}};yield{type:'finish',reason:{kind:'stop'}}
+}
 export async function* dialogueResponse(options) {
   const users=options.messages.filter(message=>message.role==='user').flatMap(message=>message.content??[]).filter(block=>block.type==='text').map(block=>block.text).join('\n')
   const results=options.messages.filter(message=>message.role==='tool')

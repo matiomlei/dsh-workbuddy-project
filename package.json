@@ -51,7 +51,7 @@
     "test:ui": "node test/packages-ui.cjs",
     "test:preset": "node test/preset-host.mjs",
     "check:package": "node scripts/check-package.mjs",
-    "test:delivery": "node test/delivery/check-store.mjs && node test/delivery/check-code-handoff.mjs && node test/delivery/check-quality-ledger.mjs && node test/delivery/check-run-checkpoints.mjs && node test/delivery/check-node-dialogue.mjs",
+    "test:delivery": "node test/delivery/check-store.mjs && node test/delivery/check-code-handoff.mjs && node test/delivery/check-quality-ledger.mjs && node test/delivery/check-run-checkpoints.mjs && node test/delivery/check-node-dialogue.mjs && node test/delivery/check-node-restart.mjs",
     "build:client": "node scripts/build-client.mjs",
     "prepare:offline": "node scripts/prepare-offline.mjs",
     "check:paths": "node scripts/check-paths.mjs"
