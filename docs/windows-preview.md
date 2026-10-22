@@ -1,4 +1,4 @@
-# Windows 封闭环境验证：WorkBuddy 项目交付 0.4.0-preview.2
+# Windows 封闭环境验证：WorkBuddy 项目交付 0.4.0-preview.3
 
 目标宿主：**DSH 0.2.1-rc2（npm 版本 0.2.1-rc.2）**，Windows 10/11，Node.js >=22.15（含 node:sqlite），Git for Windows。使用 DSH CLI 的 web profile，浏览器地址为本机 localhost。DSH 桌面壳暂未验证。
 
@@ -12,7 +12,7 @@ npm run build:client
 npm run prepare:offline
 ```
 
-生成 `dist/dsh-workbuddy-project-0.4.0-preview.2-offline.tgz`、同名 `.sha256`、`install-windows.ps1` 和本说明。离线包已包含固定依赖与画布资源。DSH 及其宿主依赖复用目标机已有安装，不包含在插件包内。
+生成 `dist/dsh-workbuddy-project-0.4.0-preview.3-offline.tgz`、同名 `.sha256`、`install-windows.ps1` 和本说明。离线包已包含固定依赖与画布资源。DSH 及其宿主依赖复用目标机已有安装，不包含在插件包内。
 
 将这四个文件复制到验证机。**目标机安装和运行插件不执行 npm install、npx 或联网下载。** 模型请求仍需要可访问的模型服务；完全断外网时，请先在 DSH 中配置可访问的本地/内网模型。MCP、Skill 脚本及项目构建工具的运行依赖须由所在环境另行具备。
 
@@ -24,7 +24,7 @@ npm run prepare:offline
 $env:DSH_HOME = 'D:\dsh-validation'
 # 在此 home 下启动 DSH、配置模型后退出，再执行安装：
 powershell -ExecutionPolicy Bypass -File .\install-windows.ps1 `
-  -Archive .\dsh-workbuddy-project-0.4.0-preview.2-offline.tgz `
+  -Archive .\dsh-workbuddy-project-0.4.0-preview.3-offline.tgz `
   -Profile web `
   -DshHome $env:DSH_HOME `
   -DshRoot 'D:\tools\dsh'
@@ -43,7 +43,7 @@ powershell -ExecutionPolicy Bypass -File .\install-windows.ps1 `
 
 1. **模型**：DSH 设置中选择一个实际可用的模型，普通对话成功。项目运行也使用该配置，节点可以单独选择模型。
 2. **能力库**：新增本地专家、Skill、规范或 MCP 包；也可在资源库管理中添加内网 Git 能力库并同步。共享库不要求公网 GitHub。
-3. **工作流模板**：新建模板，在画布任意增删节点和连接，配置任务提示词、运行输入。点击画布里的 Agent，右侧“节点能力库”有专家、Skill、MCP、规范四个入口；弹窗按类别分页，候选项直接读取能力库。“节点设置”配置仓库角色、模型和基础工具；MCP 工具随绑定自动提供，Skill 由节点内的 skill 工具加载。也可从“全部节点配置”进入，支持选择人工验收。能力列表支持搜索，编辑节点默认保留已有快照，显式勾选升级才替换能力内容。保存并发布 v1。模板不限于“需求分析、设计、编码、测试”。
+3. **工作流模板**：可直接点击“使用标准研发模板”，得到已配置的四阶段模板，详见 [标准模板说明](software-delivery-starter.md)。也可新建模板，在画布任意增删节点和连接，配置任务提示词、运行输入。点击画布里的 Agent，右侧“节点能力库”有专家、Skill、MCP、规范四个入口；弹窗按类别分页，候选项直接读取能力库。“节点设置”配置仓库角色、模型和基础工具；MCP 工具随绑定自动提供，Skill 由节点内的 skill 工具加载。也可从“全部节点配置”进入，支持选择人工验收。能力列表支持搜索，编辑节点默认保留已有快照，显式勾选升级才替换能力内容。保存并发布 v1。模板不限于“需求分析、设计、编码、测试”。
 4. **项目**：先手工 clone 一个或多个 Git 仓库并提交初始版本；新建项目，填写本机仓库根目录、别名和 ref。选择模板 v1，将模板仓库角色映射到项目仓库。
 5. **运行**：输入需求并开始。打开运行记录观察 DAG、节点状态和输出。需要验收的节点应停在“待验收”，通过前下游不执行。填写验收说明，通过后应继续。
 6. **交付物**：预览文件，下载所选节点的累计补丁；在另一个干净分支/仓库验证 `git apply --check` 后应用。累计补丁从本次运行固定的原始提交到该节点输出，包含上游已经接收的变更。

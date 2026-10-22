@@ -2,7 +2,7 @@
 
 在 DSH 中创建业务项目，绑定一个或多个 Git 仓库，选用可复用 DAG 模板，并跟踪每次运行的进度、节点产物和质量验收。
 
-当前分支为 **0.4.0-preview.2 产品预览版**，目标宿主是 **DSH 0.2.1-rc2（npm 0.2.1-rc.2）**。本分支未发布到 npm 或 GitHub Release；不要使用旧 0.3.1 的下载命令获取这个预览版。
+当前分支为 **0.4.0-preview.3 产品预览版**，目标宿主是 **DSH 0.2.1-rc2（npm 0.2.1-rc.2）**。本分支未发布到 npm 或 GitHub Release；不要使用旧 0.3.1 的下载命令获取这个预览版。
 
 ## 产品入口
 
@@ -33,13 +33,17 @@ npm run prepare:offline
 
 ```powershell
 powershell -ExecutionPolicy Bypass -File .\install-windows.ps1 `
-  -Archive .\dsh-workbuddy-project-0.4.0-preview.2-offline.tgz `
+  -Archive .\dsh-workbuddy-project-0.4.0-preview.3-offline.tgz `
   -Profile web -DshHome 'D:\dsh-validation' -DshRoot 'D:\tools\dsh'
 $env:DSH_HOME = 'D:\dsh-validation'
 dsh --profile web --no-open
 ```
 
 插件安装本身不下载依赖；实际运行需要目标环境中可访问的模型服务，以及所选 MCP、Skill 和业务项目自己的工具链。建议先在单独的 `DSH_HOME` 中配置模型并确认普通会话可用，再验证项目交付。
+
+## 内置标准研发模板
+
+在 **工作流模板 → 使用标准研发模板** 创建“标准研发交付 · 需求到测试”。四个 Agent 已配好专用专家、Skill、通用与阶段规范，以及无需联网的本地仓库只读 MCP；每阶段默认人工验收。沿用 DSH 当前模型，项目只需把 `main` 角色映射到本机仓库即可运行。完整能力映射与功能验证见 [标准研发交付模板](docs/software-delivery-starter.md)。
 
 ## 第一次交付
 

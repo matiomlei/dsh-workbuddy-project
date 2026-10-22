@@ -1,6 +1,6 @@
 # 产品预览验证记录
 
-版本：`dsh-workbuddy-project@0.4.0-preview.2`。日期：2026-10-22。
+版本：`dsh-workbuddy-project@0.4.0-preview.3`。日期：2026-10-22。
 
 ## 已验证
 
@@ -19,6 +19,10 @@
 - 浏览器验证四个产品入口、草稿画布保存和验收操作；补验节点面板四类能力入口、分类选择器及多条规范保留快照的重新保存。截图保存于 `docs/screenshots/`。
 
 正常路径自动化脚本及重现步骤见 [发布验证](releasing.md)。一次完整检查结果保存在隔离环境的 `acceptance-report.json`；不把该环境的本机路径或会话数据打进安装包。
+
+## 标准研发模板验证
+
+本版另外验证内置需求→设计→编码→测试模板。四个阶段分别加载绑定能力，经本地仓库 MCP 读取实际上游文档；每阶段固定报告后验收放行。编码与测试 Agent 通过 DSH bash 实际执行 7 项测试，累计补丁在新 clone 中应用后复测仍为 7 通过、0 失败。模型决策为测试适配器，未调用外部模型。详情见 [模板说明](software-delivery-starter.md)、[执行记录](validation/software-delivery.json) 和 [复测输出](validation/software-delivery-tests.txt)。
 
 ## 尚未验证
 
