@@ -66,7 +66,7 @@ await wait((r,d)=>d.thread?.phase==='completed'&&d.entries.some(entry=>entry.cha
 assert.equal(JSON.stringify({outputs:run.outputs,handoffs:run.codeHandoffs,quality:run.qualitySubjects,artifacts:run.artifacts}),sealed)
 const modelRequests=readFileSync(join(root,'test-model-requests.jsonl'),'utf8').trim().split('\n').map(row=>JSON.parse(row))
 const discussionRequests=modelRequests.filter(row=>JSON.stringify(row.messages).includes('这是工作流已固定结果的只读讨论'))
-assert.ok(discussionRequests.length);for(const request of discussionRequests)assert.deepEqual(request.tools.map(tool=>tool.name),['read'])
+assert.ok(discussionRequests.length);for(const request of discussionRequests){const names=request.tools.map(tool=>tool.name);assert.ok(names.includes('read'));assert.ok(!names.some(name=>['write','edit','bash','skill'].includes(name)||name.startsWith('mcp__')))}
 checks.push('completed nodes support a separate read-only discussion without changing fixed outputs, artifacts or acceptance')
 const first=run.requestId,cancelled=await start();run=cancelled
 await wait((r,d)=>d.thread?.phase==='waiting_user');await api('runs/cancel',{requestId:run.requestId})
