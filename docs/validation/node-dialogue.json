@@ -1,0 +1,17 @@
+{
+  "date": "2026-10-22T10:06:08.912Z",
+  "platform": "darwin",
+  "node": "v25.6.1",
+  "externalModelCalls": 0,
+  "requestId": "124b687a-95db-41f4-980e-6639ff10f0c3",
+  "cancelledRequestId": "55356050-69e1-453b-8e0f-7326ec18cce3",
+  "checks": [
+    "human answer waiting pauses the node deadline rather than failing after timeoutSec",
+    "reasoning prefix is visible through the authenticated gateway before the model step finishes",
+    "running steering is consumed once and retained beside actual tool call/result records",
+    "pre-acceptance conversation creates a new attempt, immutable old evidence and a new gate; stale acceptance cannot release downstream",
+    "only the accepted revision reaches downstream; models without reasoning still show real replies and tools; source remains unchanged",
+    "completed nodes support a separate read-only discussion without changing fixed outputs, artifacts or acceptance",
+    "cancelled human questions drain correctly and independent runs keep separate node sessions and histories"
+  ]
+}

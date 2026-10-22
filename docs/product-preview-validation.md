@@ -1,6 +1,6 @@
 # 产品预览验证记录
 
-版本：`dsh-workbuddy-project@0.4.0-preview.6`。日期：2026-10-22。
+版本：`dsh-workbuddy-project@0.4.0-preview.7`。日期：2026-10-22。
 
 ## 已验证
 
@@ -35,6 +35,10 @@
 ## 本轮 Windows 路径检查
 
 preview.6 扩展原生路径范围、目录身份、Git 地址及本地 MCP 入口的回归。真实 Git 同步采用中文/空格源路径；离线自检在特殊字符目录内编译四阶段能力、导入组件、处理超过 260 字符路径、调用 MCP 并交接代码。检查范围和目标机命令见 [Windows 路径检查](windows-path-audit.md)。隔离安装后的[自检输出](validation/windows-path-smoke-macos.json)明确标记 `nativeWindows: false`，不冒充 Windows 实测。
+
+## 节点对话与运行过程
+
+preview.7 的真实 DSH 隔离安装验收覆盖：模型思考在流式生成完成前经认证接口可见；运行中补充指令只接收一次；人工回答等待超过节点超时仍可继续；验收前对话生成第二次执行及新产物，旧验收不能放行；新结果通过后下游读取 v2；已完成节点只读讨论不改变固定结果；等待用户时取消能释放会话。测试使用仅在测试目录注册的确定性模型适配器，无外部模型调用。[本轮交互验证记录](validation/node-dialogue.json)。
 
 ## 尚未验证
 
