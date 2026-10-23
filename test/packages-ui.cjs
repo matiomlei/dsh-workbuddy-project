@@ -27,7 +27,7 @@ global.fetch=async(_url,request)=>{
  case 'describe':value={project:projects.find(x=>x.id===body.id)};break
  case 'update':Object.assign(projects.find(x=>x.id===body.config.id),body.config);value={id:body.config.id,cwd:body.config.cwd,validated:true};break
  case 'checkConnectors':value={id:body.id,healthy:false,connectorChecks:[{name:'search',status:'error',code:'authorization-required',message:'服务要求账号授权（401）'},{name:'tiktok',status:'error',code:'connection-reset',message:'连接被重置（ECONNRESET）'}]};break
- case 'capabilities':value=[personalExpert,projectExpert,...savedAbilities,...(options.libraries.length?[['expert','experts','专家团'],['skill','skills','团队技能'],['rule','rules','规范'],['connector','connectors','搜索']].map(([kind,directory,name])=>({...ability(directory,name),key:`team:${directory}/${name}`,kind,relative:`${directory}/${name}`,refs:[],hash:'abc',scope:'shared',writable:true})):[])];break
+ case 'capabilities':value=[personalExpert,{...personalExpert,key:'workbuddy:experts/native',library:'workbuddy',sourceLabel:'本地 · workbuddy',name:'扩展专家',displayName:'扩展专家',writable:false},projectExpert,...savedAbilities,...(options.libraries.length?[['expert','experts','专家团'],['skill','skills','团队技能'],['rule','rules','规范'],['connector','connectors','搜索']].map(([kind,directory,name])=>({...ability(directory,name),key:`team:${directory}/${name}`,kind,relative:`${directory}/${name}`,refs:[],hash:'abc',scope:'shared',writable:true})):[])];break
  case 'saveCapability':savedAbilities.push({...personalExpert,name:'new-name',displayName:'new-name',key:'personal:experts/new-name',relative:'experts/new-name'});value={saved:true,files:body.changes.map(x=>x.path)};break
  case 'capability':if(body.library!=='team'){value={...personalExpert,path:'experts/本地专家/agents/本地专家.md',files:['agents/本地专家.md'],selected:'agents/本地专家.md',content:'LOCAL EXPERT',readOnly:false};break}value={library:'team',package:'connectors/搜索',path:`connectors/搜索/${body.file??'mcp.json'}`,selected:body.file??'mcp.json',files:['mcp.json','connector.json'],content:body.file==='connector.json'?'{}':'{"mcpServers":{}}',icon:'🔗',scope:'shared'};break
  case 'contribute':value={branch:'change',files:body.changes.map(x=>x.path)};break
@@ -44,7 +44,7 @@ async function choose(label,name){
 }
 ;(async()=>{
  let entry;window.__ModuleLoader__={load:value=>{entry=value}};vm.runInThisContext(fs.readFileSync(require('node:path').join(__dirname,'../lib/client.js'),'utf8'))
- const sections={};entry.factory(()=>React).apply({slots:{inject:(_name,fn)=>fn(),register:(registration,component)=>{sections[registration.id]=component;return ()=>{}}}})
+ const sections={};entry.factory(()=>React).apply({slots:{inject:(_name,fn)=>fn(),register:(registration,component)=>{sections[registration.id??registration.key]=component;return ()=>{}}}})
  await act(async()=>{root.render(React.createElement(sections['workbuddy-project']));await settle()})
  assert.match(document.body.textContent,/项目模板 · 1/);await click(button('用此模板新建'));assert.equal(editor().querySelector('textarea').value,'模板指令');await change(editor().querySelector('input'),'/tmp/template-target');assert.equal(button('保存并编译').disabled,false);assert.match(editor().textContent,/将创建目标目录/);await click(button('关闭'))
  await click(button('新建项目'));assert.equal(button('保存并编译').disabled,true)
@@ -66,13 +66,12 @@ async function choose(label,name){
  await click(button('检查连接器'));assert.equal(requests.findLast(x=>x.action==='checkConnectors').id,'created');assert.match(document.querySelector('[aria-label="连接器检查 search"]').textContent,/401/);assert.match(document.querySelector('[aria-label="连接器检查 tiktok"]').textContent,/ECONNRESET/)
  await click(button('关闭'))
  await act(async()=>{root.render(React.createElement(sections['workbuddy-project-capabilities']));await settle()})
- assert.ok(!document.body.textContent.includes('MCP 声明'));assert.ok(!document.body.textContent.includes('项目模板'));assert.ok(!document.body.textContent.includes('团队能力'))
- const summary=document.querySelector('.wb-library-summary'),catalog=document.querySelector('.wb-capability-catalog');assert.equal(summary.nextElementSibling,catalog);assert.equal(document.querySelector('aside'),null);assert.ok(button('已连接 1 个库'));assert.equal(button('编辑配置'),undefined);assert.equal(button('删除资源库'),undefined);assert.ok(!document.body.textContent.includes('/tmp/team'))
+ assert.ok(!document.body.textContent.includes('MCP 声明'));assert.ok(!document.body.textContent.includes('项目模板'));assert.ok(!document.body.textContent.includes('团队能力'));assert.ok(!/workbuddy/i.test(document.body.textContent));assert.ok(document.body.textContent.includes('本地 · 本地扩展'))
+ assert.equal(document.querySelector('.wb-library-summary'),null);assert.ok(document.querySelector('.wb-capability-catalog'));assert.equal(button('添加资源库'),undefined);assert.equal(button('编辑配置'),undefined);assert.ok(!document.body.textContent.includes('/tmp/team'))
  assert.equal(document.querySelector('[aria-label="编辑专家 本地专家"] img').src,avatar)
  await change(document.querySelector('[aria-label="能力来源"]'),'local');assert.ok(document.querySelector('[aria-label="编辑专家 本地专家"]'));assert.equal(document.querySelector('[aria-label="编辑专家 专家团"]'),null)
  await change(document.querySelector('[aria-label="能力来源"]'),'project');assert.ok(document.querySelector('[aria-label="编辑专家 项目专家"]'));assert.equal(document.querySelector('[aria-label="编辑专家 本地专家"]'),null)
  await change(document.querySelector('[aria-label="能力来源"]'),'all')
- await click(button('添加资源库'));assert.ok(!editor().textContent.includes('同步时机'));await change(document.querySelector('[aria-label="Git 仓库地址"]'),'https://example.test/team.git');assert.match(editor().textContent,/同步时机/);await click(button('关闭'))
  const tab=name=>document.querySelector(`[role="tab"][aria-label="${name}"]`)
  assert.equal(document.querySelectorAll('[role="tablist"][aria-label="能力库分类"] [role="tab"]').length,4)
  assert.equal(tab('专家').getAttribute('aria-selected'),'true');assert.ok(document.querySelector('[aria-label="编辑专家 专家团"]'));assert.equal(document.querySelector('[aria-label="编辑连接器 搜索"]'),null)
@@ -90,14 +89,19 @@ async function choose(label,name){
  await click(tab('专家'))
  await click(button('新建专家'));assert.match(editor().querySelector('input').value,/experts\/new-name\/agents\/new-name.md/)
  await click(button('关闭'))
- await click(button('已连接 1 个库'));assert.match(editor().textContent,/管理共享资源库/);assert.match(editor().textContent,/\/tmp\/team/);await click(button('编辑配置'));assert.match(editor().textContent,/编辑资源库 team/);await click(button('取消'));assert.match(editor().textContent,/管理共享资源库/)
- await click(button('删除资源库'));assert.match(editor().textContent,/本地仓库文件和已锁定/);await click(button('取消'));assert.equal(requests.filter(x=>x.action==='removeLibrary').length,0);assert.match(editor().textContent,/管理共享资源库/)
+ await act(async()=>{root.render(React.createElement(sections['workbuddy-delivery']));await settle()})
+ assert.ok(document.body.textContent.includes('项目模式'));assert.ok(!/workbuddy/i.test(document.body.textContent));await click(document.querySelector('[aria-label="项目模式设置"]'))
+ assert.ok(document.body.textContent.includes('资源库设置'));assert.ok(document.body.textContent.includes('/tmp/team'));assert.equal(document.querySelector('.wb-capability-catalog'),null)
+ await click(button('添加资源库'));assert.ok(!editor().textContent.includes('同步时机'));await change(document.querySelector('[aria-label="Git 仓库地址"]'),'https://example.test/team.git');assert.match(editor().textContent,/同步时机/);await click(button('关闭'))
+ await click(button('编辑配置'));assert.match(editor().textContent,/编辑资源库 team/);await click(button('取消'));assert.equal(editor(),null)
+ await click(button('删除资源库'));assert.match(editor().textContent,/本地仓库文件和已锁定/);await click(button('取消'));assert.equal(requests.filter(x=>x.action==='removeLibrary').length,0)
  await click(button('删除资源库'));failRemoval=true;await click(button('确认删除'));assert.match(editor().textContent,/正在同步/);assert.equal(options.libraries.length,1)
- failRemoval=false;await click(button('确认删除'));assert.match(editor().textContent,/管理共享资源库/);assert.equal(requests.findLast(x=>x.action==='removeLibrary').library,'team');assert.equal(button('删除资源库'),undefined);assert.ok(button('已连接 0 个库'));await click(button('关闭'));assert.equal(editor(),null)
- assert.equal(document.querySelector('[aria-label="编辑专家 专家团"]'),null);assert.equal(button('新建专家').disabled,false);assert.match(document.body.textContent,/已删除资源库 team/)
+ failRemoval=false;await click(button('确认删除'));assert.equal(editor(),null);assert.equal(requests.findLast(x=>x.action==='removeLibrary').library,'team');assert.equal(button('删除资源库'),undefined)
+ await click(button('能力库'));assert.equal(document.querySelector('.wb-library-summary'),null);assert.equal(button('添加资源库'),undefined)
+ assert.equal(document.querySelector('[aria-label="编辑专家 专家团"]'),null);assert.equal(button('新建专家').disabled,false)
  assert.equal(button('立即同步'),undefined);assert.ok(document.querySelector('[aria-label="编辑专家 本地专家"]'))
  await click(button('新建专家'));assert.equal(document.querySelector('[aria-label="能力保存位置"]').value,'personal');assert.equal(button('提交为 PR'),undefined);await click(button('保存能力'));assert.equal(requests.findLast(x=>x.action==='saveCapability').library,'personal');assert.equal(editor(),null);assert.ok(document.querySelector('[aria-label="编辑专家 new-name"]'))
  await click(document.querySelector('[aria-label="编辑专家 本地专家"]'));assert.equal(editor().querySelector('textarea').value,'LOCAL EXPERT');await click(button('关闭'))
  await act(async()=>{root.render(React.createElement(sections['workbuddy-project']));await settle()});assert.match(document.body.textContent,/项目模板 · 0/);await click(button('新建项目'));await change(editor().querySelector('input'),'/tmp/no-git-project');await change(editor().querySelectorAll('input')[2],'无需资源库的项目');await click(button('保存并编译'));assert.equal(requests.findLast(x=>x.action==='create').config.name,'无需资源库的项目');await click(button('关闭'))
- await act(async()=>root.unmount());console.log('PASS unified sources, local creation without Git, avatars, compact library summary, modal-only library management, project templates, capability tabs, search and keyboard navigation; library deletion cancel/error/confirm; project/connector pickers; templates; simplified project editing and save validation; package file editor and new package layouts')
+ await act(async()=>root.unmount());console.log('PASS unified sources, local creation without Git, avatars, mode-wide gear settings, capability list without resource configuration, unbranded source labels, project templates, capability tabs, search and keyboard navigation; library deletion cancel/error/confirm; project/connector pickers; templates; simplified project editing and save validation; package file editor and new package layouts')
 })().catch(error=>{console.error(error);process.exitCode=1})

@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>项目交付</title>
+    <title>项目模式</title>
     <style>
       :root {
         font:
@@ -23,6 +23,8 @@
         margin: 0;
       }
       button,
+      .retry-node { background: #b53b3b; color: white; border-color: #b53b3b; }
+      .retry-node:hover { background: #963030; color: white; }
       input,
       select,
       textarea {
@@ -57,6 +59,8 @@
       .danger {
         color: #ad3434;
       }
+      .retry-node { background: #b53b3b; color: white; border-color: #b53b3b; }
+      .retry-node:hover { background: #963030; color: white; }
       input,
       select,
       textarea {
@@ -761,7 +765,7 @@
           el(
             "div",
             {},
-            el("div", { class: "eyebrow" }, "WORKBUDDY / DELIVERY"),
+            el("div", { class: "eyebrow" }, "PROJECT MODE"),
             el("h1", {}, title),
             el("p", {}, description),
           ),
@@ -910,7 +914,7 @@
                       class: "card clickable",
                       onclick: () => {
                         activeProject = p.id;
-                        showProjects();
+                        projectDetail(p,true);
                       },
                     },
                     el(
@@ -966,8 +970,12 @@
               ),
         );
       }
-      async function projectDetail(p) {
+      async function projectDetail(p, locateActive = false) {
         const runs = (await api("runs/list", { projectId: p.id })).runs;
+        if(locateActive){
+          const running=runs.find(r=>['running','starting','preparing','ready','recovering'].includes(r.status));
+          if(running){activeNode=null;nodeTab='activity';runViewHash='';return showRun(running)}
+        }
         const template =
           p.binding && templates.find((t) => t.id === p.binding.templateId);
         const repos = el(
@@ -1203,7 +1211,7 @@
               triggerInput: task.value,
               inputs: values,
             });
-            activeRun = run.requestId;
+            activeRun = run.requestId;activeNode=null;
             await showRun(run);
             notice(
               run.status === "preparation_failed" ? run.error : "运行已启动",
@@ -1211,24 +1219,6 @@
             );
           },
           "开始运行",
-        );
-      }
-      function starterTemplate() {
-        const name = input("标准研发交付 · 需求到测试");
-        modal(
-          "使用标准研发模板",
-          stack(
-            label("模板名称", name),
-            muted("需求分析 → 方案设计 → 编码实现 → 测试验证 → 交付汇总。四阶段均已绑定专用专家、Skill、规范和本地仓库只读 MCP，并开启人工验收。"),
-            muted("沿用 DSH 当前模型，仓库角色为 main；创建后可自由编辑，发布后即可供项目选用。无需外网连接器或额外账号。"),
-          ),
-          async () => {
-            const created = await api("template/starter", { name: name.value });
-            await catalog();
-            await openEditor(created.templateId);
-            notice("标准研发模板已创建，节点能力已固定");
-          },
-          "创建并编辑",
         );
       }
       function newTemplate() {
@@ -1279,8 +1269,8 @@
             "让交付方式可以复用",
             "自由创建 DAG，配置节点能力，发布稳定版本供项目选用。",
             [
+              button("从资源库选用", sharedTemplate),
               button("导入模板", () => importTemplate()),
-              button("使用标准研发模板", starterTemplate),
               button("新建模板", newTemplate, "primary"),
             ],
           ),
@@ -1305,8 +1295,10 @@
                     el(
                       "p",
                       { class: "muted", style: "margin:12px 0 20px" },
-                      t.source?.starter
-                        ? "内置标准研发模板，能力已配置，可独立编辑"
+                      t.source?.library
+                        ? "来自共享资源库 · "+t.source.library+"，可独立编辑"
+                        : t.source?.starter
+                        ? "标准研发模板，能力已配置，可独立编辑"
                         : t.source
                           ? "从已有模板复制，可独立编辑"
                           : "可复用的业务工作流模板",
@@ -1324,6 +1316,17 @@
                 button("新建模板", newTemplate, "primary"),
               ),
         );
+      }
+      async function sharedTemplate() {
+        const {templates:shared}=await api('workflows/shared');
+        const content=stack(muted('资源库模板由 Git 统一维护。选用后生成本地草稿并固定节点能力，可独立编辑和发布。'));
+        const dialog=modal('从共享资源库选用工作流',content,async()=>{},'关闭',true);
+        dialog.wrap.querySelector('.modal-foot').replaceChildren(button('关闭',dialog.close));
+        for(const item of shared)content.append(el('section',{class:'card'},el('div',{class:'row spread'},el('h3',{},item.name),el('span',{class:'badge'},item.library)),el('p',{},item.description),muted(item.error||('资源版本 '+(item.version??'未标注')+' · '+item.hash?.slice(0,8))),item.error?null:button('选用此模板',async()=>{
+          const created=await api('template/shared',{reference:item.reference,expectedHash:item.hash});
+          dialog.close();await catalog();await openEditor(created.templateId);notice('已从资源库创建草稿，节点能力已固定');
+        },'primary')));
+        if(!shared.length)content.append(empty('暂无资源库工作流','在右上角设置中连接资源库，模板文件放在 workflows/<模板ID>/workflow.json。'));
       }
       async function importTemplate() {
         const picker = el("input", {
@@ -1831,8 +1834,8 @@
                   el(
                     "span",
                     {},
-                    c.name || c.reference,
-                    el("small", {}, c.reference),
+                    (c.name || c.reference).replace(/workbuddy/gi,'本地扩展'),
+                    el("small", {}, c.reference.replace(/^workbuddy:/,'本地扩展:')),
                     c.unavailable ? el("small", {}, c.unavailable) : null,
                   ),
                 ),
@@ -2202,20 +2205,28 @@
           } catch(error) { notice(error.message,true); } finally { view.sending=false; send.disabled=!(view.data?.canSend||view.data?.canExplain||view.data?.canContinue); }
         }},'发送');
         message.addEventListener('input',()=>{view.pendingId=null});
-        const retry=el('button',{class:'subtle',disabled:true,onclick:async()=>{
+        const nodeName=node.data?.label||node.id;
+        const retry=el('button',{class:'danger retry-node',disabled:true,onclick:()=>{
           if(!view.data?.canRetry||view.sending)return;
-          view.sending=true;retry.disabled=true;send.disabled=true;
-          try {
-            await api('nodes/retry',{requestId:run.requestId,nodeId:node.id,commandId:view.retryId||(view.retryId=uuid()),expectedNativeRunId:view.data.nativeRunId,expectedAttempt:view.data.attempt});
-            view.retryId=null;view.scrollLatest=true;runViewHash='';await showRun(run);
-            notice('已重试：从已验收的上游输入重新执行，原过程记录保留。');
-          }catch(error){notice(error.message,true)}finally{view.sending=false;await refreshDialogue(run,node)}
-        }},'重试节点');
+          const confirm=modal('重新执行'+nodeName,stack(
+            el('p',{},'这将从头重新执行“'+nodeName+'”。本轮对话上下文将不再沿用，节点工作目录中的本轮修改会被清理，并从已验收的上游输入重新开始。'),
+            muted('历史对话和验收记录会保留。若要保留当前进度，请取消并选择“接着完成'+nodeName+'”。')
+          ),async()=>{
+            if(!view.data?.canRetry||view.sending)throw new Error('节点状态已变化，请刷新后重试');
+            view.sending=true;retry.disabled=true;send.disabled=true;
+            try{
+              await api('nodes/retry',{requestId:run.requestId,nodeId:node.id,commandId:view.retryId||(view.retryId=uuid()),expectedNativeRunId:view.data.nativeRunId,expectedAttempt:view.data.attempt});
+              view.retryId=null;message.value='';view.pendingId=null;view.scrollLatest=true;runViewHash='';await showRun(run);
+              notice('已重新开始'+nodeName+'，上一轮对话已折叠。');
+            }finally{view.sending=false;await refreshDialogue(run,node)}
+          },'确认重新执行');
+          confirm.wrap.querySelector('.modal-foot .primary').className='danger retry-node';
+        }},'重试'+nodeName);
         const resume=el('button',{class:'subtle',disabled:true,hidden:true,onclick:()=>{
           if(!view.data?.canContinue||view.sending)return;
           if(!message.value.trim())message.value='请从中断处继续本次执行，保留已经完成的工作。';
           send.click();
-        }},'继续本次执行');
+        }},'接着完成'+nodeName);
         const phaseHint = muted(''), root = stack(
           el('div',{class:'row spread'},el('h3',{class:'section-title'},'对话与运行过程'),status),
           question,stream,
@@ -2272,6 +2283,7 @@
       }
       async function showRun(value) {
         const run = await api("runs/detail", { requestId: value.requestId });
+        if(activeRun!==run.requestId)activeNode=null;
         const viewHash = JSON.stringify(run) + activeNode;
         if (root.querySelector(".run-layout") && runViewHash === viewHash) {
           const node=run.graph?.nodes.find(item=>item.id===activeNode);
@@ -2284,10 +2296,7 @@
         activeRun = run.requestId;
         const nodes = run.graph?.nodes || [];
         if (!nodes.some((n) => n.id === activeNode))
-          activeNode =
-            nodes.find(
-              (n) => run.nodeStates[n.id]?.status === "waiting_quality",
-            )?.id || nodes[0]?.id;
+          activeNode = nodes.find(n=>['running','waiting_user'].includes(run.nodeStates[n.id]?.status))?.id || nodes.find(n=>run.nodeStates[n.id]?.status==='waiting_quality')?.id || nodes.find(n=>['error','canceled'].includes(run.nodeStates[n.id]?.status))?.id || nodes[0]?.id;
         const node = nodes.find((n) => n.id === activeNode),
           state = run.nodeStates[activeNode] || {},
           subject = run.qualitySubjects
@@ -2345,7 +2354,7 @@
               state.error
                 ? el("div", { class: "inline-error" }, state.error)
                 : null,
-              row(button('对话与过程',()=>{nodeTab='activity';runViewHash='';return showRun(run)},nodeTab==='activity'?'primary':'subtle'),button('产物与验收',()=>{nodeTab='artifacts';runViewHash='';return showRun(run)},nodeTab==='artifacts'?'primary':'subtle'),subject&&nodeTab==='activity'?button('查看验收',()=>{nodeTab='artifacts';runViewHash='';return showRun(run)},'subtle'):null),
+              row(button('对话与过程',()=>{nodeTab='activity';runViewHash='';return showRun(run)},nodeTab==='activity'?'primary':'subtle'),button('产物与验收',()=>{nodeTab='artifacts';runViewHash='';return showRun(run)},nodeTab==='artifacts'?'primary':'subtle')),
               nodeTab==='activity' ? conversationPanel(run,node) : stack(
               subject ? qualityCard(run, subject) : null,
               el(
@@ -2425,7 +2434,7 @@
             "div",
             { class: "trail" },
             button(
-              "← 运行记录",
+              page === "projects" ? "← 项目概览" : "← 运行记录",
               () => {
                 activeRun = null;
                 page === "projects" ? showProjects() : showRuns();
@@ -2573,7 +2582,7 @@
           else await showProjects();
         } catch (error) {
           mount(
-            empty("项目交付尚未就绪", error.message, button("重新连接", init)),
+            empty("项目模式尚未就绪", error.message, button("重新连接", init)),
           );
         }
       }

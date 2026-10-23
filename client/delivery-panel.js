@@ -96,7 +96,7 @@ function DeliveryPanel() {
           },
         },
         h(DeliveryIcon, { size: 24 }),
-        h("strong", { style: { fontSize: 20 } }, "项目交付"),
+        h("strong", { style: { fontSize: 20 } }, "项目模式"),
         h(
           "span",
           {
@@ -110,6 +110,9 @@ function DeliveryPanel() {
           },
           "PREVIEW 0.4",
         ),
+        h("span",{style:{flex:1}}),
+        h("button",{type:"button",title:"设置",'aria-label':"项目模式设置",onClick:()=>navigate("settings"),style:{display:"grid",placeItems:"center",width:36,height:36,border:"1px solid #dfe6ef",borderRadius:8,background:page==="settings"?"#e8f3f3":"#fff",color:"#42606d",cursor:"pointer"}},
+          h("svg",{width:20,height:20,viewBox:"0 0 24 24",fill:"none",stroke:"currentColor",strokeWidth:1.6,'aria-hidden':true},h("path",{d:"M9.5 3h5l.7 2.5 2 .9 2.4-.7 2.5 4.3-1.8 1.8v2.3l1.8 1.7-2.5 4.3-2.4-.7-2 .9-.7 2.5h-5l-.7-2.5-2-.9-2.4.7L1.9 16l1.8-1.8v-2.3L1.9 10l2.5-4.3 2.4.7 2-.9z",transform:"translate(0 -1) scale(1 .96)"}),h("circle",{cx:12,cy:12,r:3.2}))),
       ),
       h(
         "nav",
@@ -150,10 +153,11 @@ function DeliveryPanel() {
           { style: { overflow: "auto", padding: 24, flex: 1 } },
           h(CapabilitySection),
         )
+      : page === "settings" ? h("div",{style:{overflow:"auto",padding:24,flex:1}},h(CapabilitySection,{settingsOnly:true}))
       : h("iframe", {
           ref: frame,
           key: page,
-          title: "项目交付 · " + tabs.find((x) => x[0] === page)[1],
+          title: "项目模式 · " + tabs.find((x) => x[0] === page)?.[1],
           src: "/api/workbuddy-delivery?document=app&page=" + page,
           style: { border: 0, width: "100%", flex: 1, minHeight: 0 },
         }),
@@ -166,7 +170,7 @@ function mountDeliveryClient(ctx) {
         name: "sidebar.panellist",
         id: "workbuddy-delivery",
         order: 25,
-        label: "项目交付",
+        label: "项目模式",
       },
       DeliveryIcon,
     ),
