@@ -150,8 +150,8 @@ function DeliveryPanel() {
     page === "capabilities"
       ? h(
           "div",
-          { style: { overflow: "auto", padding: 24, flex: 1 } },
-          h(CapabilitySection),
+          { style: { overflow: "auto", flex: 1 } },
+          h(CapabilitySection, { projectMode: true }),
         )
       : page === "settings" ? h("div",{style:{overflow:"auto",padding:24,flex:1}},h(CapabilitySection,{settingsOnly:true}))
       : h("iframe", {
