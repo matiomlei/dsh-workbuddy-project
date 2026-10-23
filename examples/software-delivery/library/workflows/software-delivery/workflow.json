@@ -169,17 +169,17 @@
       "repositoryRole": "main",
       "capabilities": {
         "experts": [
-          "delivery-starter:experts/requirements"
+          "./experts/requirements"
         ],
         "skills": [
-          "delivery-starter:skills/delivery-requirements"
+          "./skills/delivery-requirements"
         ],
         "rules": [
-          "delivery-starter:rules/delivery-common",
-          "delivery-starter:rules/requirements"
+          "./rules/delivery-common",
+          "./rules/requirements"
         ],
         "connectors": [
-          "delivery-starter:connectors/repository-context"
+          "./connectors/repository-context"
         ]
       }
     },
@@ -188,17 +188,17 @@
       "repositoryRole": "main",
       "capabilities": {
         "experts": [
-          "delivery-starter:experts/design"
+          "./experts/design"
         ],
         "skills": [
-          "delivery-starter:skills/delivery-design"
+          "./skills/delivery-design"
         ],
         "rules": [
-          "delivery-starter:rules/delivery-common",
-          "delivery-starter:rules/design"
+          "./rules/delivery-common",
+          "./rules/design"
         ],
         "connectors": [
-          "delivery-starter:connectors/repository-context"
+          "./connectors/repository-context"
         ]
       }
     },
@@ -207,17 +207,17 @@
       "repositoryRole": "main",
       "capabilities": {
         "experts": [
-          "delivery-starter:experts/implement"
+          "./experts/implement"
         ],
         "skills": [
-          "delivery-starter:skills/delivery-implement"
+          "./skills/delivery-implement"
         ],
         "rules": [
-          "delivery-starter:rules/delivery-common",
-          "delivery-starter:rules/implement"
+          "./rules/delivery-common",
+          "./rules/implement"
         ],
         "connectors": [
-          "delivery-starter:connectors/repository-context"
+          "./connectors/repository-context"
         ]
       }
     },
@@ -226,19 +226,20 @@
       "repositoryRole": "main",
       "capabilities": {
         "experts": [
-          "delivery-starter:experts/verify"
+          "./experts/verify"
         ],
         "skills": [
-          "delivery-starter:skills/delivery-verify"
+          "./skills/delivery-verify"
         ],
         "rules": [
-          "delivery-starter:rules/delivery-common",
-          "delivery-starter:rules/verify"
+          "./rules/delivery-common",
+          "./rules/verify"
         ],
         "connectors": [
-          "delivery-starter:connectors/repository-context"
+          "./connectors/repository-context"
         ]
       }
     }
-  ]
+  ],
+  "description": "需求分析、方案设计、编码实现、测试验证与交付汇总；已配置专家、技能、规范、仓库 MCP 和人工验收。"
 }

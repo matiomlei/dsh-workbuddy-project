@@ -17,7 +17,8 @@ assert.equal(stylesheet.status, 200)
 const css = await stylesheet.text()
 assert.ok(!css.includes('fonts.googleapis.com') && !css.includes('fonts.gstatic.com'))
 assert.ok(!/@import[^;]*https?:/i.test(css))
-const created=await api('template/starter'),id=created.templateId
+const shared=(await api('workflows/shared')).templates.find(item=>item.reference==='delivery-starter:workflows/software-delivery');assert.ok(shared&&!shared.error);
+const created=await api('template/shared',{reference:shared.reference,expectedHash:shared.hash}),id=created.templateId
 const detail=await api('detail',{id}),definition=detail.draft.definition
 const stages=['requirements','design','implement','verify']
 assert.deepEqual(definition.graph.nodes.map(n=>n.id),[...stages,'delivery'])
