@@ -1,4 +1,4 @@
-# Windows 封闭环境验证：项目模式 0.4.0-preview.10
+# Windows 封闭环境验证：项目模式 0.4.0-preview.11
 
 目标宿主：**DSH 0.2.1-rc2（npm 版本 0.2.1-rc.2）**，Windows 10/11，Node.js >=22.15（含 node:sqlite），Git for Windows。使用 DSH CLI 的 web profile，浏览器地址为本机 localhost。DSH 桌面壳暂未验证。
 
@@ -12,7 +12,7 @@ npm run build:client
 npm run prepare:offline
 ```
 
-生成 `dist/dsh-workbuddy-project-0.4.0-preview.10-offline.tgz`、同名 `.sha256`、`install-windows.ps1` 和本说明。离线包已包含固定依赖与画布资源。DSH 及其宿主依赖复用目标机已有安装，不包含在插件包内。
+生成 `dist/dsh-workbuddy-project-0.4.0-preview.11-offline.tgz`、同名 `.sha256`、`install-windows.ps1` 和本说明。离线包已包含固定依赖与画布资源。DSH 及其宿主依赖复用目标机已有安装，不包含在插件包内。
 
 将这四个文件复制到验证机。**目标机安装和运行插件不执行 npm install、npx 或联网下载。** 模型请求仍需要可访问的模型服务；完全断外网时，请先在 DSH 中配置可访问的本地/内网模型。MCP、Skill 脚本及项目构建工具的运行依赖须由所在环境另行具备。
 
@@ -24,7 +24,7 @@ npm run prepare:offline
 $env:DSH_HOME = 'D:\dsh-validation'
 # 在此 home 下启动 DSH、配置模型后退出，再执行安装：
 powershell -ExecutionPolicy Bypass -File .\install-windows.ps1 `
-  -Archive .\dsh-workbuddy-project-0.4.0-preview.10-offline.tgz `
+  -Archive .\dsh-workbuddy-project-0.4.0-preview.11-offline.tgz `
   -Profile web `
   -DshHome $env:DSH_HOME `
   -DshRoot 'D:\tools\dsh'
