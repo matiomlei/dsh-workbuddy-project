@@ -1,0 +1,23 @@
+{
+  "date": "2026-10-23T01:40:25.074Z",
+  "platform": "darwin",
+  "externalModelCalls": 0,
+  "host": "DSH 0.2.1-rc.2",
+  "validation": "Native DSH browser interactions plus API assertions",
+  "checks": [
+    "Gear opens common resource settings; capability page has list only and no legacy brand labels",
+    "Shared workflow picker contains bundled standard recipe and Git-synchronized recipe; dedicated starter button absent",
+    "Opening project automatically selects active second node, design",
+    "Named red retry opens explicit fresh-context confirmation; cancel does not start a new attempt",
+    "Continue resumes first attempt; answering original question reaches quality gate and artifacts tab; redundant acceptance button absent",
+    "Confirmed full retry creates attempt 2 with a different session; accepted upstream remains attempt 1",
+    "Old attempt group collapsed and latest attempt group expanded after retry"
+  ],
+  "observed": {
+    "nodeName": "方案设计",
+    "attempt": 2,
+    "phase": "waiting_user",
+    "firstAttemptContinuationCount": 1,
+    "upstreamAttempts": 1
+  }
+}

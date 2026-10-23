@@ -1,7 +1,7 @@
 {
   "name": "dsh-workbuddy-project",
-  "version": "0.4.0-preview.9",
-  "description": "DSH 项目交付：多仓库项目、可复用工作流、节点能力和运行验收",
+  "version": "0.4.0-preview.10",
+  "description": "DSH 项目模式：多仓库项目、可复用工作流、节点能力和运行验收",
   "type": "module",
   "main": "lib/index.js",
   "exports": {

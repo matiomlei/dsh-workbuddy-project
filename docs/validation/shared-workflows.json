@@ -1,0 +1,11 @@
+{
+  "date": "2026-10-23T01:22:01.920Z",
+  "platform": "darwin",
+  "externalModelCalls": 0,
+  "templateId": "93153437-563c-4814-9b7a-c8108b8c7766",
+  "checks": [
+    "resource Git is configured through the common settings API and cloned locally",
+    "portable workflow and all four capability types resolve using the configured library name and freeze into a publishable draft",
+    "Git fast-forward updates the catalog; stale selection is rejected while prior drafts and published versions remain unchanged"
+  ]
+}
