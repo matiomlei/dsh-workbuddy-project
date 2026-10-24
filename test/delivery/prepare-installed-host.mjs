@@ -1,4 +1,4 @@
-/** Install an offline payload into a NEW test home, adding a test-only model. */
+/** Prepare a NEW isolated test home from source or an offline payload, with a test-only model. */
 import {
   mkdirSync,
   existsSync,
@@ -8,6 +8,7 @@ import {
   writeFileSync,
   readFileSync,
   realpathSync,
+  statSync,
 } from "node:fs";
 import { join, resolve, dirname } from "node:path";
 import { execFileSync } from "node:child_process";
@@ -17,11 +18,12 @@ import {
   configure,
   verifyHost,
   resolveRuntime,
+  stage,
 } from "../../scripts/offline/offline-helper.mjs";
 const [rootArg, archiveArg, dshArg] = process.argv.slice(2);
 if (!rootArg || !archiveArg || !dshArg)
   throw new Error(
-    "Usage: node test/delivery/prepare-installed-host.mjs <new-root> <offline.tgz> <DSH-directory>",
+    "Usage: node test/delivery/prepare-installed-host.mjs <new-root> <source-directory-or-offline.tgz> <DSH-directory>",
   );
 const root = resolve(rootArg),
   archive = resolve(archiveArg),
@@ -78,7 +80,8 @@ put(
     },
   }),
 );
-execFileSync("tar", ["-xzf", archive, "-C", staging]);
+if (statSync(archive).isDirectory()) stage(archive, staging);
+else execFileSync("tar", ["-xzf", archive, "-C", staging]);
 await initializeProfile(runtime.anchor, profile, "web");
 const payload = join(profile, "plugins/dsh-workbuddy-project");
 mkdirSync(dirname(payload), { recursive: true });

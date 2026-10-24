@@ -2227,20 +2227,24 @@
           if(!message.value.trim())message.value='请从中断处继续本次执行，保留已经完成的工作。';
           send.click();
         }},'接着完成'+nodeName);
+        const nativeSession=el('button',{class:'subtle',hidden:true,onclick:()=>{
+          sessionStorage.setItem('delivery:return-node',JSON.stringify({requestId:run.requestId,nodeId:node.id}));
+          window.parent.postMessage({type:'delivery-open-native-session',requestId:run.requestId,nodeId:node.id},location.origin);
+        }},'在 DSH 中查看会话');
         const phaseHint = muted(''), root = stack(
-          el('div',{class:'row spread'},el('h3',{class:'section-title'},'对话与运行过程'),status),
+          el('div',{class:'row spread'},el('h3',{class:'section-title'},'对话与运行过程'),row(nativeSession,status)),
           question,stream,
           muted('只展示模型服务实际返回的思考、回复和工具过程；模型未返回的内部思考无法展示。'),
           label('与当前节点交互',message),el('div',{class:'dialogue-actions'},send,resume,retry,phaseHint),
         );
-        Object.assign(view,{root,send,resume,retry,phaseHint});dialoguePanels.set(key,view);
+        Object.assign(view,{root,send,resume,retry,phaseHint,nativeSession});dialoguePanels.set(key,view);
         if(node.type!=='agent'){message.disabled=true;send.disabled=true;phaseHint.textContent='该节点不是 Agent，不支持对话。'}
         return root;
       }
       async function refreshDialogue(run,node) {
         const view=dialoguePanels.get(run.requestId+':'+node.id);if(!view)return;
         try {
-          const data=await api('runs/node',{requestId:run.requestId,nodeId:node.id});view.data=data;
+          const data=await api('runs/node',{requestId:run.requestId,nodeId:node.id});view.data=data;view.nativeSession.hidden=!data.nativeSession?.ready;
           const phases={executing:'运行中',waiting_user:'等待你的回答',waiting_quality:'等待验收，可继续对话',revising:'正在继续对话',sealing:'正在固定产物',explaining:'正在只读讨论',completed:'节点已完成',interrupted:'会话已中断'};
           view.status.textContent=(phases[data.thread?.phase]||'尚未开始')+(data.attempt?' · 第 '+data.attempt+' 次执行':'');
           view.send.disabled=view.sending||!(data.canSend||data.canExplain||data.canContinue);view.message.disabled=!(data.canSend||data.canExplain||data.canContinue);
@@ -2264,6 +2268,7 @@
             const content=el('div',{class:'dialogue-attempt-body'}),meta=data.attempts?.find(item=>item.attempt===attempt);
             const status={preparing:'准备中',executing:'执行中',failed:'已中断 / 失败',conflict:'交接冲突',ready:'已固定输出'}[meta?.status]??'';
             const group=el('details',{class:'dialogue-attempt','data-attempt':attempt},el('summary',{},attempt?'第 '+attempt+' 次执行':'历史记录',meta?.continuationCount?el('span',{class:'badge'},'已续接 '+meta.continuationCount+' 次'):null,muted(status+' · '+items.length+' 条记录')),content);
+            if(meta?.nativeSession?.ready)content.append(button('在 DSH 中查看第 '+attempt+' 次执行',()=>{sessionStorage.setItem('delivery:return-node',JSON.stringify({requestId:run.requestId,nodeId:node.id}));window.parent.postMessage({type:'delivery-open-native-session',requestId:run.requestId,nodeId:node.id,attempt},location.origin);},'subtle'));
             group.open=latestChanged?attempt===data.attempt:existingGroups.has(attempt)?groupOpen.has(attempt):attempt===data.attempt;
             for(const entry of items) {
               const title={user:'你',assistant:entry.channel==='explanation'?'Agent · 只读讨论':'Agent',reasoning:'模型返回的思考',tool:'工具 · '+entry.name,question:'节点提问',context:'运行上下文',notice:'运行记录'}[entry.kind]||entry.kind;
@@ -2577,6 +2582,11 @@
         try {
           bootstrap = await api("bootstrap");
           await catalog();
+          const returnNode=sessionStorage.getItem('delivery:return-node');
+          if(returnNode&&page==='projects') {
+            sessionStorage.removeItem('delivery:return-node');
+            try {const target=JSON.parse(returnNode);activeRun=target.requestId;activeNode=target.nodeId;await showRun({requestId:target.requestId});return;}catch(error){notice(error.message,true);}
+          }
           if (page === "templates") await showTemplates();
           else if (page === "runs") await showRuns();
           else await showProjects();

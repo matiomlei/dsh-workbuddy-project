@@ -1192,7 +1192,7 @@ window.__ModuleLoader__.load({
     }
 
     exports.apply = apply
-    exports.inject = ['slots']
+    exports.inject = ['slots', 'uiWorkspace', 'conversation', 'layout', 'sessions']
     return module.exports
   },
 })

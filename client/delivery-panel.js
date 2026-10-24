@@ -14,7 +14,7 @@ function DeliveryIcon({ size = 18 }) {
     h("path", { d: "M9 6h6a3 3 0 0 1 3 3v6M6 9v9h9" }),
   );
 }
-function DeliveryPanel() {
+function DeliveryPanel({openNativeSession}) {
   const [page, setPage] = useState("projects"),
     [navigationError, setNavigationError] = useState("");
   const frame = useRef(null),
@@ -24,10 +24,14 @@ function DeliveryPanel() {
       if (
         event.origin !== location.origin ||
         event.source !== frame.current?.contentWindow ||
-        event.data?.type !== "delivery-navigation-ready" ||
-        !pending.current
+        !["delivery-navigation-ready","delivery-open-native-session"].includes(event.data?.type)
       )
         return;
+      if(event.data.type==='delivery-open-native-session') {
+        openNativeSession(event.data).catch(error=>setNavigationError(error.message));
+        return;
+      }
+      if(!pending.current)return;
       const item = pending.current;
       pending.current = null;
       clearTimeout(item.timer);
@@ -40,7 +44,7 @@ function DeliveryPanel() {
       window.removeEventListener("message", receive);
       if (pending.current) clearTimeout(pending.current.timer);
     };
-  }, []);
+  }, [openNativeSession]);
   const navigate = (id) => {
     if (id === page || pending.current) return;
     setNavigationError("");
@@ -163,7 +167,45 @@ function DeliveryPanel() {
         }),
   );
 }
+const deliveryNativeSessions=new Map();
+const deliveryNativeSubscribers=new Set();
+async function deliveryApi(action,payload={}) {
+  const response=await fetch('/api/workbuddy-delivery',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({action,...payload})});
+  const data=await response.json();
+  if(!response.ok)throw new Error(data.error||'无法读取节点会话');
+  return data;
+}
 function mountDeliveryClient(ctx) {
+  const block=info=>{
+    deliveryNativeSessions.set(info.sessionId,info);
+    ctx.conversation?.blocks.set(info.sessionId,{reason:'此工作流节点由项目模式管理。请点击“返回项目节点”继续对话、恢复执行或验收。'});
+  };
+  let disposed=false,refreshing=false;
+  const refresh=async()=>{
+    if(refreshing||disposed)return;
+    refreshing=true;
+    try {const entries=await deliveryApi('nodes/native-sessions');if(!disposed){for(const info of entries)block(info);for(const notify of deliveryNativeSubscribers)notify();}}
+    catch {} finally {refreshing=false;}
+  };
+  if(ctx.conversation){void refresh();const timer=setInterval(refresh,5000);ctx.on('dispose',()=>{disposed=true;clearInterval(timer);for(const id of deliveryNativeSessions.keys())ctx.conversation.blocks.set(id,undefined);deliveryNativeSessions.clear();});}
+  const openNativeSession=async({requestId,nodeId,attempt})=>{
+    const detail=await deliveryApi('runs/node',{requestId,nodeId});
+    const info=attempt?detail.attempts.find(item=>item.attempt===attempt)?.nativeSession:detail.nativeSession;
+    if(!info?.ready)throw new Error('节点原生会话尚未就绪，请稍后重试。');
+    if(!ctx.uiWorkspace)throw new Error('当前 DSH 未提供原生工作区导航，请使用 0.2.1-rc.3 Web。');
+    sessionStorage.setItem('delivery:return-node',JSON.stringify({requestId,nodeId}));
+    block(info);
+    await ctx.sessions.refresh();
+    ctx.uiWorkspace.openSession(info.sessionId);
+  };
+  function NativeNodeReturn({sessionId}) {
+    const [,update]=useState(0);
+    useEffect(()=>{const notify=()=>update(value=>value+1);deliveryNativeSubscribers.add(notify);return()=>deliveryNativeSubscribers.delete(notify);},[]);
+    const info=deliveryNativeSessions.get(String(sessionId));
+    return info?h('button',{type:'button','data-delivery-node':info.nodeId,title:'返回项目模式：'+info.title,onClick:()=>{sessionStorage.setItem('delivery:return-node',JSON.stringify({requestId:info.requestId,nodeId:info.nodeId}));ctx.layout.selectPanel('workbuddy-delivery');},style:{border:'1px solid #7199a0',borderRadius:6,padding:'5px 10px',background:'transparent',color:'inherit',cursor:'pointer'}},'返回项目节点'):null;
+  }
+  ctx.slots.inject('conversation.session.header.actions',()=>ctx.slots.register({name:'conversation.session.header.actions',id:'delivery-node-return',order:10},NativeNodeReturn));
+  const Panel=()=>h(DeliveryPanel,{openNativeSession});
   ctx.slots.inject("sidebar.panellist", () =>
     ctx.slots.register(
       {
@@ -178,7 +220,7 @@ function mountDeliveryClient(ctx) {
   ctx.slots.inject("main", () =>
     ctx.slots.register(
       { name: "main", key: "workbuddy-delivery" },
-      DeliveryPanel,
+      Panel,
     ),
   );
 }

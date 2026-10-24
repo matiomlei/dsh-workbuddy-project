@@ -252,8 +252,7 @@ export async function initializeProfile(anchor, profileDir, profileName) {
 export async function verifyHost(payload, profileDir, dshLocation) {
   const { anchor } = resolveRuntime([dshLocation]);
   const hostManifest = readJson(anchor);
-  if (hostManifest.version !== "0.2.1-rc.2")
-    throw new Error("Requires DSH 0.2.1-rc.2; found " + hostManifest.version);
+  const manifest = readJson(join(payload, "package.json"));
   const hostRequire = createRequire(anchor);
   const bootFile = hostRequire.resolve("@deepseek-ai/dsh-app-boot");
   const boot = await import(pathToFileURL(bootFile));
@@ -261,6 +260,9 @@ export async function verifyHost(payload, profileDir, dshLocation) {
     pathToFileURL(hostRequire.resolve("@deepseek-ai/cordis"))
   );
   const semver = createRequire(bootFile)("semver");
+  const supportedHost = manifest.engines?.dsh;
+  if (supportedHost && !semver.satisfies(hostManifest.version, supportedHost))
+    throw new Error(`Requires DSH ${supportedHost}; found ${hostManifest.version}`);
   const profile = boot.loadProfileDirectory(
     "offline-check",
     profileDir,
@@ -271,7 +273,6 @@ export async function verifyHost(payload, profileDir, dshLocation) {
     profile,
     home: process.env.DSH_HOME,
   });
-  const manifest = readJson(join(payload, "package.json"));
   for (const [name, range] of Object.entries(manifest.peerDependencies ?? {})) {
     const entry = resolution.entries.find(
       (candidate) => candidate.name === name,

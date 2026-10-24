@@ -89,7 +89,7 @@ const bootstrap = await api("bootstrap");
 assert.equal(bootstrap.selection.provider, "delivery-test");
 assert.equal(bootstrap.selection.model, "local-test");
 checks.push(
-  "installed offline payload loads with exact host peers and the DSH model catalog",
+  "installed source/payload loads with exact host peers and the DSH model catalog",
 );
 const op = (name, args, expect) => ({
     name,
@@ -104,7 +104,7 @@ const op = (name, args, expect) => ({
       label,
       prompt: "完成本次节点任务。",
       inputTemplate: "TEST_OPERATIONS:" + JSON.stringify(operations),
-      tools: ["read", "write", "skill"],
+      tools: ["read", "write", "edit", "glob", "grep", "skill", "bash"],
     },
   });
 const graph = {
@@ -117,8 +117,13 @@ const graph = {
         op("mcp__library_probe__inspect", {}, "LIBRARY_MCP_OK"),
         op("write", {
           file_path: "app.cjs",
-          content: 'module.exports = () => "DELIVERY_OK";\n',
+          content: 'module.exports = () => "DELIVERY_INITIAL";\n',
         }),
+        op('edit',{file_path:'app.cjs',old_string:'DELIVERY_INITIAL',new_string:'DELIVERY_OK'}),
+        op('glob',{pattern:'*.cjs'},'app.cjs'),
+        op('grep',{pattern:'DELIVERY_OK',path:'app.cjs'},'DELIVERY_OK'),
+        op(process.platform==='win32'?'pwsh':'bash',{command:'node -e "console.log(123456)"',description:'Native shell proof'},'123456'),
+        op('job_list',{}),
       ],
       80,
     ),
@@ -168,7 +173,7 @@ for (const path of ["/skills", "/llm-config", "/runtime-config", "/feishu-creden
   await api("editor/request", { editorId: editor.editorId, path, method: "GET" });
 assert.deepEqual(
   toolCatalog.tools.map((t) => t.name),
-  ["read", "write", "skill", "bash"],
+  ["read", "write", "edit", "read_image", "glob", "grep", "skill", process.platform === "win32" ? "pwsh" : "bash"],
 );
 assert.equal(
   toolCatalog.tools.some((t) => t.name === "working_directory"),
@@ -262,6 +267,14 @@ async function wait(predicate) {
   throw new Error("Product run timeout");
 }
 await wait((r) => r.nodeStates.implement?.status === "waiting_quality");
+const nodeDetail=await api('runs/node',{requestId:run.requestId,nodeId:'implement'});
+assert.equal(nodeDetail.nativeSession?.ready,true,JSON.stringify(nodeDetail.nativeSession));
+assert.equal(nodeDetail.nativeSession?.error,null);
+assert.ok(nodeDetail.nativeSession?.workspaceId);
+assert.match(nodeDetail.nativeSession.title,/编码实现/);
+assert.equal(nodeDetail.attempts[0].nativeSession.sessionId,nodeDetail.nativeSession.sessionId);
+assert.ok((await api('nodes/native-sessions')).some(info=>info.sessionId===nodeDetail.nativeSession.sessionId));
+checks.push('native rc3 edit/glob/grep/shell/jobs execute through real tools; each node session is named and attached to its private native workspace');
 assert.equal(run.qualityStatus, "pending");
 assert.equal(run.nodeStates.verify, undefined);
 assert.equal(run.models.implement.provider, "delivery-test");
@@ -370,7 +383,7 @@ checks.push(
 );
 const report = {
   date: new Date().toISOString(),
-  dsh: "0.2.1-rc.2",
+  dsh: JSON.parse(readFileSync(JSON.parse(readFileSync(join(root,"test-host.json"),"utf8")).runtime.anchor,"utf8")).version,
   node: process.version,
   platform: process.platform,
   externalModelCalls: 0,

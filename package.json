@@ -1,6 +1,6 @@
 {
   "name": "dsh-workbuddy-project",
-  "version": "0.4.0-preview.11",
+  "version": "0.4.0-preview.12",
   "description": "DSH 项目模式：多仓库项目、可复用工作流、节点能力和运行验收",
   "type": "module",
   "main": "lib/index.js",
@@ -22,7 +22,7 @@
   ],
   "engines": {
     "node": ">=22.15.0",
-    "dsh": "~0.2.1-rc.2"
+    "dsh": "0.2.1-rc.3"
   },
   "license": "MIT",
   "dsh": {
@@ -35,15 +35,15 @@
   },
   "peerDependencies": {
     "@deepseek-ai/cordis": "~4.0.5",
-    "@deepseek-ai/dsh-tools": "~0.2.1-rc.2",
-    "@deepseek-ai/dsh-mcp-client": "~0.2.1-rc.2",
-    "@deepseek-ai/dsh-subprocess": "~0.2.1-rc.2",
+    "@deepseek-ai/dsh-tools": "~0.2.1-rc.3",
+    "@deepseek-ai/dsh-mcp-client": "~0.2.1-rc.3",
+    "@deepseek-ai/dsh-subprocess": "~0.2.1-rc.3",
     "@deepseek-ai/schemastery": "~3.18.5",
     "@modelcontextprotocol/client": "^2.0.0",
-    "@deepseek-ai/dsh-app-boot": "~0.2.1-rc.2",
-    "@deepseek-ai/dsh-agent": "~0.2.1-rc.2",
-    "@deepseek-ai/dsh-llm": "~0.2.1-rc.2",
-    "@deepseek-ai/dsh-session": "~0.2.1-rc.2"
+    "@deepseek-ai/dsh-app-boot": "~0.2.1-rc.3",
+    "@deepseek-ai/dsh-agent": "~0.2.1-rc.3",
+    "@deepseek-ai/dsh-llm": "~0.2.1-rc.3",
+    "@deepseek-ai/dsh-session": "~0.2.1-rc.3"
   },
   "scripts": {
     "test": "node test/packages.mjs && node test/library-sync.mjs && node --experimental-vm-modules test/windows-package-paths.mjs && node --experimental-vm-modules test/windows-path-audit.mjs && node test/delivery/check-plugin-urls.mjs",
@@ -54,7 +54,8 @@
     "test:delivery": "node test/delivery/check-store.mjs && node test/delivery/check-code-handoff.mjs && node test/delivery/check-quality-ledger.mjs && node test/delivery/check-run-checkpoints.mjs && node test/delivery/check-node-dialogue.mjs && node test/delivery/check-node-restart.mjs",
     "build:client": "node scripts/build-client.mjs",
     "prepare:offline": "node scripts/prepare-offline.mjs",
-    "check:paths": "node scripts/check-paths.mjs"
+    "check:paths": "node scripts/check-paths.mjs",
+    "test:native": "node test/delivery/check-native-integration.mjs && node test/delivery/check-native-client.cjs"
   },
   "dependencies": {
     "yaml": "2.9.1",
