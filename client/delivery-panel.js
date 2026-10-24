@@ -195,14 +195,24 @@ function mountDeliveryClient(ctx) {
     if(!ctx.uiWorkspace)throw new Error('当前 DSH 未提供原生工作区导航，请使用 0.2.1-rc.3 Web。');
     sessionStorage.setItem('delivery:return-node',JSON.stringify({requestId,nodeId}));
     block(info);
+    if(info.legacySidebar)await deliveryApi('nodes/native-session/open',{nativeSessionId:info.sessionId});
     await ctx.sessions.refresh();
-    ctx.uiWorkspace.openSession(info.sessionId);
+    ctx.uiWorkspace.openSession(info.address??info.sessionId);
   };
   function NativeNodeReturn({sessionId}) {
     const [,update]=useState(0);
     useEffect(()=>{const notify=()=>update(value=>value+1);deliveryNativeSubscribers.add(notify);return()=>deliveryNativeSubscribers.delete(notify);},[]);
     const info=deliveryNativeSessions.get(String(sessionId));
-    return info?h('button',{type:'button','data-delivery-node':info.nodeId,title:'返回项目模式：'+info.title,onClick:()=>{sessionStorage.setItem('delivery:return-node',JSON.stringify({requestId:info.requestId,nodeId:info.nodeId}));ctx.layout.selectPanel('workbuddy-delivery');},style:{border:'1px solid #7199a0',borderRadius:6,padding:'5px 10px',background:'transparent',color:'inherit',cursor:'pointer'}},'返回项目节点'):null;
+    const returnToNode=async()=>{
+      sessionStorage.setItem('delivery:return-node',JSON.stringify({requestId:info.requestId,nodeId:info.nodeId}));
+      try {
+        if(info.legacySidebar) {
+          const result=await deliveryApi('nodes/native-session/close',{nativeSessionId:info.sessionId});
+          if(result.archived)await ctx.uiWorkspace.archiveSession(info.sessionId);
+        }
+      } finally {ctx.layout.selectPanel('workbuddy-delivery');}
+    };
+    return info?h('button',{type:'button','data-delivery-node':info.nodeId,title:'返回项目模式：'+info.title,onClick:returnToNode,style:{border:'1px solid #7199a0',borderRadius:6,padding:'5px 10px',background:'transparent',color:'inherit',cursor:'pointer'}},'返回项目节点'):null;
   }
   ctx.slots.inject('conversation.session.header.actions',()=>ctx.slots.register({name:'conversation.session.header.actions',id:'delivery-node-return',order:10},NativeNodeReturn));
   const Panel=()=>h(DeliveryPanel,{openNativeSession});
