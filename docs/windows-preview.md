@@ -1,6 +1,6 @@
-# Windows 封闭环境验证：项目模式 0.4.0-preview.11
+# Windows 封闭环境验证：项目模式 0.4.0-preview.12
 
-目标宿主：**DSH 0.2.1-rc2（npm 版本 0.2.1-rc.2）**，Windows 10/11，Node.js >=22.15（含 node:sqlite），Git for Windows。使用 DSH CLI 的 web profile，浏览器地址为本机 localhost。DSH 桌面壳暂未验证。
+目标宿主：**DSH 0.2.1-rc.3**，Windows 10/11，Node.js >=22.15（含 node:sqlite），Git for Windows。使用 DSH CLI 的 web profile，浏览器地址为本机 localhost。DSH 桌面壳暂未验证。
 
 ## 1. 在可联网的准备机制作插件离线包
 
@@ -12,7 +12,7 @@ npm run build:client
 npm run prepare:offline
 ```
 
-生成 `dist/dsh-workbuddy-project-0.4.0-preview.11-offline.tgz`、同名 `.sha256`、`install-windows.ps1` 和本说明。离线包已包含固定依赖与画布资源。DSH 及其宿主依赖复用目标机已有安装，不包含在插件包内。
+生成 `dist/dsh-workbuddy-project-0.4.0-preview.12-offline.tgz`、同名 `.sha256`、`install-windows.ps1` 和本说明。离线包已包含固定依赖与画布资源。DSH 及其宿主依赖复用目标机已有安装，不包含在插件包内。
 
 将这四个文件复制到验证机。**目标机安装和运行插件不执行 npm install、npx 或联网下载。** 模型请求仍需要可访问的模型服务；完全断外网时，请先在 DSH 中配置可访问的本地/内网模型。MCP、Skill 脚本及项目构建工具的运行依赖须由所在环境另行具备。
 
@@ -24,7 +24,7 @@ npm run prepare:offline
 $env:DSH_HOME = 'D:\dsh-validation'
 # 在此 home 下启动 DSH、配置模型后退出，再执行安装：
 powershell -ExecutionPolicy Bypass -File .\install-windows.ps1 `
-  -Archive .\dsh-workbuddy-project-0.4.0-preview.11-offline.tgz `
+  -Archive .\dsh-workbuddy-project-0.4.0-preview.12-offline.tgz `
   -Profile web `
   -DshHome $env:DSH_HOME `
   -DshRoot 'D:\tools\dsh'
@@ -69,7 +69,7 @@ powershell -ExecutionPolicy Bypass -File .\install-windows.ps1 `
 - Git 仓库先在本机准备。自动 clone、远程协作调度、多人集中审批未接入。
 - MCP 从能力包绑定；宿主原生 MCP 请先保存为能力包。外部连接器本身仍需环境网络与凭据，界面不分发凭据。
 - 重启后可查看历史；有完整检查点的中断运行支持显式恢复，不确定的执行不自动重复。
-- 当前每个节点的文件变更快照上限为 50 个文件、5 MB；文本预览上限为 256 KB。大批量修改应拆分节点，二进制文件可通过累计补丁交付。
+- 节点代码快照不再限制变更文件数量，完整记录新增、修改和删除；单文件上限仍为 5 MB，文本预览上限为 256 KB。二进制文件可通过累计补丁交付。
 - 普通运行沿用 DSH 文件访问和命令审批策略。若 bash/MCP 操作需要宿主批准，按 DSH 当前策略处理。
 
 ## Windows 能力包路径修复
@@ -111,3 +111,7 @@ node (Join-Path $pluginRoot 'scripts\check-paths.mjs')
 入口统一为“项目模式”，右上角齿轮管理资源库，能力库直接展示能力。工作流模板通过“从资源库选用”读取 Git 资源；标准研发模板也在此清单中。目录格式和更新方式见 [共享资源库与工作流](shared-workflows.md)。旧配置、API 标识和数据目录保留兼容。
 
 打开存在运行任务的项目会定位正在执行或待验收的节点。验收统一放在“产物与验收”。“重试方案设计”等红色按钮先提示从头执行、清理本轮修改和不沿用本轮上下文，确认后才执行；“接着完成方案设计”恢复原会话及成果。
+
+## 超过 50 个文件的节点变更（preview.12）
+
+preview.12 移除旧的 50 文件数量限制。升级后，对因此失败的节点选择“接着完成＋节点名称”，可补充“保留已有代码，检查结果并重新完成节点”，沿用本次上下文与工作树；红色“重试”会清理本轮修改并从头执行。报告与快照形成后仍按原质量策略验收。

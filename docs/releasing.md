@@ -2,7 +2,7 @@
 
 本仓库是独立发布包 `dsh-workbuddy-project`，运行时版本由 `package.json` 决定。npm 发布、GitHub Release 和插件市场收录是独立步骤；市场收录需要维护者审核。
 
-## 0.4.0-preview.11 产品预览
+## 0.4.0-preview.12 产品预览
 
 本分支交付源代码、固定依赖的离线制包脚本和 Windows 安装器，不自动发布 npm、标签或 GitHub Release。当前预览的检查结果见 [验证记录](product-preview-validation.md)。
 
@@ -20,13 +20,13 @@ npm run prepare:offline
 
 ### 重现隔离安装验收
 
-先制作离线包。以下准备工具只用于开发验证，目标目录必须不存在：
+以下准备工具支持直接从源码或现有离线包准备隔离环境，目标目录必须不存在；日常本机验证无需制作离线包：
 
 ```sh
-node test/delivery/prepare-installed-host.mjs <new-test-root> dist/dsh-workbuddy-project-0.4.0-preview.11-offline.tgz <DSH-package-directory>
+node test/delivery/prepare-installed-host.mjs <new-test-root> <source-directory-or-offline.tgz> <DSH-package-directory>
 ```
 
-工具解压并使用真实安装 helper 配置新 profile、验证宿主 peer，额外放入一个**仅用于测试**的确定性模型适配器。按输出设置 `DSH_HOME=<root>/home`，启动 `dsh --profile web --patch <root>/test.patch.yml --no-open --port 0` 并将输出保存到 `<root>/host.log`。再运行：
+工具复制源码或解压已有包，并使用真实安装 helper 配置新 profile、验证宿主 peer，额外放入一个**仅用于测试**的确定性模型适配器。按输出设置 `DSH_HOME=<root>/home`，启动 `dsh --profile web --patch <root>/test.patch.yml --no-open --port 0` 并将输出保存到 `<root>/host.log`。再运行：
 
 ```sh
 node test/delivery/check-installed-host.mjs <root>

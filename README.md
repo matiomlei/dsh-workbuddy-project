@@ -2,9 +2,11 @@
 
 在 DSH 中创建业务项目，绑定一个或多个 Git 仓库，选用可复用 DAG 模板，并跟踪每次运行的进度、节点产物和质量验收。
 
-当前分支为 **0.4.0-preview.11 产品预览版**，目标宿主是 **DSH 0.2.1-rc2（npm 0.2.1-rc.2）**。本分支未发布到 npm 或 GitHub Release；不要使用旧 0.3.1 的下载命令获取这个预览版。
+当前分支为 **0.4.0-preview.12 产品预览版**，目标宿主是 **DSH 0.2.1-rc.3**。当前源码已适配 rc3，本轮尚未制作离线包。需安装包时再按下方步骤构建。本分支未发布到 npm 或 GitHub Release；不要使用旧 0.3.1 的下载命令获取这个预览版。
 
-运行面板现已支持节点对话、模型返回的思考和工具过程；用法及交互与验收的关系见 [节点对话与运行过程](docs/node-dialogue.md)。
+运行面板现已支持节点对话、模型返回的思考和工具过程，并可打开对应 DSH 原生会话；用法及交互与验收的关系见 [节点对话与运行过程](docs/node-dialogue.md)。
+
+本轮源码验证记录见 [rc3 原生工具与节点会话验证](docs/rc3-native-validation.md)。
 
 ## 产品入口
 
@@ -31,11 +33,11 @@ npm run build:client
 npm run prepare:offline
 ```
 
-将 `dist/` 下的 `.tgz`、`.sha256`、`install-windows.ps1` 和 `WINDOWS-README.md` 复制到目标机。目标机已有 Node.js >=22.15、Git for Windows 和 DSH 0.2.1-rc.2 后，关闭 DSH，在 PowerShell 安装：
+将 `dist/` 下的 `.tgz`、`.sha256`、`install-windows.ps1` 和 `WINDOWS-README.md` 复制到目标机。目标机已有 Node.js >=22.15、Git for Windows 和 DSH 0.2.1-rc.3 后，关闭 DSH，在 PowerShell 安装：
 
 ```powershell
 powershell -ExecutionPolicy Bypass -File .\install-windows.ps1 `
-  -Archive .\dsh-workbuddy-project-0.4.0-preview.11-offline.tgz `
+  -Archive .\dsh-workbuddy-project-0.4.0-preview.12-offline.tgz `
   -Profile web -DshHome 'D:\dsh-validation' -DshRoot 'D:\tools\dsh'
 $env:DSH_HOME = 'D:\dsh-validation'
 dsh --profile web --no-open
