@@ -2,7 +2,7 @@
 
 本仓库是独立发布包 `dsh-workbuddy-project`，运行时版本由 `package.json` 决定。npm 发布、GitHub Release 和插件市场收录是独立步骤；市场收录需要维护者审核。
 
-## 0.4.0-preview.14 产品预览
+## 0.4.0-preview.15 产品预览
 
 本分支交付源代码、固定依赖的离线制包脚本和 Windows 安装器，不自动发布 npm、标签或 GitHub Release。当前预览的检查结果见 [验证记录](product-preview-validation.md)。
 

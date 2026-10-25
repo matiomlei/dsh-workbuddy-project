@@ -1,4 +1,4 @@
-# Windows 封闭环境验证：项目模式 0.4.0-preview.14
+# Windows 封闭环境验证：项目模式 0.4.0-preview.15
 
 目标宿主：**DSH 0.2.1-rc.3**，Windows 10/11，Node.js >=22.15（含 node:sqlite），Git for Windows。使用 DSH CLI 的 web profile，浏览器地址为本机 localhost。DSH 桌面壳暂未验证。
 
@@ -12,7 +12,7 @@ npm run build:client
 npm run prepare:offline
 ```
 
-生成 `dist/dsh-workbuddy-project-0.4.0-preview.14-offline.tgz`、同名 `.sha256`、`install-windows.ps1` 和本说明。离线包已包含固定依赖与画布资源。DSH 及其宿主依赖复用目标机已有安装，不包含在插件包内。
+生成 `dist/dsh-workbuddy-project-0.4.0-preview.15-offline.tgz`、同名 `.sha256`、`install-windows.ps1` 和本说明。离线包已包含固定依赖与画布资源。DSH 及其宿主依赖复用目标机已有安装，不包含在插件包内。
 
 将这四个文件复制到验证机。**目标机安装和运行插件不执行 npm install、npx 或联网下载。** 模型请求仍需要可访问的模型服务；完全断外网时，请先在 DSH 中配置可访问的本地/内网模型。MCP、Skill 脚本及项目构建工具的运行依赖须由所在环境另行具备。
 
@@ -24,7 +24,7 @@ npm run prepare:offline
 $env:DSH_HOME = 'D:\dsh-validation'
 # 在此 home 下启动 DSH、配置模型后退出，再执行安装：
 powershell -ExecutionPolicy Bypass -File .\install-windows.ps1 `
-  -Archive .\dsh-workbuddy-project-0.4.0-preview.14-offline.tgz `
+  -Archive .\dsh-workbuddy-project-0.4.0-preview.15-offline.tgz `
   -Profile web `
   -DshHome $env:DSH_HOME `
   -DshRoot 'D:\tools\dsh'
@@ -126,3 +126,10 @@ preview.12 移除旧的 50 文件数量限制。升级后，对因此失败的�
 DSH 随附的 `diagnose-windows-sandbox-acl` 脚本要求在沙箱外运行：可以通过工具的单次 `sandbox_permissions: danger-full-access` 请求获得用户审批，也可在外部普通 PowerShell 中按宿主随附技能执行。脚本会备份权限改动；它不需要通过管理员、UAC 或 `runas` 启动。不要通过同一受限命令反复尝试修复，不要把整个项目设成默认完全权限，不要直接递归重置目录权限。
 
 Windows 权限是否修复仍须检查脚本的 `RECAP`、`verification`、`nextAction` 和报告路径，并按脚本报告的下一步操作。失败或拒绝的修复不自动重复；保留原会话和已有文件，避免红色“重试”清理本轮成果。本轮在 macOS 验证审批链路，不能替代目标 Windows 目录的实际 ACL 报告。
+
+
+## 自动允许完全访问（preview.15）
+
+项目模式右上角齿轮 → 节点执行权限 → 勾选“自动允许 danger-full-access” → 保存执行设置。默认关闭；保存后立即生效，也会处理当前等待的同类请求。作用范围是同一数据目录下的所有项目节点，宿主重启后保留，不写入资源库或工作流模板。
+
+开启后工具可在沙箱外以当前用户权限访问文件和网络，无需逐次点击。其他种类的权限请求仍需确认，DSH 的“从不允许”策略仍优先。运行过程显示“依据项目模式设置自动允许”，原生审批审计保留。关闭恢复后续请求的逐次确认，已经获准的调用不撤销。此设置不会自动修复 Windows ACL；仍需检查实际诊断脚本的输出。

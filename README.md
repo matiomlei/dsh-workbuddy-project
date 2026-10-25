@@ -2,13 +2,13 @@
 
 在 DSH 中创建业务项目，绑定一个或多个 Git 仓库，选用可复用 DAG 模板，并跟踪每次运行的进度、节点产物和质量验收。
 
-当前分支为 **0.4.0-preview.14 产品预览版**，目标宿主是 **DSH 0.2.1-rc.3**。当前源码已适配 rc3，本轮尚未制作离线包。需安装包时再按下方步骤构建。本分支未发布到 npm 或 GitHub Release；不要使用旧 0.3.1 的下载命令获取这个预览版。
+当前分支为 **0.4.0-preview.15 产品预览版**，目标宿主是 **DSH 0.2.1-rc.3**。当前源码已适配 rc3，本轮尚未制作离线包。需安装包时再按下方步骤构建。本分支未发布到 npm 或 GitHub Release；不要使用旧 0.3.1 的下载命令获取这个预览版。
 
 运行面板现已支持节点对话、模型返回的思考和工具过程，并可打开对应 DSH 原生会话；用法及交互与验收的关系见 [节点对话与运行过程](docs/node-dialogue.md)。
 
 本轮源码验证记录见 [rc3 原生工具与节点会话验证](docs/rc3-native-validation.md)。
 
-权限请求会直接显示在项目节点中，核对后逐次允许或拒绝，等待时暂停节点计时。详见 [审批接入验证](docs/node-approval-validation.md)。
+权限请求默认直接显示在项目节点中，核对后逐次允许或拒绝，等待时暂停节点计时。右上角齿轮的“节点执行权限”可配置自动允许 `danger-full-access`，本机保存后立即生效。详见 [审批接入验证](docs/node-approval-validation.md)。
 
 ## 产品入口
 
@@ -39,7 +39,7 @@ npm run prepare:offline
 
 ```powershell
 powershell -ExecutionPolicy Bypass -File .\install-windows.ps1 `
-  -Archive .\dsh-workbuddy-project-0.4.0-preview.14-offline.tgz `
+  -Archive .\dsh-workbuddy-project-0.4.0-preview.15-offline.tgz `
   -Profile web -DshHome 'D:\dsh-validation' -DshRoot 'D:\tools\dsh'
 $env:DSH_HOME = 'D:\dsh-validation'
 dsh --profile web --no-open
