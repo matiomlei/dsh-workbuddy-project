@@ -8,6 +8,7 @@ import { fileURLToPath } from "node:url";
 export const name = "delivery-test-provider";
 export const inject = ["llm", "webServer"];
 export function apply(ctx) {
+  ctx.on('session/event',(session,event)=>{if(['approval/asked','approval/decided'].includes(event.type))appendFileSync(join(dirname(fileURLToPath(import.meta.url)),'test-approval-audit.jsonl'),JSON.stringify({sessionId:String(session.id),event})+'\n')});
   ctx.webServer.register({
     kind: "exact",
     path: "/test-library-mcp",
@@ -79,6 +80,20 @@ export function apply(ctx) {
       );
       if (options.signal?.aborted) throw options.signal.reason;
       const system=(options.system??'')+options.messages.filter(message=>message.role==='system').flatMap(message=>message.content??[]).filter(block=>block.type==='text').map(block=>block.text).join('\n');
+      if(system.includes('APPROVAL_PROBE')) {
+        const results=options.messages.filter(message=>message.role==='tool');
+        if(!results.length) {
+          for(const [index,file] of ['allow.txt','deny.txt'].entries()) {
+            const args=JSON.stringify({file_path:file,content:'APPROVAL_TEST_ONLY\n',sandbox_permissions:'danger-full-access',justification:'仅在隔离验证仓库中写入 '+file+'，用于核对逐次审批。'}),id='approval-'+index;
+            yield {type:'block-start',index,blockType:'tool-call'};
+            yield {type:'tool-call-delta',index,id,name:'write',argumentsDelta:args};
+            yield {type:'block-end',index,block:{type:'tool-call',id,name:'write',arguments:args}};
+          }
+          yield {type:'finish',reason:{kind:'tool-calls'}};return;
+        }
+        const text='审批已结束，仅获准的调用可以执行。';
+        yield {type:'block-start',index:0,blockType:'text'};yield {type:'text-delta',index:0,text};yield {type:'block-end',index:0,block:{type:'text',text}};yield {type:'finish',reason:{kind:'stop'}};return;
+      }
       if(system.includes('RESTART_CODER_PROBE')) {yield*restartResponse({...options,system});return}
       if(system.includes('DIALOGUE_CODER_PROBE') || system.includes('DIALOGUE_TESTER_PROBE') || system.includes('这是工作流已固定结果的只读讨论')) { yield* dialogueResponse({...options,system}); return; }
       const text = options.messages

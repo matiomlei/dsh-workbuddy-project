@@ -23,6 +23,8 @@ const root=createRoot(document.getElementById('root'));
  assert.deepEqual(events,['runs/node',['block','node-session',true],'refresh',['open',info.address]],'refresh native catalogue before navigation');
  await act(async()=>root.render(React.createElement(sections['delivery-node-return'],{sessionId:info.sessionId})));
  assert.equal(document.querySelector('button').dataset.deliveryNode,'coder');
+ info.pendingApprovalCount=1;await act(async()=>root.render(React.createElement(sections['delivery-node-return'],{sessionId:info.sessionId})));assert.match(document.querySelector('button').textContent,/待权限确认/);
+ info.pendingApprovalCount=0;
  await act(async()=>document.querySelector('button').click());
  assert.deepEqual(JSON.parse(sessionStorage.getItem('delivery:return-node')),{requestId:'run',nodeId:'coder'});
  assert.deepEqual(events.at(-1),['panel','workbuddy-delivery']);

@@ -725,6 +725,7 @@
         skipped: "未执行",
         pending: "待验收",
         waiting_quality: "待验收",
+        waiting_approval: "等待权限确认",
         passed: "验收通过",
         failed: "未通过",
         not_evaluated: "未配置验收",
@@ -747,6 +748,7 @@
                   : [
                         "pending",
                         "waiting_quality",
+                        "waiting_approval",
                         "running",
                         "preparing",
                         "recovering",
@@ -2145,7 +2147,7 @@
                 ? "#298a6d"
                 : status === "error"
                   ? "#c6665b"
-                  : status === "waiting_quality"
+                  : ["waiting_quality","waiting_approval"].includes(status)
                     ? "#d5a13b"
                     : "#8a9aa9";
           g.append(
@@ -2188,10 +2190,10 @@
       function conversationPanel(run, node) {
         const key = run.requestId + ':' + node.id;
         if (dialoguePanels.has(key)) {const view=dialoguePanels.get(key);if(!view.root.isConnected)view.scrollLatest=true;else view.restoreScroll={top:view.stream.scrollTop,follow:view.stream.scrollHeight-view.stream.scrollTop-view.stream.clientHeight<70};return view.root;}
-        const status = muted('正在读取节点会话…'), question = el('div'), stream = el('div', {class:'dialogue-stream', role:'log', 'aria-label':'节点对话与运行过程'});
+        const status = muted('正在读取节点会话…'), question = el('div'), approvals = el('div'), stream = el('div', {class:'dialogue-stream', role:'log', 'aria-label':'节点对话与运行过程'});
         const message = area('', '补充要求、回答问题，或在验收前提出修改…');
         message.setAttribute('aria-label','给当前节点发送消息');
-        const view = {key, run, node, status, question, stream, message, data:null, signature:'', sending:false, scrollLatest:true};
+        const view = {key, run, node, status, question, approvals, stream, message, data:null, signature:'', sending:false, scrollLatest:true};
         const send = el('button', {class:'primary', onclick: async () => {
           if (!(view.data?.canSend||view.data?.canExplain||view.data?.canContinue) || view.sending || !message.value.trim()) return;
           view.sending = true; send.disabled=true;
@@ -2233,7 +2235,7 @@
         }},'在 DSH 中查看会话');
         const phaseHint = muted(''), root = stack(
           el('div',{class:'row spread'},el('h3',{class:'section-title'},'对话与运行过程'),row(nativeSession,status)),
-          question,stream,
+          approvals,question,stream,
           muted('只展示模型服务实际返回的思考、回复和工具过程；模型未返回的内部思考无法展示。'),
           label('与当前节点交互',message),el('div',{class:'dialogue-actions'},send,resume,retry,phaseHint),
         );
@@ -2245,13 +2247,35 @@
         const view=dialoguePanels.get(run.requestId+':'+node.id);if(!view)return;
         try {
           const data=await api('runs/node',{requestId:run.requestId,nodeId:node.id});view.data=data;view.nativeSession.hidden=!data.nativeSession?.ready;
-          const phases={executing:'运行中',waiting_user:'等待你的回答',waiting_quality:'等待验收，可继续对话',revising:'正在继续对话',sealing:'正在固定产物',explaining:'正在只读讨论',completed:'节点已完成',interrupted:'会话已中断'};
+          const phases={waiting_approval:'等待权限确认',executing:'运行中',waiting_user:'等待你的回答',waiting_quality:'等待验收，可继续对话',revising:'正在继续对话',sealing:'正在固定产物',explaining:'正在只读讨论',completed:'节点已完成',interrupted:'会话已中断'};
           view.status.textContent=(phases[data.thread?.phase]||'尚未开始')+(data.attempt?' · 第 '+data.attempt+' 次执行':'');
           view.send.disabled=view.sending||!(data.canSend||data.canExplain||data.canContinue);view.message.disabled=!(data.canSend||data.canExplain||data.canContinue);
           view.resume.hidden=!data.canContinue;view.resume.disabled=view.sending||!data.canContinue;
           view.retry.hidden=!data.canRetry;view.retry.disabled=view.sending||!data.canRetry;
           view.send.textContent=data.canContinue?'发送并继续':data.canExplain?'询问结果（只读）':data.thread?.question?'回答并继续':data.thread?.phase==='waiting_quality'?'继续对话并重新验收':'发送';
-          view.phaseHint.textContent=data.canContinue?'继续加载原会话上下文并保留已有成果；重试从头执行该节点，并折叠上一轮记录。新结果仍需按模板验收。':data.canExplain?'只读讨论不改变已固定的代码、输出和验收结果。':data.thread?.phase==='waiting_quality'?'继续对话会生成新的输出与验收记录，下游继续等待。':data.canSend?'消息只发送给本次运行的当前节点。':'可查看已有记录；当前节点暂不接收消息。';
+          view.phaseHint.textContent=data.thread?.approvals?.length?'节点正在等待你确认具体工具调用，等待期间不计算节点超时。':data.canContinue?'继续加载原会话上下文并保留已有成果；重试从头执行该节点，并折叠上一轮记录。新结果仍需按模板验收。':data.canExplain?'只读讨论不改变已固定的代码、输出和验收结果。':data.thread?.phase==='waiting_quality'?'继续对话会生成新的输出与验收记录，下游继续等待。':data.canSend?'消息只发送给本次运行的当前节点。':'可查看已有记录；当前节点暂不接收消息。';
+          const pendingApprovals=data.thread?.approvals??[];
+          const approvalSignature=JSON.stringify([pendingApprovals,data.nativeRunId,data.attempt,!!view.approvalBusy]);
+          if(approvalSignature!==view.approvalSignature){
+          view.approvalSignature=approvalSignature;
+          view.approvals.replaceChildren(...pendingApprovals.map(approval=>{
+            let argumentText=approval.arguments;
+            try {argumentText=JSON.stringify(typeof argumentText==='string'?JSON.parse(argumentText):argumentText,null,2)} catch {}
+            const decide=async outcome=>{
+              if(view.approvalBusy)return;
+              view.approvalBusy=true;for(const control of view.approvals.querySelectorAll('button'))control.disabled=true;
+              try {await api('nodes/approval',{requestId:run.requestId,nodeId:node.id,expectedNativeRunId:data.nativeRunId,expectedAttempt:data.attempt,approvalId:approval.id,outcome});notice(outcome==='allowed-once'?'已仅允许本次工具调用。':'已拒绝本次工具调用。');}
+              catch(error){notice(error.message,true)}
+              finally{view.approvalBusy=false;for(const control of view.approvals.querySelectorAll('button'))control.disabled=false;await refreshDialogue(run,node)}
+            };
+            return el('section',{class:'dialogue-question','aria-label':'节点权限确认'},
+              el('strong',{},'节点等待你的权限确认 · '+approval.toolName),el('p',{},approval.reason),
+              approval.cwd?muted('节点工作目录：'+approval.cwd):null,
+              argumentText?el('pre',{},argumentText):null,
+              muted('仅允许本次工具调用。请核对命令、目标路径和请求理由；此决定不代表节点通过验收。'),
+              row(el('button',{class:'subtle',disabled:!!view.approvalBusy,onclick:()=>decide('rejected')},'拒绝'),el('button',{class:'primary',disabled:!!view.approvalBusy,onclick:()=>decide('allowed-once')},'仅允许本次')));
+          }));
+          }
           const q=data.thread?.question;
           view.question.replaceChildren(...(q?[el('div',{class:'dialogue-question'},el('strong',{},'节点需要你补充信息'),el('p',{},q.text),el('div',{class:'dialogue-options'},...(q.options||[]).map(option=>el('button',{class:'question-option','aria-pressed':String(view.message.value===option),onclick:()=>{view.message.value=option;view.pendingId=null;view.message.focus();for(const item of view.question.querySelectorAll('.question-option'))item.setAttribute('aria-pressed',String(item.textContent===option))}},option))))]:[]));
           const scrollLatest=()=>{if(view.stream.isConnected&&view.stream.clientHeight>0){view.stream.scrollTop=view.stream.scrollHeight;view.scrollLatest=false}};
@@ -2271,11 +2295,11 @@
             if(meta?.nativeSession?.ready)content.append(button('在 DSH 中查看第 '+attempt+' 次执行',()=>{sessionStorage.setItem('delivery:return-node',JSON.stringify({requestId:run.requestId,nodeId:node.id}));window.parent.postMessage({type:'delivery-open-native-session',requestId:run.requestId,nodeId:node.id,attempt},location.origin);},'subtle'));
             group.open=latestChanged?attempt===data.attempt:existingGroups.has(attempt)?groupOpen.has(attempt):attempt===data.attempt;
             for(const entry of items) {
-              const title={user:'你',assistant:entry.channel==='explanation'?'Agent · 只读讨论':'Agent',reasoning:'模型返回的思考',tool:'工具 · '+entry.name,question:'节点提问',context:'运行上下文',notice:'运行记录'}[entry.kind]||entry.kind;
+              const title={approval:'权限审批',user:'你',assistant:entry.channel==='explanation'?'Agent · 只读讨论':'Agent',reasoning:'模型返回的思考',tool:'工具 · '+entry.name,question:'节点提问',context:'运行上下文',notice:'运行记录'}[entry.kind]||entry.kind;
               if(['reasoning','tool','context'].includes(entry.kind)) {
-                const details=el('details',{class:'trace-entry '+entry.kind,'data-id':entry.id},el('summary',{},title,entry.status?el('span',{class:'badge'},({running:'执行中',success:'成功',error:'失败',consumed:'已接收',queued:'待接收'})[entry.status]||entry.status):entry.streaming?el('span',{class:'badge'},'生成中'):entry.interrupted?el('span',{class:'badge'},'已中断'):null),el('pre',{},entry.text),entry.result!==undefined?el('pre',{class:'tool-result'},entry.result):null,entry.truncated?muted('内容较长，当前显示已截断。'):null);
+                const details=el('details',{class:'trace-entry '+entry.kind,'data-id':entry.id},el('summary',{},title,entry.status?el('span',{class:'badge'},({pending:'等待确认','allowed-once':'已仅允许本次',rejected:'已拒绝',cancelled:'已取消',running:'执行中',success:'成功',error:'失败',consumed:'已接收',queued:'待接收'})[entry.status]||entry.status):entry.streaming?el('span',{class:'badge'},'生成中'):entry.interrupted?el('span',{class:'badge'},'已中断'):null),el('pre',{},entry.text),entry.result!==undefined?el('pre',{class:'tool-result'},entry.result):null,entry.truncated?muted('内容较长，当前显示已截断。'):null);
                 details.open=existingDetails.has(String(entry.id))?open.has(String(entry.id)):(entry.kind==='reasoning'&&entry.streaming);content.append(details);
-              } else content.append(el('article',{class:'dialogue-entry '+entry.kind},el('div',{class:'row spread'},el('strong',{},title),muted(time(entry.time))),el('div',{class:'dialogue-text'},entry.text),entry.status==='queued'?muted('已提交，等待节点接收'):['discarded','rejected','failed'].includes(entry.status)?muted('消息未完成接收或执行，请查看节点状态。'):null,entry.truncated?muted('内容较长，当前显示已截断。'):null));
+              } else content.append(el('article',{class:'dialogue-entry '+entry.kind},el('div',{class:'row spread'},el('strong',{},title),muted(time(entry.time))),el('div',{class:'dialogue-text'},entry.text),entry.status==='queued'?muted('已提交，等待节点接收'):entry.kind==='user'&&['discarded','rejected','failed'].includes(entry.status)?muted('消息未完成接收或执行，请查看节点状态。'):null,entry.truncated?muted('内容较长，当前显示已截断。'):null));
             }
             if(!items.length)content.append(muted('正在准备本次执行…'));
             entries.push(group);
@@ -2301,7 +2325,7 @@
         activeRun = run.requestId;
         const nodes = run.graph?.nodes || [];
         if (!nodes.some((n) => n.id === activeNode))
-          activeNode = nodes.find(n=>['running','waiting_user'].includes(run.nodeStates[n.id]?.status))?.id || nodes.find(n=>run.nodeStates[n.id]?.status==='waiting_quality')?.id || nodes.find(n=>['error','canceled'].includes(run.nodeStates[n.id]?.status))?.id || nodes[0]?.id;
+          activeNode = nodes.find(n=>run.nodeStates[n.id]?.status==='waiting_approval')?.id || nodes.find(n=>['running','waiting_user'].includes(run.nodeStates[n.id]?.status))?.id || nodes.find(n=>run.nodeStates[n.id]?.status==='waiting_quality')?.id || nodes.find(n=>['error','canceled'].includes(run.nodeStates[n.id]?.status))?.id || nodes[0]?.id;
         const node = nodes.find((n) => n.id === activeNode),
           state = run.nodeStates[activeNode] || {},
           subject = run.qualitySubjects
