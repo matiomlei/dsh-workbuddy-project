@@ -14,6 +14,31 @@ function DeliveryIcon({ size = 18 }) {
     h("path", { d: "M9 6h6a3 3 0 0 1 3 3v6M6 9v9h9" }),
   );
 }
+function DeliveryExecutionSettings() {
+  const [saved,setSaved]=useState(null),[enabled,setEnabled]=useState(false),[busy,setBusy]=useState(false),[error,setError]=useState(''),[notice,setNotice]=useState('');
+  useEffect(()=>{
+    let active=true;
+    deliveryApi('settings/get').then(value=>{if(active){setSaved(value.autoAllowDangerFullAccess);setEnabled(value.autoAllowDangerFullAccess)}}).catch(problem=>{if(active)setError(problem.message)});
+    return()=>{active=false};
+  },[]);
+  const save=async()=>{
+    setBusy(true);setError('');setNotice('');
+    try {
+      const value=await deliveryApi('settings/save',{autoAllowDangerFullAccess:enabled});
+      setSaved(value.autoAllowDangerFullAccess);setEnabled(value.autoAllowDangerFullAccess);
+      setNotice(value.autoAllowDangerFullAccess?'已开启：当前等待及后续的完全访问请求将自动允许。':'已关闭：后续完全访问请求需要逐次确认。');
+    } catch(problem){setError(problem.message)} finally {setBusy(false)}
+  };
+  return h('section',{'aria-label':'节点执行权限',style:{...S.card,background:'#fff',padding:20,gap:14,marginBottom:24}},
+    h('div',{style:S.bar},h('strong',null,'节点执行权限'),h('span',{style:{...S.tag,color:saved?'#a15a13':'#526576'}},saved===null?'读取中…':saved?'自动允许已开启':'逐次确认')),
+    h('label',{style:{...S.bar,alignItems:'flex-start',fontWeight:600}},h('input',{type:'checkbox',checked:enabled,disabled:saved===null||busy,onChange:event=>{setEnabled(event.target.checked);setNotice('')}}),'自动允许 danger-full-access'),
+    h('div',{style:S.muted},'开启后，本机项目模式所有节点的此类权限请求会自动允许，包括当前正在等待的请求，无需每次选择。工具将以当前登录用户的权限在沙箱外执行，可访问工作树外的文件和网络。'),
+    h('div',{style:S.muted},'此设置保存在本机，不随共享模板同步。其他审批仍逐次确认；DSH 的“从不允许”策略仍然优先。关闭后不会中断已经获准的调用。'),
+    error?h('div',{role:'alert',style:S.error},error):null,
+    notice?h('div',{role:'status',style:S.ok},notice):null,
+    h('div',{style:S.bar},button(busy?'保存中…':'保存执行设置',save,{disabled:saved===null||busy||enabled===saved,background:'#087e8b',color:'#fff',borderColor:'transparent'})),
+  );
+}
 function DeliveryPanel({openNativeSession}) {
   const [page, setPage] = useState("projects"),
     [navigationError, setNavigationError] = useState("");
@@ -157,7 +182,7 @@ function DeliveryPanel({openNativeSession}) {
           { style: { overflow: "auto", flex: 1 } },
           h(CapabilitySection, { projectMode: true }),
         )
-      : page === "settings" ? h("div",{style:{overflow:"auto",padding:24,flex:1}},h(CapabilitySection,{settingsOnly:true}))
+      : page === "settings" ? h("div",{style:{overflow:"auto",padding:24,flex:1}},h(DeliveryExecutionSettings),h(CapabilitySection,{settingsOnly:true}))
       : h("iframe", {
           ref: frame,
           key: page,

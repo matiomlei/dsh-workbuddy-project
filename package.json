@@ -1,6 +1,6 @@
 {
   "name": "dsh-workbuddy-project",
-  "version": "0.4.0-preview.14",
+  "version": "0.4.0-preview.15",
   "description": "DSH 项目模式：多仓库项目、可复用工作流、节点能力和运行验收",
   "type": "module",
   "main": "lib/index.js",
@@ -56,7 +56,7 @@
     "prepare:offline": "node scripts/prepare-offline.mjs",
     "check:paths": "node scripts/check-paths.mjs",
     "test:native": "node test/delivery/check-native-integration.mjs && node test/delivery/check-native-client.cjs",
-    "test:approval": "node test/delivery/check-node-approval.mjs && node test/delivery/check-approval-timeout.mjs && node test/delivery/check-approval-ui.cjs"
+    "test:approval": "node test/delivery/check-node-approval.mjs && node test/delivery/check-execution-settings.mjs && node test/delivery/check-execution-settings-ui.cjs && node test/delivery/check-approval-timeout.mjs && node test/delivery/check-approval-ui.cjs"
   },
   "dependencies": {
     "yaml": "2.9.1",

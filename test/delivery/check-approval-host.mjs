@@ -20,6 +20,7 @@ project=await api('project/bind',{id:project.id,expectedRevision:project.revisio
 const start=()=>api('runs/start',{requestId:randomUUID(),projectId:project.id,expectedProjectRevision:project.revision,triggerInput:'只验证本次工具调用的允许和拒绝'})
 const detail=id=>api('runs/node',{requestId:id,nodeId:'worker'})
 async function wait(id,predicate){for(let i=0;i<120;i++){const run=await api('runs/detail',{requestId:id}),node=await detail(id);if(predicate(run,node))return{run,node};if(['execution_failed','preparation_failed'].includes(run.status))throw new Error(JSON.stringify({run,node}));await new Promise(r=>setTimeout(r,100))}throw new Error('Approval test timed out: '+JSON.stringify(await detail(id)))}
+assert.equal((await api('settings/get')).autoAllowDangerFullAccess,false)
 let run=await start(),state=await wait(run.requestId,(_r,n)=>n.thread?.approvals?.length===1)
 writeFileSync(join(root,'approval-active-run.json'),JSON.stringify({requestId:run.requestId,projectId:project.id}))
 assert.ok((await api('nodes/native-sessions')).some(info=>info.sessionId===state.node.nativeSession.sessionId&&info.pendingApprovalCount===1));
@@ -41,5 +42,18 @@ assert.deepEqual(audit.filter(event=>event.type==='approval/decided').map(event=
 const completed=run.requestId;run=await start();state=await wait(run.requestId,(_r,n)=>n.thread?.approvals?.length===1)
 const cancelCwd=state.node.thread.approvals[0].cwd,stale=decide(state.node.thread.approvals[0],'allowed-once');await api('runs/cancel',{requestId:run.requestId});state=await wait(run.requestId,(r,n)=>r.status==='canceled'&&!n.thread?.approvals?.length)
 assert.notEqual((await request('nodes/approval',stale)).status,200);assert.equal(existsSync(join(cancelCwd,'deny.txt')),false);assert.equal(existsSync(join(cancelCwd,'allow.txt')),false)
-const report={date:new Date().toISOString(),platform:process.platform,externalModelCalls:0,completedRequestId:completed,cancelledRequestId:run.requestId,checks:['native approval/asked + approval/decided retained','native tool approvals visible in project mode','waiting beyond timeout keeps node alive across consecutive requests','only explicitly granted write executes; rejection and cancellation keep files unchanged','stale and late permission decisions rejected; original source remains clean']}
+const cancelled=run.requestId
+run=await start();state=await wait(run.requestId,(_r,n)=>n.thread?.approvals?.length===1)
+const autoSession=state.node.nativeSession.sessionId,autoCwd=state.node.thread.approvals[0].cwd
+assert.equal((await api('settings/save',{autoAllowDangerFullAccess:true})).autoAllowDangerFullAccess,true)
+state=await wait(run.requestId,r=>r.status==='execution_succeeded')
+assert.equal(readFileSync(join(autoCwd,'allow.txt'),'utf8'),'APPROVAL_TEST_ONLY\n');assert.equal(readFileSync(join(autoCwd,'deny.txt'),'utf8'),'APPROVAL_TEST_ONLY\n')
+assert.equal(state.node.entries.filter(entry=>entry.decisionSource==='project-settings').length,2,'pending and subsequent requests both follow the saved preference')
+const autoAudit=readFileSync(join(root,'test-approval-audit.jsonl'),'utf8').trim().split('\n').map(line=>JSON.parse(line)).filter(row=>row.sessionId===autoSession).map(row=>row.event)
+assert.deepEqual(autoAudit.filter(event=>event.type==='approval/decided').map(event=>event.data.outcome),['allowed-once','allowed-once'])
+const autoRun=run.requestId
+await api('settings/save',{autoAllowDangerFullAccess:false});run=await start();state=await wait(run.requestId,(_r,n)=>n.thread?.approvals?.length===1)
+await api('runs/cancel',{requestId:run.requestId});assert.equal((await api('settings/get')).autoAllowDangerFullAccess,false)
+assert.equal(git('status','--porcelain'),'')
+const report={date:new Date().toISOString(),platform:process.platform,externalModelCalls:0,completedRequestId:completed,cancelledRequestId:cancelled,autoApprovedRequestId:autoRun,checks:['native approval/asked + approval/decided retained','native tool approvals visible in project mode','waiting beyond timeout keeps node alive across consecutive requests','only explicitly granted write executes; rejection and cancellation keep files unchanged','stale and late permission decisions rejected; original source remains clean','saved full-access preference releases pending and subsequent native calls, with native audit and source label','disabling restores manual approval']}
 writeFileSync(join(root,'approval-report.json'),JSON.stringify(report,null,2));console.log(JSON.stringify(report,null,2))
